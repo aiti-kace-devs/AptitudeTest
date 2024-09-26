@@ -183,6 +183,7 @@ class AdminController extends Controller
         $exam->title = $request->title;
         $exam->exam_date = $request->exam_date;
         $exam->category = $request->exam_category;
+        $exam->passmark = $request->passmark;
         $exam->exam_duration = $request->exam_duration;
 
         $exam->update();
@@ -196,10 +197,11 @@ class AdminController extends Controller
     //Manage students
     public function manage_students(){
 
+        $data['exam'] = Oex_exam_master::where('id', '1')->get()->first();
 
         $data['exams']=Oex_exam_master::where('status','1')->get()->toArray();
 
-        $data['students'] = user_exam::select(['user_exams.*','users.name','oex_exam_masters.title as ex_name','oex_exam_masters.exam_date', 'oex_results.yes_ans'])
+        $data['students'] = user_exam::select(['user_exams.*','users.name','oex_exam_masters.title as ex_name','oex_exam_masters.exam_date','oex_exam_masters.passmark', 'oex_results.yes_ans'])
             ->join('users','users.id','=','user_exams.user_id')
             ->join('oex_exam_masters','user_exams.exam_id','=','oex_exam_masters.id')->orderBy('user_exams.exam_id','desc')
             ->leftJoin('oex_results', 'user_exams.id', '=', 'oex_results.exam_id')

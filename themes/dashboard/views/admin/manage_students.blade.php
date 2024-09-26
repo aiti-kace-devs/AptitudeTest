@@ -68,10 +68,10 @@
 
                                   </td>
                                   <td>
-                                    @if ($std['yes_ans'] >= 1)
-                                        <span class="btn btn-info btn-sm">PASS</span>
+                                    @if ($std['yes_ans'] >= $std['passmark'])
+                                        <span class="btn btn-success btn-sm">PASS</span>
                                     @else
-                                        <span class="btn btn-info btn-sm">FAIL</span>
+                                        <span class="btn btn-danger btn-sm">FAIL</span>
                                     @endif
                                     {{-- <input type="checkbox" class="student_status" data-id="{{ $std['id']}}" <?php if($std['std_status']==1){ echo "checked";} ?> name="status"> --}}
                                   </td>
