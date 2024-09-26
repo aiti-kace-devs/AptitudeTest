@@ -87,18 +87,8 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
         Route::get('/view_answer/{id}',[StudentOperation::class,'view_answer']);
 
 
-    Route::middleware(['auth:web'])->group(function () {
-        Route::get('/dashboard', [StudentOperation::class, 'dashboard']);
 
-        Route::get('/exam', [StudentOperation::class, 'exam']);
-        Route::get('/join_exam/{id}', [StudentOperation::class, 'join_exam']);
-        Route::post('/submit_questions', [StudentOperation::class, 'submit_questions']);
-        Route::get('/show_result/{id}', [StudentOperation::class, 'show_result']);
-        Route::get('/apply_exam/{id}', [StudentOperation::class, 'apply_exam']);
-        Route::get('/view_result/{id}', [StudentOperation::class, 'view_result']);
-        Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
-        Route::post('/start-exam/{id}', [StudentOperation::class, 'start_exam']);
-        Route::get('/logout', [AuthenticatedSessionController::class, 'destroy']);
+        Route::get('/logout',[AuthenticatedSessionController::class,'destroy']);
     });
 
 
