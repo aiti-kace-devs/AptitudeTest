@@ -17,10 +17,17 @@ class StudentOperation extends Controller
     //student dashboard
     public function dashboard()
     {
-
-        $data['portal_exams'] = Oex_exam_master::select(['oex_exam_masters.*', 'oex_categories.name as cat_name'])
+        $data['portal_exams'] = user_exam::select(['user_exams.*', 'users.name', 'oex_exam_masters.*', 'oex_categories.name as category_name'])
+            ->join('users', 'users.id', '=', 'user_exams.user_id')
+            ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')->orderBy('user_exams.exam_id', 'desc')
             ->join('oex_categories', 'oex_exam_masters.category', '=', 'oex_categories.id')
-            ->orderBy('id', 'desc')->where('oex_exam_masters.status', '1')->get()->toArray();
+            ->where('user_exams.user_id', Session::get('id'))
+            ->where('user_exams.std_status', '1')
+            ->get()->toArray();
+
+        // $data['portal_exams'] = Oex_exam_master::select(['oex_exam_masters.*', 'oex_categories.name as cat_name'])
+        //     ->join('oex_categories', 'oex_exam_masters.category', '=', 'oex_categories.id')
+        //     ->orderBy('id', 'desc')->where('oex_exam_masters.status', '1')->get()->toArray();
         return view('student.dashboard', $data);
     }
 
