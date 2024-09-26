@@ -29,7 +29,7 @@
               <div class="card">
                 <div class="card-header">
                   <h3 class="card-title">Title</h3>
-  
+
                   <div class="card-tools">
                         <a class="btn btn-info btn-sm" href="javascript:;" data-toggle="modal" data-target="#myModal">Add new</a>
                   </div>
@@ -57,17 +57,24 @@
                                   <td>{{ $std['ex_name']}}</td>
                                   <td>{{ $std['exam_date']}}</td>
                                   <td>
-                                    <?php 
+                                    <?php
                                     if($std['exam_joined']==1){
                                     ?>
                                           <a href="{{url('admin/admin_view_result/'.$std['id'])}}" class="btn btn-info btn-sm">View result</a>
-                                    <?php    
+                                    <?php
                                     }
                                     ?>
 
 
                                   </td>
-                                  <td><input type="checkbox" class="student_status" data-id="{{ $std['id']}}" <?php if($std['std_status']==1){ echo "checked";} ?> name="status"></td>
+                                  <td>
+                                    @if ($std['yes_ans'] >= 1)
+                                        <span class="btn btn-info btn-sm">PASS</span>
+                                    @else
+                                        <span class="btn btn-info btn-sm">FAIL</span>
+                                    @endif
+                                    {{-- <input type="checkbox" class="student_status" data-id="{{ $std['id']}}" <?php if($std['std_status']==1){ echo "checked";} ?> name="status"> --}}
+                                  </td>
                                   <td>
                                       {{-- <a href="{{url('admin/edit_students/'.$std['id'])}}" class="btn btn-primary">Edit</a> --}}
                                       <a href="{{url('admin/delete_students/'.$std['id'])}}" class="btn btn-danger btn-sm">Delete</a>
@@ -76,7 +83,7 @@
                           @endforeach
                         </tbody>
                         <tfoot>
-                            
+
                         </tfoot>
                     </table>
                 </div>
@@ -93,7 +100,7 @@
     <!-- Modal -->
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
-    
+
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
@@ -101,7 +108,7 @@
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body">
-          <form action="{{ url('admin/add_new_students')}}" class="database_operation">  
+          <form action="{{ url('admin/add_new_students')}}" class="database_operation">
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="form-group">
@@ -155,10 +162,10 @@
                 </div>
             </form>
       </div>
-      
+
     </div>
-    </div>	
+    </div>
 
 
- 
+
 @endsection

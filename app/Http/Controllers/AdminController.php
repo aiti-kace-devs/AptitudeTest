@@ -38,8 +38,8 @@ class AdminController extends Controller
 
     //Adding new exam categories
     public function add_new_category(Request $request){
-            
-        $validator = Validator::make($request->all(), [ 
+
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
         ]);
 
@@ -47,7 +47,7 @@ class AdminController extends Controller
             $arr=array('status'=>'false','message'=>$validator->errors()->all());
         }
         else{
-            
+
             $cat = new Oex_category();
             $cat->name = $request->name;
             $cat->status = 1;
@@ -95,7 +95,7 @@ class AdminController extends Controller
             $status=0;
         else
             $status=1;
-        
+
         $cat1 = Oex_category::where('id',$id)->get()->first();
         $cat1->status=$status;
         $cat1->update();
@@ -115,19 +115,20 @@ class AdminController extends Controller
 
     //Adding new exam page
     public function add_new_exam(Request $request){
-            $validator = Validator::make($request->all(),['title'=>'required','exam_date'=>'required','exam_category'=>'required',
+            $validator = Validator::make($request->all(),['title'=>'required','exam_date'=>'required','exam_category'=>'required', 'passmark'=>'required',
             'exam_duration'=>'required']);
 
             if($validator->fails()){
                 $arr=array('status'=>'false','message'=>$validator->errors()->all());
             }
             else{
-                
+
                 $exam = new Oex_exam_master();
                 $exam->title = $request->title;
                 $exam->exam_date = $request->exam_date;
                 $exam->exam_duration = $request->exam_duration;
                 $exam->category = $request->exam_category;
+                $exam->passmark = $request->passmark;
                 $exam->status = 1;
                 $exam->save();
 
@@ -149,7 +150,7 @@ class AdminController extends Controller
             $status=0;
         else
             $status=1;
-        
+
         $exam1 = Oex_exam_master::where('id',$id)->get()->first();
         $exam1->status=$status;
         $exam1->update();
@@ -195,10 +196,13 @@ class AdminController extends Controller
     //Manage students
     public function manage_students(){
 
+
         $data['exams']=Oex_exam_master::where('status','1')->get()->toArray();
-        $data['students'] = user_exam::select(['user_exams.*','users.name','oex_exam_masters.title as ex_name','oex_exam_masters.exam_date'])
+
+        $data['students'] = user_exam::select(['user_exams.*','users.name','oex_exam_masters.title as ex_name','oex_exam_masters.exam_date', 'oex_results.yes_ans'])
             ->join('users','users.id','=','user_exams.user_id')
             ->join('oex_exam_masters','user_exams.exam_id','=','oex_exam_masters.id')->orderBy('user_exams.exam_id','desc')
+            ->leftJoin('oex_results', 'user_exams.id', '=', 'oex_results.exam_id')
             ->get()->toArray();
         return view('admin.manage_students',$data);
     }
@@ -248,7 +252,7 @@ class AdminController extends Controller
             $status=0;
         else
             $status=1;
-        
+
         $std1 = user_exam::where('id',$id)->get()->first();
         $std1->std_status=$status;
         $std1->update();
@@ -299,10 +303,10 @@ class AdminController extends Controller
         $std = User::where('id',$id)->get()->first();
         $std->delete();
         return redirect('admin/registered_students');
-        
+
     }
 
-    
+
 
 
     //addning questions
@@ -329,7 +333,7 @@ class AdminController extends Controller
             $arr = array('status'=>'flase','message'=>$validator->errors()->all());
 
         }else{
-           
+
             $q = new Oex_question_master();
             $q->exam_id=$request->exam_id;
             $q->questions=$request->question;
@@ -343,7 +347,7 @@ class AdminController extends Controller
             }else{
                 $q->ans=$request->option_4;
             }
-            
+
 
 
             $q->status=1;
@@ -367,7 +371,7 @@ class AdminController extends Controller
             $status=0;
         else
             $status=1;
-        
+
         $p1 = Oex_question_master::where('id',$id)->get()->first();
         $p1->status=$status;
         $p1->update();
@@ -413,7 +417,7 @@ class AdminController extends Controller
         }
 
         $q->options = json_encode(array('option1'=>$request->option_1,'option2'=>$request->option_2,'option3'=>$request->option_3,'option4'=>$request->option_4));
-        
+
         $q->update();
 
         echo json_encode(array('status'=>'true','message'=>'successfully updated','reload'=>url('admin/add_questions/'.$q->exam_id)));
@@ -422,9 +426,9 @@ class AdminController extends Controller
 
 
     public function admin_view_result($id){
-        
+
         $std_exam = user_exam::where('id',$id)->get()->first();
-        
+
         $data['student_info'] = User::where('id',$std_exam->user_id)->get()->first();
 
         $data['exam_info'] = Oex_exam_master::where('id',$std_exam->exam_id)->get()->first();

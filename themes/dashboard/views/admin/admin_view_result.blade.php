@@ -30,9 +30,15 @@
                 <!-- Default box -->
                 <!-- /.card -->
                 <div class="card mt-4">
-                    
+
                     <div class="card-body">
                         <h2>Student information</h2>
+                        {{-- @if ($result_info->yes_ans >= 1)
+                            <span>PASS</span>
+                        @else
+                            <span>FAIL</span>
+                        @endif --}}
+
                         <table class="table">
                             <tr>
                                 <td>Name : </td>
@@ -83,5 +89,5 @@
     <!-- Modal -->
 
 
- 
+
 @endsection

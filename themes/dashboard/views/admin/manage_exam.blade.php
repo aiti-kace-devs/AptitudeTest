@@ -29,7 +29,7 @@
               <div class="card">
                 <div class="card-header">
                   <h3 class="card-title">Title</h3>
-  
+
                   <div class="card-tools">
                         <a class="btn btn-info btn-sm" href="javascript:;" data-toggle="modal" data-target="#myModal">Add new</a>
                   </div>
@@ -41,6 +41,7 @@
                                 <th>#</th>
                                 <th>Title</th>
                                 <th>Category</th>
+                                <th>Passmark</th>
                                 <th>Exam Date</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -52,6 +53,7 @@
                                    <td>{{ $key+1}}</td>
                                    <td>{{ $exam['title']}}</td>
                                    <td>{{ $exam['cat_name']}}</td>
+                                   <td>{{ $exam['passmark'] }}</td>
                                    <td>{{ $exam['exam_date']}}</td>
                                    <td><input type="checkbox" class="exam_status" data-id="{{ $exam['id']}}" <?php if($exam['status']==1){ echo "checked";} ?> name="status"></td>
                                    <td>
@@ -63,7 +65,7 @@
                            @endforeach
                         </tbody>
                         <tfoot>
-                            
+
                         </tfoot>
                     </table>
                 </div>
@@ -80,7 +82,7 @@
     <!-- Modal -->
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
-    
+
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
@@ -88,7 +90,7 @@
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body">
-          <form action="{{ url('/admin/add_new_exam')}}" class="database_operation">  
+          <form action="{{ url('/admin/add_new_exam')}}" class="database_operation">
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="form-group">
@@ -109,6 +111,12 @@
                           <input type="text" required="required" name="exam_duration"  class="form-control">
                       </div>
                   </div>
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="">Enter Passmark</label>
+                        <input type="text" required="required" name="passmark"  class="form-control">
+                    </div>
+                </div>
                     <div class="col-sm-12">
                         <div class="form-group">
                             <label for="">Select category</label>
@@ -128,10 +136,10 @@
                 </div>
             </form>
       </div>
-      
+
     </div>
-    </div>	
+    </div>
 
 
- 
+
 @endsection
