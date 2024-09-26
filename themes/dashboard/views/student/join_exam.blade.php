@@ -40,12 +40,13 @@
                                             <h3 class="text-center">Time : {{ $exam->exam_duration }} min</h3>
                                         </div>
                                         <div class="col-sm-4">
-                                            <h3><b>Timer</b> : <span class="js-timeout"
-                                                    id="timer">{{ $exam['exam_duration'] }}:00</span></h3>
+                                            <h3><b>Time Left</b> : <span
+                                                    id="timer">{{ $exam['exam_duration'] - $usedTime }}:00</span>
+                                            </h3>
                                         </div>
 
                                         <div class="col-sm-4">
-                                            <h3 class="text-right"><b>Status</b> :Running</h3>
+                                            <h3 class="text-right text-success"><b>Status</b> :Running</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -117,7 +118,51 @@
     @push('scripts')
         <script>
             var warn = 0;
-            window['warnCount'] = warn;
+
+            const startTest = () => {
+                const timer = document.getElementById('timer');
+                $(timer).addClass('js-timeout');
+                openFullscreen();
+            }
+
+            const showWarning = (e) => {
+
+                if (warn === 4) {
+                    Swal.fire({
+                        title: 'Violation!',
+                        text: `Test submitted due to repeated violations`,
+                        icon: 'error',
+                        backdrop: `rgba(0,0,0,0.95)`,
+                        confirmButtonText: 'Okay',
+                        allowOutsideClick: false,
+                        position: 'center',
+                        timer: 5000
+                    });
+                    const form = $('[name="examination_form"]');
+                    setTimeout(() => {
+                        form.submit();
+                    }, 5000);
+                } else {
+
+                    Swal.fire({
+                        title: 'Violation!',
+                        text: `You are in violation of exam rules. Please DO NOT exit fullscreen or changed tabs.
+                        Your test may be automatically submitted if you keep on violating the rules. Warning Count: ${warn}`,
+                        icon: 'error',
+                        backdrop: `rgba(0,0,0,0.95)`,
+                        confirmButtonText: 'Okay',
+                        preConfirm: () => {
+                            openFullscreen();
+                        },
+                        allowOutsideClick: false
+                    })
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+
+
+            }
+
             const openFullscreen = () => {
 
                 // const elem = document.documentElement;
@@ -140,56 +185,58 @@
 
             // document
             const handleVisibilityChange = async (e) => {
-                e.stopImmediatePropagation();
-
-                warn++;
-                //    await checkWarningCount()
-                //   if (document.hidden) {
-                //     setShowTabWarning(true)
-                //     setWarningCount((prev) => prev + 1)
-                //   }
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Visibility Changed',
-                    icon: 'error',
-                    confirmButtonText: 'Cool'
-                })
-                e.preventDefault();
+                if (document.hidden) {
+                    warn++;
+                }
+                showWarning(e);
             }
 
             const handleFullscreenChange = async (e) => {
                 //    await checkWarningCount()
-                //   if (!document.fullscreenElement) {
-                //     setIsFullscreen(false)
-                //     setShowFullscreenWarning(true)
-                //     setWarningCount((prev) => prev + 1)
-                //   } else {
-                //     setIsFullscreen(true)
-                //   }
-                // e.stopImmediatePropagation();
-                warn++;
-                // e.preventDefault();
-                alert('fullscreen changed')
-
-            }
-
-
-            const checkWarningCount = () => {
-                if (window['warnCount'] === 3) {
-                    alert('submitting the form')
+                if (!document.fullscreenElement) {
+                    warn++;
                 }
+                showWarning(e);
             }
+
+
 
             document.addEventListener('visibilitychange', handleVisibilityChange)
-            // document.addEventListener('fullscreenchange', handleFullscreenChange)
-            // document.addEventListener('warningEncountered', checkWarningCount)
+            document.addEventListener('fullscreenchange', handleFullscreenChange)
 
             Swal.fire({
-                title: 'Error!',
+                title: 'Welcome',
                 text: 'Do you want to continue',
                 icon: 'info',
-                confirmButtonText: 'Cool',
-                backdrop: `rgba(0,0,123,0.4)`
+                confirmButtonText: 'START',
+                backdrop: `rgba(0,0,0,0.8)`,
+                allowOutsideClick: false,
+                preConfirm: async () => {
+                    try {
+                        const url = `/student/start-exam/{{ $exam->id }}`;
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            body: JSON.stringify({
+                                exam_id: '{{ $exam->id }}'
+                            })
+                        });
+                        if (!response.ok) {
+                            return Swal.showValidationMessage(`
+                            ${JSON.stringify(await response.json())}
+                            `);
+                        }
+                        startTest();
+                        Swal.close();
+
+                    } catch (error) {
+                        Swal.showValidationMessage(`
+                            Request failed: ${error}
+                        `);
+                    }
+                },
             })
         </script>
     @endpush

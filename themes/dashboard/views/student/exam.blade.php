@@ -60,44 +60,25 @@
                                                     }
                                                     ?></td>
                                                     <td>
-                                                        <?php
-                                    if($std_info['exam_joined']==1){
-                                ?>
-                                                        <a href="{{ url('student/view_result/' . $std_info['exam_id']) }}"
-                                                            class="btn btn-info btn-sm">View Result</a>
-                                                        <?php
-                                    }
-                                ?>
+
+                                                        @if ($std_info['submitted'] != null)
+                                                            <a href="{{ url('student/view_result/' . $std_info['exam_id']) }}"
+                                                                class="btn btn-info btn-sm">View Result</a>
+                                                        @endif
                                                     </td>
 
 
                                                     <td>
-                                                        <a href="{{ url('student/join_exam/' . $std_info['exam_id']) }}"
-                                                            class="btn btn-primary btn-sm" data-widget="fullscreen">Join
-                                                            Exam</a>
+                                                        @if (strtotime($std_info['exam_date']) == strtotime(date('Y-m-d')))
+                                                            @if ($std_info['exam_joined'] == 0)
+                                                                <a href="{{ url('student/join_exam/' . $std_info['exam_id']) }}"
+                                                                    class="btn btn-primary btn-sm">Join Exam</a>
+                                                            @else
+                                                                <a href="{{ url('student/view_answer/' . $std_info['exam_id']) }}"
+                                                                    class="btn btn-primary btn-sm">View Answers</a>
+                                                            @endif
+                                                        @endif
 
-                                                        <?php
-                                  if(strtotime($std_info['exam_date']) == strtotime(date('Y-m-d'))){
-                                    if($std_info['exam_joined']==0){
-
-                                  ?>
-                                                        <a href="{{ url('student/join_exam/' . $std_info['exam_id']) }}"
-                                                            class="btn btn-primary btn-sm">Join Exam</a>
-
-                                                        <?php
-                                      } else{
-                                  ?>
-                                                        <a href="{{ url('student/view_answer/' . $std_info['exam_id']) }}"
-                                                            class="btn btn-primary btn-sm">View Answers</a>
-
-
-                                                        <?php
-                                      }
-
-
-
-                                    }
-                                  ?>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -118,25 +99,4 @@
         <!-- /.content-header -->
 
         <!-- Modal -->
-
-        <script>
-            const openFullscreen = () => {
-                setTimeout(() => {
-                    var elem = document.documentElement;
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                    } else if (elem.webkitRequestFullscreen) {
-                        /* Safari */
-                        elem.webkitRequestFullscreen();
-                    } else if (elem.msRequestFullscreen) {
-                        /* IE11 */
-                        elem.msRequestFullscreen();
-                    }
-                    console.log('opened fs')
-                    console.log(elem)
-                }, 3000);
-
-            }
-        </script>
-
     @endsection

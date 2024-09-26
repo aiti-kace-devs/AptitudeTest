@@ -6,6 +6,7 @@
         BASE_URL = "<?php echo url(''); ?>"
     </script>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title> @yield('title')</title>
 
@@ -224,9 +225,28 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('.datatable').dataTable();
+            document.addEventListener('contextmenu', function(ev) {
+                ev.preventDefault();
+                return false;
+            }, false);
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const flashMessage = "{{ session('flash') }}";
+        const key = "{{ session('key') }}";
+
+        if (flashMessage) {
+            setTimeout(() => {
+                Swal.fire({
+                    text: flashMessage,
+                    icon: key || 'info'
+                })
+            }, 500);
+        }
+    </script>
+
+
     @stack('scripts')
 </body>
 
