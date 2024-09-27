@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserRegistered;
 use Illuminate\Http\Request;
 use App\Models\Oex_category;
 use App\Models\Oex_exam_master;
@@ -15,6 +16,9 @@ use Illuminate\Support\Facades\Session;
 use App\Models\user_exam;
 use App\Models\Admin;
 use App\Models\Oex_result;
+use App\Mail\ExamLoginCredentials;
+use Illuminate\Support\Facades\Mail;
+
 
 class AdminController extends Controller
 {
@@ -247,7 +251,7 @@ class AdminController extends Controller
             $std->email = $request->email;
             $std->mobile_no = $request->mobile_no;
             $std->exam = $request->exam;
-            $std->password = Hash::make($request->password);
+            $std->password = $request->password;
 
             $std->status = 1;
 
@@ -260,9 +264,11 @@ class AdminController extends Controller
                 'exam_joined' => 0,
             ]);
 
-            $arr = array('status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students'));
-        }
+            Mail::to($std->email)->send(new ExamLoginCredentials($std));
 
+            $arr = array('status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students'));
+
+        }
         echo json_encode($arr);
     }
 
