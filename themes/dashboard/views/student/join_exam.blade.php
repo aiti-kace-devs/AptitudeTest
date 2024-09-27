@@ -7,6 +7,22 @@
             height: 40px;
             line-height: 40px;
         }
+
+        *:fullscreen {
+            overflow: scroll !important;
+        }
+
+        *:-ms-fullscreen {
+            overflow: scroll !important;
+        }
+
+        *:-webkit-full-screen {
+            overflow: scroll !important;
+        }
+
+        *:-moz-full-screen {
+            overflow: scroll !important;
+        }
     </style>
     <!-- /.content-header -->
     <!-- Content Wrapper. Contains page content -->
@@ -53,7 +69,7 @@
                                 <!-- /.card-body -->
                             </div>
                             <!-- /.card -->
-                            <div class="card mt-4">
+                            <div class="card mt-4 w-100" style="height: calc(90vh)">
 
                                 <div class="card-body">
 
@@ -62,39 +78,47 @@
                                         <input type="hidden" name="exam_id" value="{{ Request::segment(3) }}">
                                         {{ csrf_field() }}
                                         <div class="row">
+                                            <div class="card mt-4 w-100">
 
-                                            @foreach ($question as $key => $q)
-                                                <div class="col-sm-12 mt-4">
-                                                    <p>{{ $key + 1 }}. {{ $q->questions }}</p>
-                                                    <?php
-                                                    $options = json_decode(json_decode(json_encode($q->options)), true);
-                                                    ?>
-                                                    <input type="hidden" name="question{{ $key + 1 }}"
-                                                        value="{{ $q['id'] }}">
-                                                    <ul class="question_options">
-                                                        <li><input type="radio" value="{{ $options['option1'] }}"
-                                                                name="ans{{ $key + 1 }}"> {{ $options['option1'] }}
-                                                        </li>
-                                                        <li><input type="radio" value="{{ $options['option2'] }}"
-                                                                name="ans{{ $key + 1 }}"> {{ $options['option2'] }}
-                                                        </li>
-                                                        <li><input type="radio" value="{{ $options['option3'] }}"
-                                                                name="ans{{ $key + 1 }}"> {{ $options['option3'] }}
-                                                        </li>
-                                                        <li><input type="radio" value="{{ $options['option4'] }}"
-                                                                name="ans{{ $key + 1 }}"> {{ $options['option4'] }}
-                                                        </li>
+                                                <div class="card-body">
+                                                    @foreach ($question as $key => $q)
+                                                        <div class="col-sm-12 mt-4 border border-dark">
+                                                            <p>{{ $key + 1 }}. {{ $q->questions }}</p>
+                                                            <?php
+                                                            $options = json_decode(json_decode(json_encode($q->options)), true);
+                                                            ?>
+                                                            <input type="hidden" name="question{{ $key + 1 }}"
+                                                                value="{{ $q['id'] }}">
+                                                            <ul class="question_options">
+                                                                <li><input type="radio" value="{{ $options['option1'] }}"
+                                                                        name="ans{{ $key + 1 }}">
+                                                                    {{ $options['option1'] }}
+                                                                </li>
+                                                                <li><input type="radio" value="{{ $options['option2'] }}"
+                                                                        name="ans{{ $key + 1 }}">
+                                                                    {{ $options['option2'] }}
+                                                                </li>
+                                                                <li><input type="radio" value="{{ $options['option3'] }}"
+                                                                        name="ans{{ $key + 1 }}">
+                                                                    {{ $options['option3'] }}
+                                                                </li>
+                                                                <li><input type="radio" value="{{ $options['option4'] }}"
+                                                                        name="ans{{ $key + 1 }}">
+                                                                    {{ $options['option4'] }}
+                                                                </li>
 
-                                                        <li style="display: none;"><input value="0" type="radio"
-                                                                checked="checked" name="ans{{ $key + 1 }}">
-                                                            {{ $options['option4'] }}</li>
-                                                    </ul>
+                                                                <li style="display: none;"><input value="0"
+                                                                        type="radio" checked="checked"
+                                                                        name="ans{{ $key + 1 }}">
+                                                                    {{ $options['option4'] }}</li>
+                                                            </ul>
+                                                        </div>
+                                                    @endforeach
+
                                                 </div>
-                                            @endforeach
+                                            </div>
 
-
-
-                                            <div class="col-sm-12">
+                                            <div class="col-sm-12 ">
                                                 <input type="hidden" name="index" value="{{ $key + 1 }}">
                                                 <button type="submit" class="btn btn-primary"
                                                     id="myCheck">Submit</button>
@@ -120,13 +144,15 @@
             var warn = 0;
 
             const startTest = () => {
+                document.addEventListener('visibilitychange', handleVisibilityChange)
+                document.addEventListener('fullscreenchange', handleFullscreenChange)
                 const timer = document.getElementById('timer');
                 $(timer).addClass('js-timeout');
                 openFullscreen();
             }
 
             const showWarning = (e) => {
-
+                const form = $('[name="examination_form"]');
                 if (warn === 4) {
                     Swal.fire({
                         title: 'Violation!',
@@ -136,12 +162,12 @@
                         confirmButtonText: 'Okay',
                         allowOutsideClick: false,
                         position: 'center',
-                        timer: 5000
+                        timer: 5000,
+                        target: document.querySelector('div.content-wrapper > div > section.content')
                     });
-                    const form = $('[name="examination_form"]');
                     setTimeout(() => {
                         form.submit();
-                    }, 5000);
+                    }, 3000);
                 } else {
 
                     Swal.fire({
@@ -154,7 +180,8 @@
                         preConfirm: () => {
                             openFullscreen();
                         },
-                        allowOutsideClick: false
+                        allowOutsideClick: false,
+                        target: document.querySelector('div.content-wrapper > div > section.content')
                     })
                     e.preventDefault();
                     e.stopImmediatePropagation();
@@ -178,35 +205,35 @@
                     /* IE11 */
                     elem.msRequestFullscreen();
                 }
-                console.log('opened fs')
-                console.log(elem)
-
             }
 
             // document
             const handleVisibilityChange = async (e) => {
                 if (document.hidden) {
                     warn++;
+                    showWarning(e);
                 }
-                showWarning(e);
             }
 
             const handleFullscreenChange = async (e) => {
                 //    await checkWarningCount()
                 if (!document.fullscreenElement) {
                     warn++;
+                    showWarning(e);
                 }
-                showWarning(e);
             }
-
-
-
-            document.addEventListener('visibilitychange', handleVisibilityChange)
-            document.addEventListener('fullscreenchange', handleFullscreenChange)
 
             Swal.fire({
                 title: 'Welcome',
-                text: 'Do you want to continue',
+                html: `
+                <ol>
+                    <li>Make sure you answer all questions</li>
+                    <li>Donot exit fullscreen</li>
+                    <li>Do not switch tabs</li>
+                    <li>You'll be warned when you violate the rules</li>
+                    <li>Your test may be terminated if you keep on violating rules</li>
+                </ol>
+                `,
                 icon: 'info',
                 confirmButtonText: 'START',
                 backdrop: `rgba(0,0,0,0.8)`,

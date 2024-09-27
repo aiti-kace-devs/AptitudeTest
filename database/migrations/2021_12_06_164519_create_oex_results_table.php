@@ -19,7 +19,7 @@ class CreateOexResultsTable extends Migration
             $table->string('user_id');
             $table->string('yes_ans');
             $table->string('no_ans');
-            $table->string('result_json');
+            $table->longText('result_json');
             $table->timestamps();
         });
     }

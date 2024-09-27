@@ -18,6 +18,7 @@ class StudentOperation extends Controller
     public function dashboard()
     {
         $data['portal_exams'] = user_exam::select(['user_exams.*', 'users.name', 'oex_exam_masters.*', 'oex_categories.name as category_name'])
+            ->selectRaw('(SELECT count(id) from oex_question_masters where exam_id = oex_exam_masters.id) as question_count', [])
             ->join('users', 'users.id', '=', 'user_exams.user_id')
             ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')->orderBy('user_exams.exam_id', 'desc')
             ->join('oex_categories', 'oex_exam_masters.category', '=', 'oex_categories.id')
@@ -52,7 +53,7 @@ class StudentOperation extends Controller
     public function join_exam($id)
     {
 
-        $question = Oex_question_master::where('exam_id', $id)->get();
+        $question = Oex_question_master::where('exam_id', $id)->inRandomOrder()->get();
         $user_exam = user_exam::where('exam_id', $id)->where('user_id', Session::get('id'))->get()->first();
         if ($user_exam && $user_exam->submitted) {
             return redirect(url('student/exam'))->with([
@@ -74,6 +75,7 @@ class StudentOperation extends Controller
                 'key' => 'error',
             ]);
         }
+        // dd($question->pluck("id"));
         return view('student.join_exam', ['question' => $question, 'exam' => $exam, 'usedTime' => $usedTime]);
     }
 

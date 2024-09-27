@@ -52,7 +52,9 @@
                                     <p>{{ $exam['category_name'] }}</p>
                                     <p>Exam date : {{ $exam['exam_date'] }}</p>
                                     <p>Duration : {{ $exam['exam_duration'] }} mins</p>
-                                    <p>Pass Mark : {{ $exam['exam_duration'] }} mins</p>
+                                    <p>Pass Mark : {{ $exam['passmark'] }}</p>
+                                    <p>Total Questions : {{ $exam['question_count'] }}</p>
+
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-bag"></i>
