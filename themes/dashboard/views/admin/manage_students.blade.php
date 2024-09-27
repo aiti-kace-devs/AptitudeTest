@@ -45,7 +45,7 @@
                                                 <th>Exam</th>
                                                 <th>Exam Date</th>
                                                 <th>Result</th>
-                                                <th>status</th>
+                                                <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -54,16 +54,18 @@
                                                 <tr>
                                                     <td>{{ $key + 1 }}</td>
                                                     <td>{{ $std['name'] }}</td>
-                                                    {{-- <td>{{ $std['dob']}}</td> --}}
                                                     <td>{{ $std['ex_name'] }}</td>
                                                     <td>{{ $std['exam_date'] }}</td>
                                                     <td>
+
                                                         @if ($std['submitted'] == null)
                                                             <span class="badge badge-secondary">N/A</span>
                                                         @else
-                                                           <span class="badge badge-warning">{{ round(($std['yes_ans'] / 30) * 100) }}%</span>
-                                                    </td>
-                                            @endif
+                                                           {{-- <span class="badge badge-warning">{{ round(($std['yes_ans'] / 2) * 100) }}%</span> --}}
+                                                           <span class="badge badge-warning">{{ $std['yes_ans']}}</span>
+                                                        @endif
+
+                                                        </td>
                                             <td>
                                                 @if ($std['submitted'] == null)
                                                     <span class="badge badge-primary">Not Taken</span>
