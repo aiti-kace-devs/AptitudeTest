@@ -58,32 +58,36 @@
                                                     <td>{{ $std['ex_name'] }}</td>
                                                     <td>{{ $std['exam_date'] }}</td>
                                                     <td>
+                                                        @if ($std['submitted'] == null)
+                                                            <span class="badge badge-secondary">N/A</span>
+                                                        @else
+                                                           <span class="badge badge-warning">{{ round(($std['yes_ans'] / 30) * 100) }}%</span>
+                                                    </td>
+                                            @endif
+                                            <td>
+                                                @if ($std['submitted'] == null)
+                                                    <span class="badge badge-primary">Not Taken</span>
+                                                @elseif($std['yes_ans'] >= $std['passmark'])
+                                                    <span class="badge badge-success">PASS</span>
+                                                @else
+                                                    <span class="badge badge-danger">FAIL</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{-- <a href="{{url('admin/edit_students/'.$std['id'])}}" class="btn btn-primary">Edit</a> --}}
+                                                <a href="{{ url('admin/delete_students/' . $std['id']) }}"
+                                                    class="btn btn-danger btn-sm">Delete</a>
                                                         <?php
                                     if($std['exam_joined']==1){
                                     ?>
                                                         <a href="{{ url('admin/admin_view_result/' . $std['id']) }}"
-                                                            class="btn btn-info btn-sm">View result</a>
+                                                            class="btn btn-success btn-sm">View Result</a>
                                                         <?php
                                     }
                                     ?>
 
-
-                                                    </td>
-                                                    <td>
-                                                        @if ($std['submitted'] == null)
-                                                            <span class="badge badge-primary">Not Taken</span>
-                                                        @elseif($std['yes_ans'] >= $std['passmark'])
-                                                            <span class="badge badge-success">PASS</span>
-                                                        @else
-                                                            <span class="badge badge-danger">FAIL</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{-- <a href="{{url('admin/edit_students/'.$std['id'])}}" class="btn btn-primary">Edit</a> --}}
-                                                        <a href="{{ url('admin/delete_students/' . $std['id']) }}"
-                                                            class="btn btn-danger btn-sm">Delete</a>
-                                                    </td>
-                                                </tr>
+                                            </td>
+                                            </tr>
                                             @endforeach
                                         </tbody>
                                         <tfoot>

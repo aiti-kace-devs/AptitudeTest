@@ -40,13 +40,13 @@
                             if ($val % 2 == 0) {
                                 $cls = 'bg-info';
                             } else {
-                                $cls = 'bg-success';
+                                $cls = 'bg-info';
                             }
                         }
 
                         ?>
-                        <div class="col-lg-4 col-6">
-                            <div class="small-box {{ $cls }}">
+                        {{-- <div class="col-lg-8 col-12 mx-auto">
+                            <div class="small-box {{ $cls }} text-center">
                                 <div class="inner">
                                     <h3>{{ $exam['title'] }}</h3>
                                     <p>{{ $exam['category_name'] }}</p>
@@ -61,12 +61,45 @@
                                 </div>
                                 @if (strtotime(date('Y-m-d')) <= strtotime($exam['exam_date']))
                                     <a href="{{ url('student/join_exam/' . $exam['exam_id']) }}"
-                                        class="small-box-footer">Take Test &nbsp;<i
+                                    class="btn btn-warning mt-3 mb-3">Take Test &nbsp;<i
                                             class="fas fa-arrow-circle-right"></i></a>
                                 @endif
 
                             </div>
+                        </div> --}}
+
+                        <div class="col-lg-8 col-12 mx-auto">
+                            <div class="small-box text-center custom-card p-4">
+                                <div class="inner">
+                                    <!-- Exam Title -->
+                                    <h2 class="exam-title">{{ $exam['title'] }}</h2>
+
+                                    <!-- Exam Category -->
+                                    <p class="exam-category">Category: {{ $exam['category_name'] }}</p>
+
+                                    <!-- Exam Details -->
+                                    <div class="exam-details py-3">
+                                        <p class="exam-detail"><strong>Exam Date:</strong> {{ $exam['exam_date'] }}</p>
+                                        <p class="exam-detail"><strong>Duration:</strong> {{ $exam['exam_duration'] }} mins</p>
+                                        <p class="exam-detail"><strong>Pass Mark:</strong> {{ $exam['passmark'] }}</p>
+                                        <p class="exam-detail"><strong>Total Questions:</strong> {{ $exam['question_count'] }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Icon -->
+                                <div class="icon my-3">
+                                    <i class="ion ion-bag exam-icon"></i>
+                                </div>
+
+                                <!-- Call to Action Button -->
+                                @if (strtotime(date('Y-m-d')) <= strtotime($exam['exam_date']))
+                                    <a href="{{ url('student/join_exam/' . $exam['exam_id']) }}" class="btn custom-btn mt-3">
+                                        Take Test &nbsp;<i class="fas fa-arrow-circle-right"></i>
+                                    </a>
+                                @endif
+                            </div>
                         </div>
+
                     @endforeach
 
                 </div>
