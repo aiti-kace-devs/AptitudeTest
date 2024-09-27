@@ -33,11 +33,6 @@
 
                     <div class="card-body">
                         <h2>Student information</h2>
-                        {{-- @if ($result_info->yes_ans >= 1)
-                            <span>PASS</span>
-                        @else
-                            <span>FAIL</span>
-                        @endif --}}
 
                         <table class="table">
                             <tr>
@@ -61,19 +56,24 @@
                                 <td>{{ $exam_info->exam_date}}</td>
                             </tr>
                         </table>
-                        <h2>Result info</h2>
+                        <br>
+                        <h2>Exam Result</h2>
                         <table class="table">
                             <tr>
-                                <td>Correst ans : </td>
+                                <td>Number of correct answers : </td>
                                 <td>{{ $result_info->yes_ans}}</td>
                             </tr>
                             <tr>
-                                <td>Wrong ans : </td>
+                                <td>Number of wrong answers : </td>
                                 <td>{{ $result_info->no_ans}}</td>
                             </tr>
                             <tr>
-                                <td>Total : </td>
+                                <td>Total marks: </td>
                                 <td>{{ $result_info->yes_ans+$result_info->no_ans}}</td>
+                            </tr>
+                            <tr>
+                                <td>Percentage score :</td>
+                                <td>{{ round(($result_info->yes_ans / 30) * 100) }}%</td>
                             </tr>
                         </table>
                     </div>

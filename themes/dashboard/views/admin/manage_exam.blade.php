@@ -31,7 +31,7 @@
                   <h3 class="card-title">Title</h3>
 
                   <div class="card-tools">
-                        <a class="btn btn-info btn-sm" href="javascript:;" data-toggle="modal" data-target="#myModal">Add new</a>
+                        <a class="btn btn-info btn-sm" href="javascript:;" data-toggle="modal" data-target="#myModal">Add new exam</a>
                   </div>
                 </div>
                 <div class="card-body">
