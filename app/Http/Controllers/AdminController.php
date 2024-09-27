@@ -188,12 +188,6 @@ class AdminController extends Controller
         echo json_encode(['status' => 'true', 'message' => 'Successfully updated', 'reload' => url('admin/manage_exam')]);
     }
 
-    public function calculatePercentage($yes_ans)
-    {
-        $totalQuestions = 30;
-        return round(($yes_ans / $totalQuestions) * 100);
-    }
-
     //Manage students
     public function manage_students()
     {
