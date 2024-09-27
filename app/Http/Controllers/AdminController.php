@@ -246,13 +246,15 @@ class AdminController extends Controller
         if ($validator->fails()) {
             $arr = array('status' => 'false', 'message' => $validator->errors()->all());
         } else {
+
+            $plainPassword = $request->password;
+
             $std = new User();
             $std->name = $request->name;
             $std->email = $request->email;
             $std->mobile_no = $request->mobile_no;
             $std->exam = $request->exam;
-            $std->password = $request->password;
-
+            $std->password = Hash::make($plainPassword);
             $std->status = 1;
 
             $std->save();
@@ -264,7 +266,7 @@ class AdminController extends Controller
                 'exam_joined' => 0,
             ]);
 
-            Mail::to($std->email)->send(new ExamLoginCredentials($std));
+            Mail::to($std->email)->send(new ExamLoginCredentials($std, $plainPassword));
 
             $arr = array('status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students'));
 

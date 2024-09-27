@@ -21,9 +21,10 @@ class ExamLoginCredentials extends Mailable
      *
      * @return void
      */
-    public function __construct(public $std)
+    public function __construct(public $std, public $plainPassword)
     {
         $this->std = $std;
+        $this->plainPassword = $plainPassword;
     }
 
 
@@ -34,13 +35,15 @@ class ExamLoginCredentials extends Mailable
      */
     public function build()
     {
+        $examUrl = url('/login');
 
         return $this->subject('Your Exam Login Credentials')
                 ->markdown('mail.exam_credentials')
                 ->with([
                     'name' => $this->std->name,
                     'email' => $this->std->email,
-                    'password' => $this->std->password,
+                    'password' => $this->plainPassword,
+                    'examUrl' => $examUrl
                 ]);
     }
 }
