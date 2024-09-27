@@ -8,20 +8,29 @@
             line-height: 40px;
         }
 
-        *:fullscreen {
-            overflow: scroll !important;
-        }
+        /* *:fullscreen {
+                                                overflow: scroll !important;
+                                            }
 
-        *:-ms-fullscreen {
-            overflow: scroll !important;
-        }
+                                            *:-ms-fullscreen {
+                                                overflow: scroll !important;
+                                            }
 
-        *:-webkit-full-screen {
-            overflow: scroll !important;
-        }
+                                            *:-webkit-full-screen {
+                                                overflow: scroll !important;
+                                            }
 
-        *:-moz-full-screen {
-            overflow: scroll !important;
+                                            *:-moz-full-screen {
+                                                overflow: scroll !important;
+                                            } */
+
+        #examination_form {
+            height: calc(85vh);
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+            scrollbar-width: 1px;
+            overflow-x: hidden;
+            width: calc(95vw);
         }
     </style>
     <!-- /.content-header -->
@@ -52,16 +61,20 @@
 
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-3">
                                             <h3 class="text-center">Time : {{ $exam->exam_duration }} min</h3>
                                         </div>
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-3">
                                             <h3><b>Time Left</b> : <span
                                                     id="timer">{{ $exam['exam_duration'] - $usedTime }}:00</span>
                                             </h3>
                                         </div>
-
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-3">
+                                            <button class="btn btn-primary btn-lg">
+                                                SUBMIT TEST
+                                            </button>
+                                        </div>
+                                        <div class="col-sm-3">
                                             <h3 class="text-right text-success"><b>Status</b> :Running</h3>
                                         </div>
                                     </div>
@@ -69,12 +82,12 @@
                                 <!-- /.card-body -->
                             </div>
                             <!-- /.card -->
-                            <div class="card mt-4 w-100" style="height: calc(90vh)">
+                            <div class="card mt-4 w-100">
 
                                 <div class="card-body">
 
                                     <form action="{{ url('student/submit_questions') }}" method="POST"
-                                        name="examination_form">
+                                        name="examination_form" id="examination_form">
                                         <input type="hidden" name="exam_id" value="{{ Request::segment(3) }}">
                                         {{ csrf_field() }}
                                         <div class="row">
@@ -223,15 +236,21 @@
                 }
             }
 
+            const handleSubmitTest = () => {
+
+            }
+
             Swal.fire({
-                title: 'Welcome',
+                title: '{{ $exam->title }}',
                 html: `
-                <ol>
+                <ol class="text-left">
                     <li>Make sure you answer all questions</li>
                     <li>Donot exit fullscreen</li>
                     <li>Do not switch tabs</li>
                     <li>You'll be warned when you violate the rules</li>
                     <li>Your test may be terminated if you keep on violating rules</li>
+                    <li>The duration of the test is {{ $exam->duration }} mins from the time you start</li>
+                    <li>Ensure you have good and stable internet</li>
                 </ol>
                 `,
                 icon: 'info',

@@ -1,16 +1,38 @@
+sAlert = (message, options = {}, callbackFn = undefined) => {
+    options['toast'] = typeof options['toast'] === 'undefined' ? true : options['toast'];
+                    Swal.fire({
+                        title: 'Violation!',
+                        text: message,
+                        icon: 'error',
+                        backdrop: options.toast ? false : `rgba(0,0,0,0.95)`,
+                        confirmButtonText: 'Okay',
+                        allowOutsideClick: false,
+                        timer: options.toast?  5000 : undefined,
+                        toast: true,
+                        position: options.toast ? 'top-end' : 'center',
+                        showConfirmButton: callbackFn ? true : false,
+                        preConfirm: () => {
+                            if (callbackFn){
+                                callbackFn();
+                            }
+                        },
+                        ...options
+                    });
+}
+
 $(document).on('submit','.database_operation',function(){
     var url=$(this).attr('action');
     var data=$(this).serialize();
     $.post(url,data,function(fb){
         var resp=$.parseJSON(fb);
         if(resp.status=='true'){
-            alert(resp.message);
+            sAlert(resp.message);
             setTimeout(() => {
                 window.location.href=resp.reload;
             }, 1000);
         }
         else{
-            alert(resp.message);
+            sAlert(resp.message);
         }
     });
     return false;
@@ -21,13 +43,13 @@ $(document).on('click','.apply_exam',function(){
     $.get(BASE_URL+'/student/apply_exam/'+id,function(fb){
         var resp=$.parseJSON(fb);
         if(resp.status=='true'){
-            alert(resp.message);
+            sAlert(resp.message);
             setTimeout(() => {
                 window.location.href=resp.reload;
             }, 1000);
         }
         else{
-            alert(resp.message);
+            sAlert(resp.message);
         }
     })
 })
@@ -35,7 +57,7 @@ $(document).on('click','.apply_exam',function(){
 $(document).on('click','.category_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/category_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
@@ -43,35 +65,39 @@ $(document).on('click','.category_status',function(){
 $(document).on('click','.exam_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/exam_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
 $(document).on('click','.student_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/student_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
 $(document).on('click','.portal_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/portal_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
 $(document).on('click','.question_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/question_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
 
 
+const clickSubmit =() => {
+        document.getElementById("myCheck").click();
+}
+
 var interval;
-	function countdown() {
+function countdown() {
 	  clearInterval(interval);
 	  interval = setInterval( function() {
 	      var timer = $('.js-timeout').html();
@@ -88,17 +114,18 @@ var interval;
 
 	      $('.js-timeout').html(minutes + ':' + seconds);
 
-	      if (minutes == 0 && seconds == 0) { clearInterval(interval); alert('time UP'); myFunction() }
+	      if (minutes == 0 && seconds == 0) {
+            clearInterval(interval);
+            const elem = document.querySelector('div.content-wrapper > div > section.content');
+            sAlert('TIME UP', {target: elem, title: 'END OF TEST', icon: 'warning'});
+            setTimeout(() => {
+                clickSubmit();
+            }, 3000);
+        }
 	  }, 1000);
-	}
+}
 
-    var time = document.getElementById('timer').value;
-	$('.js-timeout').text(time);
-	countdown();
-
-
-    function myFunction() {
-        document.getElementById("myCheck").click();
-      }
-    
+var time = document.getElementById('timer').value;
+$('.js-timeout').text(time);
+countdown();
 
