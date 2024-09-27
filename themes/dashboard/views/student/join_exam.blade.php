@@ -236,7 +236,7 @@
                 `,
                 icon: 'info',
                 confirmButtonText: 'START',
-                backdrop: `rgba(0,0,0,0.8)`,
+                backdrop: `rgba(0,0,0,0.99)`,
                 allowOutsideClick: false,
                 preConfirm: async () => {
                     try {
