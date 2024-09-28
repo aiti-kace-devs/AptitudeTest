@@ -191,17 +191,18 @@ class AdminController extends Controller
     //Manage students
     public function manage_students()
     {
-        $data['exam'] = Oex_exam_master::where('id', '1')->get()->first();
+        $data['exam'] = Oex_exam_master::all();
 
         $data['exams'] = Oex_exam_master::where('status', '1')->get()->toArray();
 
-        $data['students'] = user_exam::select(['user_exams.*', 'users.name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.exam_date', 'oex_exam_masters.passmark', 'oex_results.yes_ans'])
+        $data['students'] = user_exam::with('result')
+            // select(['user_exams.*', 'users.name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.exam_date', 'oex_exam_masters.passmark'])
             ->join('users', 'users.id', '=', 'user_exams.user_id')
             ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
             ->orderBy('user_exams.exam_id', 'desc')
-            ->leftJoin('oex_results', 'user_exams.id', '=', 'oex_results.exam_id')
-            ->get()
-            ->toArray();
+            // ->leftJoin('oex_results', 'user_exams.id', '=', 'oex_results.exam_id')
+            ->get();
+        // ->toArray();
         return view('admin.manage_students', $data);
     }
 
@@ -423,20 +424,15 @@ class AdminController extends Controller
 
     public function admin_view_result($id)
     {
-        $std_exam = user_exam::where('id', $id)->get()->first();
-
-        $data['student_info'] = User::where('id', $std_exam->user_id)
-            ->get()
-            ->first();
-
-        $data['exam_info'] = Oex_exam_master::where('id', $std_exam->exam_id)
-            ->get()
-            ->first();
+        $std_exam = user_exam::where('user_id', $id)->first();
 
         $data['result_info'] = Oex_result::where('exam_id', $std_exam->exam_id)
-            ->where('user_id', $std_exam->user_id)
-            ->get()
+            ->where('user_id', $id)
             ->first();
+
+        $data['student_info'] = User::where('id', $id)->first();
+
+        $data['exam_info'] = Oex_exam_master::where('id', $std_exam->exam_id)->first();
 
         return view('admin.admin_view_result', $data);
     }

@@ -12,5 +12,10 @@ class Oex_result extends Model
     protected $table="oex_results";
     protected $primaryKey="id";
 
-    protected $fillable=['exam','question_id','yes_ans','no_ans','result_json'];
+    protected $fillable=['exam_id', 'user_id','yes_ans','no_ans','result_json'];
+
+    public function userExam()
+    {
+        return $this->belongsTo(user_exam::class, 'user_id');
+    }
 }

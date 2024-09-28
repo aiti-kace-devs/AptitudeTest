@@ -54,22 +54,22 @@
                                                 <tr>
                                                     <td>{{ $key + 1 }}</td>
                                                     <td>{{ $std['name'] }}</td>
-                                                    <td>{{ $std['ex_name'] }}</td>
+                                                    <td>{{ $std['title'] }}</td>
                                                     <td>{{ $std['exam_date'] }}</td>
                                                     <td>
 
                                                         @if ($std['submitted'] == null)
                                                             <span class="badge badge-secondary">N/A</span>
                                                         @else
-                                                           {{-- <span class="badge badge-warning">{{ round(($std['yes_ans'] / 2) * 100) }}%</span> --}}
-                                                           <span class="badge badge-warning">{{ $std['yes_ans']}}</span>
+                                                           <span class="badge badge-warning">{{ round(($std->result->yes_ans / 2) * 100) }}%</span>
+                                                           {{-- <span class="badge badge-warning">{{ $std->result->yes_ans}}</span> --}}
                                                         @endif
 
                                                         </td>
                                             <td>
                                                 @if ($std['submitted'] == null)
                                                     <span class="badge badge-primary">Not Taken</span>
-                                                @elseif($std['yes_ans'] >= $std['passmark'])
+                                                @elseif($std->result->yes_ans >= $std['passmark'])
                                                     <span class="badge badge-success">PASS</span>
                                                 @else
                                                     <span class="badge badge-danger">FAIL</span>
@@ -82,7 +82,7 @@
                                                         <?php
                                     if($std['exam_joined']==1){
                                     ?>
-                                                        <a href="{{ url('admin/admin_view_result/' . $std['id']) }}"
+                                                        <a href="{{ url('admin/admin_view_result/' . $std['user_id']) }}"
                                                             class="btn btn-success btn-sm">View Result</a>
                                                         <?php
                                     }

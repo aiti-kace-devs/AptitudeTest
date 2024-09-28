@@ -68,7 +68,7 @@
                             </tr>
                             <tr>
                                 <td>Total marks: </td>
-                                <td>{{ $result_info->yes_ans+$result_info->no_ans}}</td>
+                                <td>{{ $result_info->yes_ans}}/30</td>
                             </tr>
                             <tr>
                                 <td>Percentage score :</td>
