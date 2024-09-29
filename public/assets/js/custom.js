@@ -1,9 +1,9 @@
 sAlert = (message, options = {}, callbackFn = undefined) => {
     options['toast'] = typeof options['toast'] === 'undefined' ? true : options['toast'];
                     Swal.fire({
-                        title: 'Violation!',
+                        title: 'Success!',
                         text: message,
-                        icon: 'error',
+                        icon: 'success',
                         backdrop: options.toast ? false : `rgba(0,0,0,0.95)`,
                         confirmButtonText: 'Okay',
                         allowOutsideClick: false,

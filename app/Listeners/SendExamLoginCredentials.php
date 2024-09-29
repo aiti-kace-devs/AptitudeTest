@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\UserRegistered;
+use App\Jobs\SendExamLoginCredentialsJob;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ExamLoginCredentials;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,6 +29,7 @@ class SendExamLoginCredentials
      */
     public function handle(UserRegistered $event)
     {
-        Mail::to($event->user->email)->send(new ExamLoginCredentials($event->user));
+        // Mail::to($event->user->email)->send(new ExamLoginCredentials($event->user));
+        SendExamLoginCredentialsJob::dispatch($event->std, $event->plainPassword);
     }
 }

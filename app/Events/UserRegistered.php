@@ -20,9 +20,13 @@ class UserRegistered
      *
      * @return void
      */
-    public function __construct(public $std)
+    public $std;
+    public $plainPassword;
+
+    public function __construct(User $std, $plainPassword)
     {
-        //
+        $this->std = $std;
+        $this->plainPassword = $plainPassword;
     }
 
     /**

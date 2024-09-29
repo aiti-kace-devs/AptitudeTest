@@ -239,8 +239,8 @@ class AdminController extends Controller
                 'exam_joined' => 0,
             ]);
 
-            Mail::to($std->email)->send(new ExamLoginCredentials($std, $plainPassword));
-
+            // Mail::to($std->email)->send(new ExamLoginCredentials($std, $plainPassword));
+            event(new UserRegistered($std, $plainPassword));
             $arr = ['status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students')];
         }
         echo json_encode($arr);
