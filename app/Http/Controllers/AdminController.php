@@ -211,37 +211,61 @@ class AdminController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|email',
             'mobile_no' => 'required',
-            'exam' => 'required',
-            'password' => 'required',
+            'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
+            'password' => 'sometimes',
+            'exam_name' => 'sometimes',
         ]);
 
         if ($validator->fails()) {
             $arr = ['status' => 'false', 'message' => $validator->errors()->all()];
         } else {
-            $plainPassword = $request->password;
 
-            $std = new User();
-            $std->name = $request->name;
-            $std->email = $request->email;
-            $std->mobile_no = $request->mobile_no;
-            $std->exam = $request->exam;
-            $std->password = Hash::make($plainPassword);
-            $std->status = 1;
+            $plainPassword = $request->password ? $request->password : str()->random(8);
 
-            $std->save();
+            if ($request->exam_name) {
+                $exam = Oex_exam_master::where('title', $request->exam_name)->get()->first();
+                if ($exam == null) {
+                    abort(422, 'Exam not found');
+                }
+                $request->merge([
+                    'exam' => $exam->id
+                ]);
+            }
 
-            user_exam::create([
-                'user_id' => $std->id,
-                'exam_id' => $request->exam,
-                'std_status' => 1,
-                'exam_joined' => 0,
-            ]);
+            $existingUser = User::where('email', $request->email)->first();
+            $std = null;
+            if ($existingUser == null) {
+                $std = new User();
+                $std->name = $request->name;
+                $std->email = $request->email;
+                $std->mobile_no = $request->mobile_no;
+                $std->exam = $request->exam;
+                $std->password = Hash::make($plainPassword);
+                $std->status = 1;
+                $std->save();
+            }
 
-            // Mail::to($std->email)->send(new ExamLoginCredentials($std, $plainPassword));
-            event(new UserRegistered($std, $plainPassword));
-            $arr = ['status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students')];
+            user_exam::firstOrCreate(
+                [
+                    'user_id' => $existingUser ? $existingUser->id :  $std->id,
+                    'exam_id' => $request->exam,
+                ],
+                [
+                    'user_id' => $existingUser ? $existingUser->id :  $std->id,
+                    'exam_id' => $request->exam,
+                    'std_status' => 1,
+                    'exam_joined' => 0,
+                ]
+            );
+
+
+            if ($existingUser == null) {
+                event(new UserRegistered($std, $plainPassword));
+            }
+
+            $arr = array('status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students'));
         }
         echo json_encode($arr);
     }

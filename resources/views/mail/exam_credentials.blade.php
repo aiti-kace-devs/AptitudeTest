@@ -12,6 +12,10 @@ You can log in and start your exam preparation by clicking the button below:
 Start Your Exam
 @endcomponent
 
+@component('mail::panel')
+If you are having trouble with the button copy and paste this URL in a browser: {{$examUrl}}
+@endcomponent
+
 Thanks,
 {{ config('app.name') }}
 @endcomponent

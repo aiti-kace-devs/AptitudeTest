@@ -8,22 +8,6 @@
             line-height: 40px;
         }
 
-        /* *:fullscreen {
-                                                overflow: scroll !important;
-                                            }
-
-                                            *:-ms-fullscreen {
-                                                overflow: scroll !important;
-                                            }
-
-                                            *:-webkit-full-screen {
-                                                overflow: scroll !important;
-                                            }
-
-                                            *:-moz-full-screen {
-                                                overflow: scroll !important;
-                                            } */
-
         #examination_form {
             height: calc(85vh);
             overflow-y: scroll;
@@ -70,7 +54,7 @@
                                             </h3>
                                         </div>
                                         <div class="col-sm-3">
-                                            <button class="btn btn-primary btn-lg">
+                                            <button class="btn btn-primary btn-lg" onclick="handleSubmitTest()">
                                                 SUBMIT TEST
                                             </button>
                                         </div>
@@ -120,7 +104,7 @@
                                                                     {{ $options['option4'] }}
                                                                 </li>
 
-                                                                <li style="display: none;"><input value="0"
+                                                                <li style="display: none;"><input value="null"
                                                                         type="radio" checked="checked"
                                                                         name="ans{{ $key + 1 }}">
                                                                     {{ $options['option4'] }}</li>
@@ -163,6 +147,25 @@
                 $(timer).addClass('js-timeout');
                 openFullscreen();
             }
+
+            const form = document.getElementById('examination_form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const form = $('#examination_form');
+                // form.submit();
+                const values = form.serializeArray();
+                const questionCount = values.find(d => d.name.startsWith('question')).length;
+                const answerCount = values.find(d => d.name.startsWith('ans') && d.value !== 'null').length;
+
+                console.log(questionCount);
+                console.log(answerCount);
+
+                if (questionCount == answerCount) {
+                    alert('you havent answered all questions');
+                }
+
+            });
 
             const showWarning = (e) => {
                 const form = $('[name="examination_form"]');
@@ -236,7 +239,9 @@
                 }
             }
 
+
             const handleSubmitTest = () => {
+
 
             }
 
@@ -249,7 +254,7 @@
                     <li>Do not switch tabs</li>
                     <li>You'll be warned when you violate the rules</li>
                     <li>Your test may be terminated if you keep on violating rules</li>
-                    <li>The duration of the test is {{ $exam->duration }} mins from the time you start</li>
+                    <li>The duration of the test is {{ $exam->exam_duration }} mins from the time you start</li>
                     <li>Ensure you have good and stable internet</li>
                 </ol>
                 `,
