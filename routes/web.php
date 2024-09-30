@@ -88,6 +88,8 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
     });
 });
 
+Route::get('/send', [StudentOperation::class, 'sendStudentResultToGoogleDocs']);
+
 
 
 require __DIR__ . '/auth.php';

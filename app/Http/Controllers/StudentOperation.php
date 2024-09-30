@@ -154,43 +154,68 @@ class StudentOperation extends Controller
         $percentage = ($yes_ans / $total) * 100;
         echo $res->save();
 
+
+
         return redirect(url('student/exam'))->with([
             'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
             'key' => 'success',
         ]);
     }
 
-    public function sendResultToFile($userId)
+    public function sendStudentResultToGoogleDocs()
     {
-        $user = User::where('userId', $userId)->first();
-
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-        $result = Oex_result::where('user_id', $user->id)->first();
-
-        if (!$result) {
-            return response()->json(['error' => 'Result not found'], 404);
-        }
+        $apiEndpoint = "https://us-central1-skilful-boulder-395614.cloudfunctions.net/api";
 
         $data = [
-            'sheetIndex' => 1,
-            'userId' => $user->userId,
-            'data' => [
-                'registered' => $user->registered,
-                'result' => $result->yes_ans,
+            "sheetIndex" => 1,
+            "userId" => "d027038b-3a87-4f3f-be8c-9002851e8880",
+            "data" => [
+                "registered" => false,
+                "result" => 300,
             ],
         ];
 
-        $response = Http::post('#', $data);
+        $response = Http::post($apiEndpoint, $data);
 
         if ($response->successful()) {
-            return response()->json(['message' => 'Result successfully sent to the file'], 200);
+            return response()->json(['status' => 'success', 'message' => 'Result sent successfully.']);
         } else {
-            return response()->json(['error' => 'Failed to send result'], $response->status());
+            return response()->json(['status' => 'error', 'message' => 'Failed to send result.'], $response->status());
         }
     }
+
+
+    // public function sendResultToFile($userId)
+    // {
+    //     $user = User::where('userId', $userId)->first();
+
+    //     if (!$user) {
+    //         return response()->json(['error' => 'User not found'], 404);
+    //     }
+
+    //     $result = Oex_result::where('user_id', $user->id)->first();
+
+    //     if (!$result) {
+    //         return response()->json(['error' => 'Result not found'], 404);
+    //     }
+
+    //     $data = [
+    //         'sheetIndex' => 1,
+    //         'userId' => $user->userId,
+    //         'data' => [
+    //             'registered' => $user->registered,
+    //             'result' => $result->yes_ans,
+    //         ],
+    //     ];
+
+    //     $response = Http::post('#', $data);
+
+    //     if ($response->successful()) {
+    //         return response()->json(['message' => 'Result successfully sent to the file'], 200);
+    //     } else {
+    //         return response()->json(['error' => 'Failed to send result'], $response->status());
+    //     }
+    // }
 
     //Applying for exam
     public function apply_exam($id)
