@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Events\UserRegistered;
+use App\Jobs\AddNewStudentsJob;
+use App\Jobs\ProcessStudentRegistrationJob;
 use Illuminate\Http\Request;
 use App\Models\Oex_category;
 use App\Models\Oex_exam_master;
@@ -10,6 +12,8 @@ use App\Models\Oex_student;
 use App\Models\Oex_portal;
 use App\Models\User;
 use App\Models\Oex_question_master;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -18,9 +22,11 @@ use App\Models\Admin;
 use App\Models\Oex_result;
 use App\Mail\ExamLoginCredentials;
 use Illuminate\Support\Facades\Mail;
+use App\Traits\UpdateGoogleSheets;
 
 class AdminController extends Controller
 {
+    use UpdateGoogleSheets;
     // admin dashboard
     public function index()
     {
@@ -206,67 +212,101 @@ class AdminController extends Controller
         return view('admin.manage_students', $data);
     }
 
-    //Add new students
     public function add_new_students(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'mobile_no' => 'required',
-            'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
-            'password' => 'sometimes',
-            'exam_name' => 'sometimes',
-        ]);
+        $data = $request->input('students') !== null ? $request->input('students') : [$request->all()];
+        // $request->input("students");
+        $errors = [];
+        // return $data;
+        foreach ($data as $student) {
+            $validator = Validator::make($student, [
+                'name' => 'required',
+                'email' => 'required',
+                'mobile_no' => 'required',
+                'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
+                'password' => 'sometimes',
+                'exam_name' => 'sometimes',
+            ]);
+            if ($validator->fails()) {
+                $arr = ['status' => 'false', 'message' => $validator->errors()->all()];
+                $errors[] = $arr;
+            } else {
+                $plainPassword = $student['password'] ?? str()->random(8);
 
-        if ($validator->fails()) {
-            $arr = ['status' => 'false', 'message' => $validator->errors()->all()];
-        } else {
-
-            $plainPassword = $request->password ? $request->password : str()->random(8);
-
-            if ($request->exam_name) {
-                $exam = Oex_exam_master::where('title', $request->exam_name)->get()->first();
-                if ($exam == null) {
-                    abort(422, 'Exam not found');
+                if (!empty($student['exam_name'])) {
+                    $exam = Oex_exam_master::where('title', $student['exam_name'])->first();
+                    if ($exam == null) {
+                        abort(422, 'Exam not found');
+                    }
+                    $student['exam'] = $exam->id;
                 }
-                $request->merge([
-                    'exam' => $exam->id
-                ]);
+
+                $existingUser = User::where('email', $student['email'])->first();
+                $std = null;
+
+                if ($existingUser == null) {
+                    $std = new User();
+                    $std->name = $student['name'];
+                    $std->email = $student['email'];
+                    $std->mobile_no = $student['mobile_no'];
+                    $std->exam = $student['exam'];
+                    $std->password = Hash::make($plainPassword);
+                    $std->status = 1;
+                    $std->save();
+                }
+
+                user_exam::firstOrCreate(
+                    [
+                        'user_id' => $existingUser ? $existingUser->id : $std->id,
+                        'exam_id' => $student['exam'],
+                    ],
+                    [
+                        'user_id' => $existingUser ? $existingUser->id : $std->id,
+                        'exam_id' => $student['exam'],
+                        'std_status' => 1,
+                        'exam_joined' => 0,
+                    ],
+                );
+
+                if ($existingUser == null) {
+                    event(new UserRegistered($std, $plainPassword));
+                    $this->updateGoogleSheets('d027038b-3a87-4f3f-be8c-9002851e8880', [false]);
+                }
+
+                $arr = [
+                    'status' => 'true',
+                    'message' => 'student added successfully',
+                    'reload' => url('admin/manage_students'),
+                ];
             }
-
-            $existingUser = User::where('email', $request->email)->first();
-            $std = null;
-            if ($existingUser == null) {
-                $std = new User();
-                $std->name = $request->name;
-                $std->email = $request->email;
-                $std->mobile_no = $request->mobile_no;
-                $std->exam = $request->exam;
-                $std->password = Hash::make($plainPassword);
-                $std->status = 1;
-                $std->save();
-            }
-
-            user_exam::firstOrCreate(
-                [
-                    'user_id' => $existingUser ? $existingUser->id :  $std->id,
-                    'exam_id' => $request->exam,
-                ],
-                [
-                    'user_id' => $existingUser ? $existingUser->id :  $std->id,
-                    'exam_id' => $request->exam,
-                    'std_status' => 1,
-                    'exam_joined' => 0,
-                ]
-            );
-
-
-            if ($existingUser == null) {
-                event(new UserRegistered($std, $plainPassword));
-            }
-
-            $arr = array('status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students'));
         }
+
+        echo json_encode($arr);
+    }
+
+    //Add new students
+    public function add_new_students_arr(Request $request)
+    {
+        $students = $request->input('students') ? $request->input('students') : [$request->all()];
+
+        foreach ($students as $student) {
+            $validator = Validator::make($student, [
+                'name' => 'required',
+                'email' => 'required|email',
+                'mobile_no' => 'required',
+                'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
+                'password' => 'sometimes',
+                'exam_name' => 'sometimes',
+            ]);
+
+            if ($validator->fails()) {
+                $arr = ['status' => 'false', 'message' => $validator->errors()->all()];
+            } else {
+                AddNewStudentsJob::dispatch($student);
+            }
+        }
+
+        $arr = ['status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students')];
         echo json_encode($arr);
     }
 

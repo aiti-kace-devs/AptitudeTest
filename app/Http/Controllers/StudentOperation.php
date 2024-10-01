@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use App\Models\Oex_student;
 use App\Models\Oex_exam_master;
@@ -12,9 +11,11 @@ use App\Models\Oex_result;
 use App\Models\User;
 use App\Models\user_exam;
 use Illuminate\Support\Carbon;
+use App\Traits\UpdateGoogleSheets;
 
 class StudentOperation extends Controller
 {
+    use UpdateGoogleSheets;
     //student dashboard
     public function dashboard()
     {
@@ -154,34 +155,12 @@ class StudentOperation extends Controller
         $percentage = ($yes_ans / $total) * 100;
         echo $res->save();
 
-
+        $this->updateGoogleSheets('d027038b-3a87-4f3f-be8c-9002851e8880', [30]);
 
         return redirect(url('student/exam'))->with([
             'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
             'key' => 'success',
         ]);
-    }
-
-    public function sendStudentResultToGoogleDocs()
-    {
-        $apiEndpoint = "https://us-central1-skilful-boulder-395614.cloudfunctions.net/api";
-
-        $data = [
-            "sheetIndex" => 1,
-            "userId" => "d027038b-3a87-4f3f-be8c-9002851e8880",
-            "data" => [
-                "registered" => false,
-                "result" => 300,
-            ],
-        ];
-
-        $response = Http::post($apiEndpoint, $data);
-
-        if ($response->successful()) {
-            return response()->json(['status' => 'success', 'message' => 'Result sent successfully.']);
-        } else {
-            return response()->json(['status' => 'error', 'message' => 'Failed to send result.'], $response->status());
-        }
     }
 
 

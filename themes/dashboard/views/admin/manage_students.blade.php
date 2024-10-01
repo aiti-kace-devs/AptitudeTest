@@ -61,24 +61,25 @@
                                                         @if ($std['submitted'] == null)
                                                             <span class="badge badge-secondary">N/A</span>
                                                         @else
-                                                           <span class="badge badge-warning">{{ round(($std->result->yes_ans / 2) * 100) }}%</span>
-                                                           {{-- <span class="badge badge-warning">{{ $std->result->yes_ans}}</span> --}}
+                                                            <span
+                                                                class="badge badge-warning">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
+                                                            {{-- <span class="badge badge-warning">{{ $std->result->yes_ans}}</span> --}}
                                                         @endif
 
-                                                        </td>
-                                            <td>
-                                                @if ($std['submitted'] == null)
-                                                    <span class="badge badge-primary">Not Taken</span>
-                                                @elseif($std->result->yes_ans >= $std['passmark'])
-                                                    <span class="badge badge-success">PASS</span>
-                                                @else
-                                                    <span class="badge badge-danger">FAIL</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                {{-- <a href="{{url('admin/edit_students/'.$std['id'])}}" class="btn btn-primary">Edit</a> --}}
-                                                <a href="{{ url('admin/delete_students/' . $std['id']) }}"
-                                                    class="btn btn-danger btn-sm">Delete</a>
+                                                    </td>
+                                                    <td>
+                                                        @if ($std['submitted'] == null)
+                                                            <span class="badge badge-primary">Not Taken</span>
+                                                        @elseif($std->result->yes_ans >= $std['passmark'])
+                                                            <span class="badge badge-success">PASS</span>
+                                                        @else
+                                                            <span class="badge badge-danger">FAIL</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        {{-- <a href="{{url('admin/edit_students/'.$std['id'])}}" class="btn btn-primary">Edit</a> --}}
+                                                        <a href="{{ url('admin/delete_students/' . $std['id']) }}"
+                                                            class="btn btn-danger btn-sm">Delete</a>
                                                         <?php
                                     if($std['exam_joined']==1){
                                     ?>
@@ -88,8 +89,8 @@
                                     }
                                     ?>
 
-                                            </td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
                                             @endforeach
                                         </tbody>
                                         <tfoot>
