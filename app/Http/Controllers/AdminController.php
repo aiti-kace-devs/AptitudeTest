@@ -215,100 +215,39 @@ class AdminController extends Controller
     public function add_new_students(Request $request)
     {
         $data = $request->input('students') !== null ? $request->input('students') : [$request->all()];
-        // $request->input("students");
-        $errors = [];
-        // return $data;
-        foreach ($data as $student) {
-            $validator = Validator::make($student, [
-                'name' => 'required',
-                'email' => 'required',
-                'mobile_no' => 'required',
-                'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
-                'password' => 'sometimes',
-                'exam_name' => 'sometimes',
-            ]);
-            if ($validator->fails()) {
-                $arr = ['status' => 'false', 'message' => $validator->errors()->all()];
-                $errors[] = $arr;
-            } else {
-                $plainPassword = $student['password'] ?? str()->random(8);
 
-                if (!empty($student['exam_name'])) {
-                    $exam = Oex_exam_master::where('title', $student['exam_name'])->first();
-                    if ($exam == null) {
-                        abort(422, 'Exam not found');
-                    }
-                    $student['exam'] = $exam->id;
-                }
+    AddNewStudentsJob::dispatch($data);
 
-                $existingUser = User::where('email', $student['email'])->first();
-                $std = null;
+    echo json_encode(['status' => 'true', 'message' => 'Successfully updated', 'reload' => url('admin/manage_students')]);
 
-                if ($existingUser == null) {
-                    $std = new User();
-                    $std->name = $student['name'];
-                    $std->email = $student['email'];
-                    $std->mobile_no = $student['mobile_no'];
-                    $std->exam = $student['exam'];
-                    $std->password = Hash::make($plainPassword);
-                    $std->status = 1;
-                    $std->save();
-                }
 
-                user_exam::firstOrCreate(
-                    [
-                        'user_id' => $existingUser ? $existingUser->id : $std->id,
-                        'exam_id' => $student['exam'],
-                    ],
-                    [
-                        'user_id' => $existingUser ? $existingUser->id : $std->id,
-                        'exam_id' => $student['exam'],
-                        'std_status' => 1,
-                        'exam_joined' => 0,
-                    ],
-                );
-
-                if ($existingUser == null) {
-                    event(new UserRegistered($std, $plainPassword));
-                    $this->updateGoogleSheets('d027038b-3a87-4f3f-be8c-9002851e8880', [false]);
-                }
-
-                $arr = [
-                    'status' => 'true',
-                    'message' => 'student added successfully',
-                    'reload' => url('admin/manage_students'),
-                ];
-            }
-        }
-
-        echo json_encode($arr);
     }
 
     //Add new students
-    public function add_new_students_arr(Request $request)
-    {
-        $students = $request->input('students') ? $request->input('students') : [$request->all()];
+    // public function add_new_students_arr(Request $request)
+    // {
+    //     $students = $request->input('students') ? $request->input('students') : [$request->all()];
 
-        foreach ($students as $student) {
-            $validator = Validator::make($student, [
-                'name' => 'required',
-                'email' => 'required|email',
-                'mobile_no' => 'required',
-                'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
-                'password' => 'sometimes',
-                'exam_name' => 'sometimes',
-            ]);
+    //     foreach ($students as $student) {
+    //         $validator = Validator::make($student, [
+    //             'name' => 'required',
+    //             'email' => 'required|email',
+    //             'mobile_no' => 'required',
+    //             'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
+    //             'password' => 'sometimes',
+    //             'exam_name' => 'sometimes',
+    //         ]);
 
-            if ($validator->fails()) {
-                $arr = ['status' => 'false', 'message' => $validator->errors()->all()];
-            } else {
-                AddNewStudentsJob::dispatch($student);
-            }
-        }
+    //         if ($validator->fails()) {
+    //             $arr = ['status' => 'false', 'message' => $validator->errors()->all()];
+    //         } else {
+    //             AddNewStudentsJob::dispatch($student);
+    //         }
+    //     }
 
-        $arr = ['status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students')];
-        echo json_encode($arr);
-    }
+    //     $arr = ['status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students')];
+    //     echo json_encode($arr);
+    // }
 
     //Editing student status
     public function student_status($id)

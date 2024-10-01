@@ -2,12 +2,18 @@
 
 namespace App\Jobs;
 
+use App\Events\UserRegistered;
+use App\Models\Oex_exam_master;
+use App\Models\User;
+use App\Models\user_exam;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AddNewStudentsJob implements ShouldQueue
 {
@@ -32,7 +38,6 @@ class AddNewStudentsJob implements ShouldQueue
     public function handle()
     {
         $errors = [];
-        $successMessages = [];
 
         foreach ($this->students as $student) {
             $validator = Validator::make($student, [
@@ -45,20 +50,16 @@ class AddNewStudentsJob implements ShouldQueue
             ]);
 
             if ($validator->fails()) {
-                $errors[] = [
-                    'status' => 'false',
-                    'message' => $validator->errors()->all(),
-                ];
-                continue; // Skip to the next student if validation fails
+                $errors[] = ['status' => 'false', 'message' => $validator->errors()->all()];
             }
 
-            $plainPassword = !empty($student['password']) ? $student['password'] : str()->random(8);
+            $plainPassword = $student['password'] ?? str()->random(8);
 
-            // Check and retrieve exam ID if exam_name is provided
+            // Exam validation
             if (!empty($student['exam_name'])) {
                 $exam = Oex_exam_master::where('title', $student['exam_name'])->first();
                 if ($exam == null) {
-                    abort(422, 'Exam not found for student: ' . $student['name']);
+                    abort(422, 'Exam not found');
                 }
                 $student['exam'] = $exam->id;
             }
@@ -68,7 +69,7 @@ class AddNewStudentsJob implements ShouldQueue
             $std = null;
 
             if ($existingUser == null) {
-                // Create new user
+                // Create a new student
                 $std = new User();
                 $std->name = $student['name'];
                 $std->email = $student['email'];
@@ -86,20 +87,30 @@ class AddNewStudentsJob implements ShouldQueue
                     'exam_id' => $student['exam'],
                 ],
                 [
+                    'user_id' => $existingUser ? $existingUser->id : $std->id,
+                    'exam_id' => $student['exam'],
                     'std_status' => 1,
                     'exam_joined' => 0,
                 ]
             );
 
-            // Fire the registration event for new users
+            // Trigger event for newly registered users
             if ($existingUser == null) {
                 event(new UserRegistered($std, $plainPassword));
-            }
 
-            $successMessages[] = [
-                'status' => 'true',
-                'message' => 'Student ' . $student['name'] . ' added successfully',
-            ];
+                // Call any additional methods like updating Google Sheets
+                $this->updateGoogleSheets('d027038b-3a87-4f3f-be8c-9002851e8880', [false]);
+            }
         }
+
+        if (!empty($errors)) {
+            // Handle errors, possibly log or notify the admin
+            // Log errors or do something meaningful here
+        }
+    }
+
+    protected function updateGoogleSheets($sheetId, array $data)
+    {
+        // Implement your logic to update Google Sheets here
     }
 }
