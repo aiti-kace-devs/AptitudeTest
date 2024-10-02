@@ -34,7 +34,7 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Exam title</th>
-                                                <th>Exam date</th>
+                                                <th>Exam deadline</th>
                                                 <th>Status</th>
                                                 <th>Result</th>
                                                 <th>Actions</th>
@@ -45,20 +45,28 @@
                                                 <tr>
                                                     <td>1</td>
                                                     <td>{{ $std_info['title'] }}</td>
-                                                    <td>{{ $std_info['exam_date'] }}</td>
-                                                    <td><?php
-                                                    if (strtotime($std_info['exam_date']) < strtotime(date('Y-m-d'))) {
-                                                        echo 'Date expired';
-                                                    } elseif (strtotime($std_info['exam_date']) == strtotime(date('Y-m-d'))) {
-                                                        if ($std_info['exam_joined'] == 1) {
-                                                            echo 'Finished';
-                                                        } else {
-                                                            echo 'Running';
-                                                        }
-                                                    } else {
-                                                        echo 'Pending';
-                                                    }
-                                                    ?></td>
+                                                    @php
+                                                        $left = Carbon\Carbon::now()->diffInHours(
+                                                            new Carbon\Carbon($std_info['exam_date']),
+                                                        );
+
+                                                        $studentTimeAllowed = Carbon\Carbon::now()->diffInHours(
+                                                            (new Carbon\Carbon($std_info['registered']))->addDays(2),
+                                                        );
+
+                                                        // ->diffInHours(new Carbon\Carbon($std_info['exam_date']));
+
+                                                    @endphp
+                                                    <td>
+                                                        <x-exam-deadline :date="$std_info['exam_date']"></x-exam-deadline>
+                                                    </td>
+                                                    <td>
+                                                        @if ($std_info['submitted'])
+                                                            <span class="badge badge-success">Submitted</span>
+                                                        @else
+                                                            <span class="badge badge-danger">Not Submitted</span>
+                                                        @endif
+                                                    </td>
                                                     <td>
 
                                                         @if ($std_info['submitted'] != null)
@@ -69,16 +77,15 @@
 
 
                                                     <td>
-                                                        @if (strtotime($std_info['exam_date']) == strtotime(date('Y-m-d')))
+                                                        <x-can-take-exam :date="$std_info['exam_date']">
                                                             @if ($std_info['exam_joined'] == 0)
                                                                 <a href="{{ url('student/join_exam/' . $std_info['exam_id']) }}"
                                                                     class="btn btn-primary btn-sm">Join Exam</a>
-                                                            @else
-                                                                <a href="{{ url('student/view_answer/' . $std_info['exam_id']) }}"
-                                                                    class="btn btn-primary btn-sm">View Answers</a>
+                                                                {{-- @else
+                                                          <a href="{{ url('student/view_answer/' . $std_info['exam_id']) }}"
+                                                          class="btn btn-primary btn-sm">View Answers</a> --}}
                                                             @endif
-                                                        @endif
-
+                                                        </x-can-take-exam>
                                                     </td>
                                                 </tr>
                                             @endforeach

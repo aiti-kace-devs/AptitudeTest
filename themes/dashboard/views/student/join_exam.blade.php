@@ -4,8 +4,8 @@
     <style type="text/css">
         .question_options>li {
             list-style: none;
-            height: 40px;
-            line-height: 40px;
+            min-height: 60px;
+            line-height: 60px;
         }
 
         #examination_form {
@@ -14,7 +14,11 @@
             scroll-behavior: smooth;
             scrollbar-width: 1px;
             overflow-x: hidden;
-            width: calc(95vw);
+            width: 99% !important;
+        }
+
+        input[type="radio"] {
+            height: 30px;
         }
     </style>
     <!-- /.content-header -->
@@ -75,7 +79,7 @@
                                         <input type="hidden" name="exam_id" value="{{ Request::segment(3) }}">
                                         {{ csrf_field() }}
                                         <div class="row">
-                                            <div class="card mt-4 w-100">
+                                            <div class="card mt-4 col-12 p-4">
 
                                                 <div class="card-body">
                                                     @foreach ($question as $key => $q)
@@ -115,10 +119,10 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-sm-12 ">
+                                            <div class="col-sm-12 mb-4">
                                                 <input type="hidden" name="index" value="{{ $key + 1 }}">
-                                                <button type="submit" class="btn btn-primary"
-                                                    id="myCheck">Submit</button>
+                                                <button type="submit" class="btn btn-primary btn-lg" id="myCheck">SUBMIT
+                                                    TEST</button>
                                             </div>
                                         </div>
                                     </form>
@@ -139,33 +143,19 @@
     @push('scripts')
         <script>
             var warn = 0;
+            var timeLeft = "{{ $exam->duration }}";
+
 
             const startTest = () => {
                 document.addEventListener('visibilitychange', handleVisibilityChange)
                 document.addEventListener('fullscreenchange', handleFullscreenChange)
                 const timer = document.getElementById('timer');
                 $(timer).addClass('js-timeout');
+                countdown();
                 openFullscreen();
             }
 
-            const form = document.getElementById('examination_form');
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
 
-                const form = $('#examination_form');
-                // form.submit();
-                const values = form.serializeArray();
-                const questionCount = values.find(d => d.name.startsWith('question')).length;
-                const answerCount = values.find(d => d.name.startsWith('ans') && d.value !== 'null').length;
-
-                console.log(questionCount);
-                console.log(answerCount);
-
-                if (questionCount == answerCount) {
-                    alert('you havent answered all questions');
-                }
-
-            });
 
             const showWarning = (e) => {
                 const form = $('[name="examination_form"]');
@@ -182,6 +172,7 @@
                         target: document.querySelector('div.content-wrapper > div > section.content')
                     });
                     setTimeout(() => {
+                        timeLeft = 0;
                         form.submit();
                     }, 3000);
                 } else {
@@ -202,8 +193,6 @@
                     e.preventDefault();
                     e.stopImmediatePropagation();
                 }
-
-
             }
 
             const openFullscreen = () => {
@@ -241,8 +230,8 @@
 
 
             const handleSubmitTest = () => {
-
-
+                const submitButton = document.getElementById('myCheck');
+                submitButton.click();
             }
 
             Swal.fire({
@@ -250,17 +239,21 @@
                 html: `
                 <ol class="text-left">
                     <li>Make sure you answer all questions</li>
-                    <li>Donot exit fullscreen</li>
-                    <li>Do not switch tabs</li>
-                    <li>You'll be warned when you violate the rules</li>
-                    <li>Your test may be terminated if you keep on violating rules</li>
-                    <li>The duration of the test is {{ $exam->exam_duration }} mins from the time you start</li>
+                    <li>DO NOT exit fullscreen</li>
+                    <li>DO NOT switch tabs</li>
+                    <li>You will be warned when you violate the rules</li>
+                    <li>Your test may be automatically SUBMITTED if you keep on violating rules</li>
+                    <li>The duration of the test is {{ $exam->exam_duration }} mins from the time you click 'Start'</li>
                     <li>Ensure you have good and stable internet</li>
+                    <li>Click on 'START' work to begin the test</li>
+                    <li>Click on 'Submit Test' after you have completed</li>
                 </ol>
+
+                <p>Good luck</p>
                 `,
                 icon: 'info',
                 confirmButtonText: 'START',
-                backdrop: `rgba(0,0,0,0.99)`,
+                // backdrop: `rgba(0,0,0,0.99)`,
                 allowOutsideClick: false,
                 preConfirm: async () => {
                     try {
@@ -288,6 +281,75 @@
                         `);
                     }
                 },
-            })
+            });
+
+            const form = document.getElementById('examination_form');
+            form.addEventListener('submit', function(e) {
+
+                // if time is up, just submit
+                if (timeLeft == 0) {
+                    form.submit();
+                }
+
+                e.preventDefault();
+
+                const values = $('#examination_form').serializeArray();
+
+                const questionCount = values.filter(d => d.name.startsWith('question')).length;
+                const answerCount = values.filter(d => d.name.startsWith('ans') && d.value !== 'null').length;
+                let remainder = questionCount - answerCount;
+
+                Swal.fire({
+                    title: 'Confirm Submission',
+                    text: `Are you sure you want to submit this test. This cannot be undone. ${ remainder != 0 ? `${remainder} question(s) left to answer`: '' }`,
+                    icon: 'info',
+                    backdrop: `rgba(0,0,0,0.95)`,
+                    confirmButtonText: 'Yes, Submit',
+                    cancelButtonText: 'No, Review Work',
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                    position: 'center',
+                    target: document.querySelector('div.content-wrapper > div > section.content'),
+                    preConfirm: () => {
+                        form.submit();
+                    },
+                });
+
+            });
+
+            var interval;
+
+            function countdown() {
+                clearInterval(interval);
+                interval = setInterval(function() {
+                    var timer = $('.js-timeout').html();
+                    timer = timer.split(':');
+                    var minutes = timer[0];
+                    var seconds = timer[1];
+                    seconds -= 1;
+                    if (minutes < 0) return;
+                    else if (seconds < 0 && minutes != 0) {
+                        minutes -= 1;
+                        seconds = 59;
+                    } else if (seconds < 10 && length.seconds != 2) seconds = '0' + seconds;
+
+                    $('.js-timeout').html(minutes + ':' + seconds);
+                    if (minutes < 11) {
+                        $('.js-timeout').css('color', 'red');
+                    }
+
+                    if (minutes == 0 && seconds == 0) {
+                        clearInterval(interval);
+                        const elem = document.querySelector('div.content-wrapper > div > section.content');
+                        sAlert('TIME UP', {
+                            target: elem,
+                            title: 'END OF TEST',
+                            icon: 'warning'
+                        });
+                        timeLeft = 0;
+                        handleSubmitTest();
+                    }
+                }, 1000);
+            }
         </script>
     @endpush

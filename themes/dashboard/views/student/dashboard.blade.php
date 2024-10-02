@@ -79,10 +79,13 @@
 
                                     <!-- Exam Details -->
                                     <div class="exam-details py-3">
-                                        <p class="exam-detail"><strong>Exam Date:</strong> {{ $exam['exam_date'] }}</p>
-                                        <p class="exam-detail"><strong>Duration:</strong> {{ $exam['exam_duration'] }} mins</p>
+                                        <p class="exam-detail"><strong>Exam Deadline:</strong><x-exam-deadline
+                                                :date="$exam['exam_date']"></x-exam-deadline></p>
+                                        <p class="exam-detail"><strong>Duration:</strong> {{ $exam['exam_duration'] }} mins
+                                        </p>
                                         <p class="exam-detail"><strong>Pass Mark:</strong> {{ $exam['passmark'] }}</p>
-                                        <p class="exam-detail"><strong>Total Questions:</strong> {{ $exam['question_count'] }}</p>
+                                        <p class="exam-detail"><strong>Total Questions:</strong>
+                                            {{ $exam['question_count'] }}</p>
                                     </div>
                                 </div>
 
@@ -92,14 +95,14 @@
                                 </div>
 
                                 <!-- Call to Action Button -->
-                                @if (strtotime(date('Y-m-d')) <= strtotime($exam['exam_date']))
-                                    <a href="{{ url('student/join_exam/' . $exam['exam_id']) }}" class="btn custom-btn mt-3">
+                                <x-can-take-exam :date="$exam['exam_date']">
+                                    <a href="{{ url('student/join_exam/' . $exam['exam_id']) }}"
+                                        class="btn custom-btn mt-3">
                                         Take Test &nbsp;<i class="fas fa-arrow-circle-right"></i>
                                     </a>
-                                @endif
+                                </x-can-take-exam>
                             </div>
                         </div>
-
                     @endforeach
 
                 </div>

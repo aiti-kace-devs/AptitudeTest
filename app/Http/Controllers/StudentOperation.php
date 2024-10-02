@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\user_exam;
 use Illuminate\Support\Carbon;
 use App\Traits\UpdateGoogleSheets;
+use Illuminate\Support\Facades\Auth;
 
 class StudentOperation extends Controller
 {
@@ -39,7 +40,7 @@ class StudentOperation extends Controller
     //Exam page
     public function exam()
     {
-        $student_info = user_exam::select(['user_exams.*', 'users.name', 'oex_exam_masters.title', 'oex_exam_masters.exam_date'])
+        $student_info = user_exam::select(['user_exams.*', 'users.name', 'oex_exam_masters.title', 'oex_exam_masters.exam_date', 'users.created_at as registered'])
             ->join('users', 'users.id', '=', 'user_exams.user_id')
             ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
             ->orderBy('user_exams.exam_id', 'desc')
@@ -47,6 +48,7 @@ class StudentOperation extends Controller
             ->where('user_exams.std_status', '1')
             ->get()
             ->toArray();
+
 
         return view('student.exam', ['student_info' => $student_info]);
     }
@@ -56,6 +58,7 @@ class StudentOperation extends Controller
     {
         $question = Oex_question_master::where('exam_id', $id)->inRandomOrder()->get();
         $user_exam = user_exam::where('exam_id', $id)->where('user_id', Session::get('id'))->get()->first();
+
         if ($user_exam && $user_exam->submitted) {
             return redirect(url('student/exam'))->with([
                 'flash' => 'Unable to take exam. Test already submitted',
@@ -64,15 +67,37 @@ class StudentOperation extends Controller
         }
 
         $exam = Oex_exam_master::where('id', $id)->get()->first();
+        $now = Carbon::now();
+
+        if ($now->isAfter(new Carbon($exam->exam_date))) {
+            return redirect(url('student/exam'))->with([
+                'flash' => 'Unable to take exam. Exam deadline was ' . $exam->exam_date,
+                'key' => 'error',
+            ]);
+        }
+
+        // 48 hours to finish exam
+        $userCreatedAt = new Carbon(Auth::user()->created_at);
+        $userCreatedAtPlusTwoDays = $userCreatedAt->addDays(2);
+
+
+        if ($userCreatedAtPlusTwoDays->isBefore($now)) {
+            return redirect(url('student/exam'))->with([
+                'flash' => 'Unable to take exam. Time to take exams has elapsed',
+                'key' => 'error',
+            ]);
+        }
+
+
         $usedTime = 0;
         if ($user_exam && $user_exam->started) {
             $start = new Carbon($user_exam->started);
-            $now = Carbon::now();
+
             $usedTime = $now->diffInMinutes($start);
         }
         if ($usedTime > $exam->exam_duration) {
             return redirect(url('student/exam'))->with([
-                'flash' => 'Unable to take exam. Time elased',
+                'flash' => 'Unable to take exam. Exam duration time has elapsed. ' . $usedTime . ' mins has passed since user started exams.',
                 'key' => 'error',
             ]);
         }

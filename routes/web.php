@@ -17,9 +17,12 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/login');
+
+
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 
 Route::get('/home', function () {
