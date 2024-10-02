@@ -145,6 +145,9 @@ class StudentOperation extends Controller
         $std_info->submitted = Carbon::now()->toDateTimeString();
         $std_info->update();
 
+        $user = User::where('id', Session::get('id'))->first();
+        $userId = $user->userId;
+
         $res = new Oex_result();
         $res->exam_id = $request->exam_id;
         $res->user_id = Session::get('id');
@@ -154,8 +157,8 @@ class StudentOperation extends Controller
         $total = $yes_ans + $no_ans;
         $percentage = ($yes_ans / $total) * 100;
         echo $res->save();
-
-        $this->updateGoogleSheets('d027038b-3a87-4f3f-be8c-9002851e8880', [30]);
+        $storedResult = Oex_result::where('user_id', $user->id)->where('exam_id', $request->exam_id)->first();
+        $this->updateGoogleSheets($userId, ["result" => $storedResult->yes_ans]);
 
         return redirect(url('student/exam'))->with([
             'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",

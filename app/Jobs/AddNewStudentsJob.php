@@ -45,6 +45,7 @@ class AddNewStudentsJob implements ShouldQueue
                 'email' => 'required|email',
                 'mobile_no' => 'required',
                 'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
+                'userId' => 'required',
                 'password' => 'sometimes',
                 'exam_name' => 'sometimes',
             ]);
@@ -75,6 +76,7 @@ class AddNewStudentsJob implements ShouldQueue
                 $std->email = $student['email'];
                 $std->mobile_no = $student['mobile_no'];
                 $std->exam = $student['exam'];
+                $std->userId = $student['userId'];
                 $std->password = Hash::make($plainPassword);
                 $std->status = 1;
                 $std->save();
@@ -94,23 +96,18 @@ class AddNewStudentsJob implements ShouldQueue
                 ]
             );
 
-            // Trigger event for newly registered users
             if ($existingUser == null) {
                 event(new UserRegistered($std, $plainPassword));
-
-                // Call any additional methods like updating Google Sheets
-                $this->updateGoogleSheets('d027038b-3a87-4f3f-be8c-9002851e8880', [false]);
+                $userId = $std->userId;
+                $this->updateGoogleSheets($userId, ["registered" => true]);
             }
         }
 
         if (!empty($errors)) {
-            // Handle errors, possibly log or notify the admin
-            // Log errors or do something meaningful here
         }
     }
 
     protected function updateGoogleSheets($sheetId, array $data)
     {
-        // Implement your logic to update Google Sheets here
     }
 }

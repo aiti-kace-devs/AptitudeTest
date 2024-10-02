@@ -10,7 +10,7 @@ trait UpdateGoogleSheets
         $apiEndpoint = env('SheetUpdateURL');
         $data = [
             'sheetIndex' => 1,
-            'userId' => $userId, // 'd027038b-3a87-4f3f-be8c-9002851e8880',
+            'userId' => $userId,
             'data' => $data,
         ];
 
