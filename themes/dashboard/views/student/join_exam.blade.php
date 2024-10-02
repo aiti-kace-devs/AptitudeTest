@@ -15,6 +15,7 @@
             scrollbar-width: 1px;
             overflow-x: hidden;
             width: 99% !important;
+            font-size: 20px;
         }
 
         input[type="radio"] {
@@ -72,7 +73,7 @@
                             <!-- /.card -->
                             <div class="card mt-4 w-100">
 
-                                <div class="card-body">
+                                <div class="card-body ">
 
                                     <form action="{{ url('student/submit_questions') }}" method="POST"
                                         name="examination_form" id="examination_form">

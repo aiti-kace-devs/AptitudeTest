@@ -83,16 +83,13 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
         Route::get('/show_result/{id}', [StudentOperation::class, 'show_result']);
         Route::get('/apply_exam/{id}', [StudentOperation::class, 'apply_exam']);
         Route::get('/view_result/{id}', [StudentOperation::class, 'view_result']);
-        Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
+        // Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
 
         Route::post('/start-exam/{id}', [StudentOperation::class, 'start_exam']);
 
         Route::get('/logout', [AuthenticatedSessionController::class, 'destroy']);
     });
 });
-
-Route::get('/send', [StudentOperation::class, 'sendStudentResultToGoogleDocs']);
-
 
 
 require __DIR__ . '/auth.php';
