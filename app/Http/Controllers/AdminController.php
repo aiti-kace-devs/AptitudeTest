@@ -22,11 +22,10 @@ use App\Models\Admin;
 use App\Models\Oex_result;
 use App\Mail\ExamLoginCredentials;
 use Illuminate\Support\Facades\Mail;
-use App\Traits\UpdateGoogleSheets;
+use App\Helpers\GoogleSheets;
 
 class AdminController extends Controller
 {
-    use UpdateGoogleSheets;
     // admin dashboard
     public function index()
     {
@@ -216,11 +215,9 @@ class AdminController extends Controller
     {
         $data = $request->input('students') !== null ? $request->input('students') : [$request->all()];
 
-    AddNewStudentsJob::dispatch($data);
+        AddNewStudentsJob::dispatch($data);
 
-    echo json_encode(['status' => 'true', 'message' => 'Successfully updated', 'reload' => url('admin/manage_students')]);
-
-
+        echo json_encode(['status' => 'true', 'message' => 'Successfully updated', 'reload' => url('admin/manage_students')]);
     }
 
     //Add new students

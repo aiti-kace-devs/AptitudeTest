@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Mail\ExamLoginCredentials;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,13 +39,14 @@ class SendExamLoginCredentialsJob implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to($this->std->email)->send(new ExamLoginCredentials($this->std, $this->plainPassword));
+        $deadline = (new Carbon($this->std->created_at))->addDays(2);
+        Mail::to($this->std->email)->send(new ExamLoginCredentials($this->std, $this->plainPassword, $deadline));
 
-    //     Log::info('Handling the job, sending email to ' . $this->std->email);
+        //     Log::info('Handling the job, sending email to ' . $this->std->email);
 
-    // Mail::to($this->std->email)->send(new ExamLoginCredentials($this->std, $this->plainPassword));
+        // Mail::to($this->std->email)->send(new ExamLoginCredentials($this->std, $this->plainPassword));
 
-    // Log::info('Email sent to ' . $this->std->email);
+        // Log::info('Email sent to ' . $this->std->email);
 
 
     }

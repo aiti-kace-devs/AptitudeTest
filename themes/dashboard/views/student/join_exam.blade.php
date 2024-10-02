@@ -4,8 +4,8 @@
     <style type="text/css">
         .question_options>li {
             list-style: none;
-            min-height: 60px;
-            line-height: 60px;
+            height: auto;
+            line-height: auto;
         }
 
         #examination_form {
@@ -143,7 +143,7 @@
     @push('scripts')
         <script>
             var warn = 0;
-            var timeLeft = "{{ $exam->duration }}";
+            var timeLeft = 10;
 
 
             const startTest = () => {
@@ -236,8 +236,7 @@
 
             Swal.fire({
                 title: '{{ $exam->title }}',
-                html: `
-                <ol class="text-left">
+                html: `<ol class = "text-left" style = "font-size:1.7rem;color:red" >
                     <li>Make sure you answer all questions</li>
                     <li>DO NOT exit fullscreen</li>
                     <li>DO NOT switch tabs</li>
@@ -249,11 +248,12 @@
                     <li>Click on 'Submit Test' after you have completed</li>
                 </ol>
 
-                <p>Good luck</p>
+                <h2>Good luck</h2>
                 `,
                 icon: 'info',
                 confirmButtonText: 'START',
-                // backdrop: `rgba(0,0,0,0.99)`,
+                backdrop: `rgba(0,0,0,0.99)`,
+                width: '70%',
                 allowOutsideClick: false,
                 preConfirm: async () => {
                     try {
@@ -311,6 +311,18 @@
                     position: 'center',
                     target: document.querySelector('div.content-wrapper > div > section.content'),
                     preConfirm: () => {
+                        Swal.fire({
+                            title: 'Submitting Test....',
+                            icon: 'info',
+                            backdrop: `rgba(0,0,0,0.95)`,
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            position: 'center',
+                            timer: 3000,
+                            target: document.querySelector(
+                                'div.content-wrapper > div > section.content'),
+                        });
+                        timeLeft = 0;
                         form.submit();
                     },
                 });

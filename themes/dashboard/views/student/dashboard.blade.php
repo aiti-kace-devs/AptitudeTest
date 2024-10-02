@@ -32,7 +32,7 @@
                 <div class="row">
                     @foreach ($portal_exams as $key => $exam)
                         <?php
-
+                        
                         if (strtotime(date('Y-m-d')) > strtotime($exam['exam_date'])) {
                             $cls = 'bg-danger';
                         } else {
@@ -43,7 +43,7 @@
                                 $cls = 'bg-info';
                             }
                         }
-
+                        
                         ?>
                         {{-- <div class="col-lg-8 col-12 mx-auto">
                             <div class="small-box {{ $cls }} text-center">
@@ -96,10 +96,12 @@
 
                                 <!-- Call to Action Button -->
                                 <x-can-take-exam :date="$exam['exam_date']">
-                                    <a href="{{ url('student/join_exam/' . $exam['exam_id']) }}"
-                                        class="btn custom-btn mt-3">
-                                        Take Test &nbsp;<i class="fas fa-arrow-circle-right"></i>
-                                    </a>
+                                    @if ($exam['submitted'] == null)
+                                        <a href="{{ url('student/join_exam/' . $exam['exam_id']) }}"
+                                            class="btn custom-btn mt-3">
+                                            Take Test &nbsp;<i class="fas fa-arrow-circle-right"></i>
+                                        </a>
+                                    @endif
                                 </x-can-take-exam>
                             </div>
                         </div>

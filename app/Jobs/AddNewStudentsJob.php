@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Events\UserRegistered;
+use App\Helpers\GoogleSheets;
 use App\Models\Oex_exam_master;
 use App\Models\User;
 use App\Models\user_exam;
@@ -13,7 +14,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+
 
 class AddNewStudentsJob implements ShouldQueue
 {
@@ -51,7 +54,9 @@ class AddNewStudentsJob implements ShouldQueue
             ]);
 
             if ($validator->fails()) {
-                $errors[] = ['status' => 'false', 'message' => $validator->errors()->all()];
+                $errors[] = "Error creating student with email " . $student['email'];
+                $errors[] = $validator->errors()->all();
+                break;
             }
 
             $plainPassword = $student['password'] ?? str()->random(8);
@@ -97,17 +102,14 @@ class AddNewStudentsJob implements ShouldQueue
             );
 
             if ($existingUser == null) {
-                event(new UserRegistered($std, $plainPassword));
                 $userId = $std->userId;
-                $this->updateGoogleSheets($userId, ["registered" => true]);
+                GoogleSheets::updateGoogleSheets($userId, ["registered" => true]);
+                event(new UserRegistered($std, $plainPassword));
             }
         }
 
         if (!empty($errors)) {
+            Log::error($errors);
         }
-    }
-
-    protected function updateGoogleSheets($sheetId, array $data)
-    {
     }
 }

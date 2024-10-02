@@ -11,12 +11,11 @@ use App\Models\Oex_result;
 use App\Models\User;
 use App\Models\user_exam;
 use Illuminate\Support\Carbon;
-use App\Traits\UpdateGoogleSheets;
+use App\Helpers\GoogleSheets;
 use Illuminate\Support\Facades\Auth;
 
 class StudentOperation extends Controller
 {
-    use UpdateGoogleSheets;
     //student dashboard
     public function dashboard()
     {
@@ -138,7 +137,7 @@ class StudentOperation extends Controller
                 ->first();
             $yes_ans = $res->yes_ans;
             $total = $res->yes_ans + $res->no_ans;
-            $percentage = ($yes_ans / $total) * 100;
+            $percentage = round(($yes_ans / $total) * 100);
 
             return redirect(url('student/exam'))->with([
                 'flash' => "Test already submitted on this exam. Submission Date: {$std_info->submitted} .Result: {$percentage}% ({$yes_ans}/{$total})",
@@ -180,49 +179,16 @@ class StudentOperation extends Controller
         $res->no_ans = $no_ans;
         $res->result_json = json_encode($result);
         $total = $yes_ans + $no_ans;
-        $percentage = ($yes_ans / $total) * 100;
+        $percentage = round(($yes_ans / $total) * 100);
         echo $res->save();
         $storedResult = Oex_result::where('user_id', $user->id)->where('exam_id', $request->exam_id)->first();
-        $this->updateGoogleSheets($userId, ["result" => $storedResult->yes_ans]);
+        GoogleSheets::updateGoogleSheets($userId, ["result" => $storedResult->yes_ans]);
 
         return redirect(url('student/exam'))->with([
             'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
             'key' => 'success',
         ]);
     }
-
-
-    // public function sendResultToFile($userId)
-    // {
-    //     $user = User::where('userId', $userId)->first();
-
-    //     if (!$user) {
-    //         return response()->json(['error' => 'User not found'], 404);
-    //     }
-
-    //     $result = Oex_result::where('user_id', $user->id)->first();
-
-    //     if (!$result) {
-    //         return response()->json(['error' => 'Result not found'], 404);
-    //     }
-
-    //     $data = [
-    //         'sheetIndex' => 1,
-    //         'userId' => $user->userId,
-    //         'data' => [
-    //             'registered' => $user->registered,
-    //             'result' => $result->yes_ans,
-    //         ],
-    //     ];
-
-    //     $response = Http::post('#', $data);
-
-    //     if ($response->successful()) {
-    //         return response()->json(['message' => 'Result successfully sent to the file'], 200);
-    //     } else {
-    //         return response()->json(['error' => 'Failed to send result'], $response->status());
-    //     }
-    // }
 
     //Applying for exam
     public function apply_exam($id)

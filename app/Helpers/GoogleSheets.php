@@ -1,15 +1,18 @@
 <?php
-namespace App\Traits;
+
+namespace App\Helpers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
-trait UpdateGoogleSheets
+class GoogleSheets
 {
-    public function updateGoogleSheets($userId, array $data)
+    public static function updateGoogleSheets($userId, array $data)
     {
+
         $apiEndpoint = env('SheetUpdateURL');
         $data = [
-            'sheetIndex' => 1,
+            'sheetIndex' => 0,
             'userId' => $userId,
             'data' => $data,
         ];
