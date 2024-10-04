@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:prune-failed', ['--hours=24'])
             ->dailyAt('01:00');
 
-        $schedule->command('email:SendFeedback')->hourly();
+        $schedule->command('email:sendFeedback')->hourly();
     }
 
     /**

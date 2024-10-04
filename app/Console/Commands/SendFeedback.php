@@ -22,26 +22,25 @@ class SendFeedback extends Command
     public function handle()
     {
 
-    $completedExams = user_exam::whereNotNull('submitted')  
-    ->whereNull('user_feedback')->limit(300)
-    ->get();
-    if ($completedExams->isEmpty()) {
-        $this->info('No students completed exams in the last hour.');
-        return;
-    }
+        $completedExams = user_exam::whereNotNull('submitted')
+            ->whereNull('user_feedback')->limit(300)
+            ->get();
+        if ($completedExams->isEmpty()) {
+            $this->info('No students completed exams in the last hour.');
+            return;
+        }
 
-    $emails = [];
         $userEmails = User::select('email')->whereIn('id', $completedExams->pluck('id')->all())->get()->pluck('email')->all();
-      
-    if (count($userEmails) > 0) {
-        Mail::to(env('MAIL_FROM_ADDRESS'))->bcc($emails)->send(new SendStudentFeedback());
-        user_exam::whereIn('id', $completedExams->pluck('id')->all())->update([
-            'user_feedback' => Carbon::now()->toDateTimeString()
-        ]);
 
-        $this->info('Emails sent to students who completed exams in the last hour.');
-    } else {
-        $this->info('No valid email addresses found.');
-    }    
-}
+        if (count($userEmails) > 0) {
+            Mail::to(env('MAIL_FROM_ADDRESS'))->bcc($userEmails)->send(new SendStudentFeedback());
+            user_exam::whereIn('id', $completedExams->pluck('id')->all())->update([
+                'user_feedback' => Carbon::now()->toDateTimeString()
+            ]);
+
+            $this->info('Emails sent to students who completed exams in the last hour.');
+        } else {
+            $this->info('No valid email addresses found.');
+        }
+    }
 }

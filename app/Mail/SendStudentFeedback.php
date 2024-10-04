@@ -19,19 +19,16 @@ class SendStudentFeedback extends Mailable
      *
      * @return void
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
-        /**
+    /**
      * Build the message.
      *
      * @return $this
      */
     public function build()
     {
-        return $this->subject('ExamFeedback')
+        return $this->subject('Exam Feedback')
             ->markdown('mail.send_feedback');
     }
-
 }
