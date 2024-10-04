@@ -9,7 +9,7 @@ class GoogleSheets
 {
     public static function updateGoogleSheets($userId, array $data)
     {
-
+        return;
         $apiEndpoint = env('SheetUpdateURL');
         $data = [
             'sheetIndex' => 0,
