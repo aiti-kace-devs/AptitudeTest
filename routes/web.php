@@ -65,6 +65,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::post('/edit_new_category', [AdminController::class, 'edit_new_category']);
         Route::post('/edit_exam_sub', [AdminController::class, 'edit_exam_sub']);
         Route::post('/add_new_students', [AdminController::class, 'add_new_students']);
+        Route::get('/reset-exam/{exam_id}/student/{user_id}', [StudentOperation::class, 'reset_exam'])->name('reset-exam');
     });
 });
 

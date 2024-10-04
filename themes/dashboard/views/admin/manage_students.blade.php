@@ -62,7 +62,7 @@
                                                             <span class="badge badge-secondary">N/A</span>
                                                         @else
                                                             <span
-                                                                class="badge badge-warning">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
+                                                                class="badge badge-{{ ($std->result->yes_ans >= 25 ? 'success' : $std->result->yes_ans >= 15) ? 'primary' : 'danger' }}">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
                                                             {{-- <span class="badge badge-warning">{{ $std->result->yes_ans}}</span> --}}
                                                         @endif
 
@@ -80,15 +80,13 @@
                                                         {{-- <a href="{{url('admin/edit_students/'.$std['id'])}}" class="btn btn-primary">Edit</a> --}}
                                                         <a href="{{ url('admin/delete_students/' . $std['id']) }}"
                                                             class="btn btn-danger btn-sm">Delete</a>
-                                                        <?php
-                                    if($std['exam_joined']==1){
-                                    ?>
-                                                        <a href="{{ url('admin/admin_view_result/' . $std['user_id']) }}"
-                                                            class="btn btn-success btn-sm">View Result</a>
-                                                        <?php
-                                    }
-                                    ?>
 
+                                                        @if ($std['exam_joined'] == 1)
+                                                            <a href="{{ url('admin/admin_view_result/' . $std['user_id']) }}"
+                                                                class="btn btn-success btn-sm">View Result</a>
+                                                        @endif
+                                                        <a href="{{ route('admin.reset-exam', [$std['exam_id'], $std['user_id']]) }}"
+                                                            class="btn btn-info btn-sm">Reset Result</a>
                                                     </td>
                                                 </tr>
                                             @endforeach

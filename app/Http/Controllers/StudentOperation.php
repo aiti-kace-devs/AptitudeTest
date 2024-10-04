@@ -13,6 +13,7 @@ use App\Models\user_exam;
 use Illuminate\Support\Carbon;
 use App\Helpers\GoogleSheets;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class StudentOperation extends Controller
 {
@@ -231,5 +232,29 @@ class StudentOperation extends Controller
         $data['question'] = Oex_question_master::where('exam_id', $id)->get()->toArray();
 
         return view('student.view_amswer', $data);
+    }
+
+    public function reset_exam($exam_id, $user_id)
+    {
+
+        $user = User::findOrFail($user_id);
+        $user->created_at = Carbon::now()->toDateTimeString();
+        $user->updated_at = Carbon::now()->toDateTimeString();
+        $user->save();
+
+        user_exam::updateOrCreate(
+            [
+                'user_id' => $user_id,
+                'exam_id' => $exam_id,
+            ],
+            ['started' => null, 'submitted' => null, 'exam_joined' => 0, 'std_status' => 1],
+        );
+
+        Oex_result::where('user_id', $user_id)->where('exam_id', $exam_id)->delete();
+
+        return redirect(url('admin/manage_students'))->with([
+            'flash' => 'Exam reset successfully',
+            'key' => 'success',
+        ]);
     }
 }

@@ -259,6 +259,19 @@
             $('.datatable').dataTable();
         });
     </script>
+    <script>
+        const flashMessage = "{{ session('flash') }}";
+        const key = "{{ session('key') }}";
+
+        if (flashMessage) {
+            setTimeout(() => {
+                Swal.fire({
+                    text: flashMessage,
+                    icon: key || 'info'
+                })
+            }, 500);
+        }
+    </script>
 </body>
 
 </html>
