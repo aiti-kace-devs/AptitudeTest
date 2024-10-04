@@ -62,14 +62,14 @@
                                                             <span class="badge badge-secondary">N/A</span>
                                                         @else
                                                             <span
-                                                                class="badge badge-{{ ($std->result->yes_ans >= 25 ? 'success' : $std->result->yes_ans >= 15) ? 'primary' : 'danger' }}">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
+                                                                class="badge badge-{{ ($std->result->yes_ans <= 15 ? 'danger' : $std->result->yes_ans <= 80) ? 'primary' : 'success' }}">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
                                                             {{-- <span class="badge badge-warning">{{ $std->result->yes_ans}}</span> --}}
                                                         @endif
 
                                                     </td>
                                                     <td>
                                                         @if ($std['submitted'] == null)
-                                                            <span class="badge badge-primary">Not Taken</span>
+                                                            <span class="badge badge-secondary">Not Taken</span>
                                                         @elseif($std->result->yes_ans >= $std['passmark'])
                                                             <span class="badge badge-success">PASS</span>
                                                         @else
