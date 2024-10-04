@@ -62,7 +62,7 @@
                                                             <span class="badge badge-secondary">N/A</span>
                                                         @else
                                                             <span
-                                                                class="badge badge-{{ ($std->result->yes_ans <= 15 ? 'danger' : $std->result->yes_ans <= 80) ? 'primary' : 'success' }}">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
+                                                                class="badge badge-{{ ($std->result->yes_ans <= 20 ? 'danger' : $std->result->yes_ans <= 25) ? 'primary' : 'success' }}">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
                                                             {{-- <span class="badge badge-warning">{{ $std->result->yes_ans}}</span> --}}
                                                         @endif
 
