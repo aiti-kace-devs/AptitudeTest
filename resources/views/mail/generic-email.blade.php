@@ -8,7 +8,7 @@ exam.
 <br>
 Please submit it as soon as possible.
 
-<x-mail::panel'>
+<x-mail::panel>
 For more information, kindly send a whatsapp message on 0556660355 or call us on 0536466032
 </x-mail::panel>
 
