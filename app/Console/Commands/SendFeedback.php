@@ -30,7 +30,7 @@ class SendFeedback extends Command
             return;
         }
 
-        $userEmails = User::select('email')->whereIn('id', $completedExams->pluck('id')->all())->get()->pluck('email')->all();
+        $userEmails = User::select('email')->whereIn('id', $completedExams->pluck('user_id')->all())->get()->pluck('email')->all();
 
         if (count($userEmails) > 0) {
             Mail::to(env('MAIL_FROM_ADDRESS'))->bcc($userEmails)->send(new SendStudentFeedback());
