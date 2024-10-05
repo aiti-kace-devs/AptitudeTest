@@ -103,7 +103,7 @@ class AddNewStudentsJob implements ShouldQueue
 
             if ($existingUser == null) {
                 $userId = $std->userId;
-                GoogleSheets::updateGoogleSheets($userId, ["registered" => true]);
+                GoogleSheets::updateGoogleSheets($userId, ["registered" => true, "result" => "N/A"]);
                 event(new UserRegistered($std, $plainPassword));
             }
         }
