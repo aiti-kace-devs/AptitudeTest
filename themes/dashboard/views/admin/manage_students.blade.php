@@ -41,9 +41,10 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Name</th>
+                                                <th>Email</th>
                                                 {{-- <th>DOB</th> --}}
                                                 <th>Exam</th>
-                                                <th>Exam Date</th>
+                                                {{-- <th>Exam Date</th> --}}
                                                 <th>Result</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
@@ -52,10 +53,10 @@
                                         <tbody>
                                             @foreach ($students as $key => $std)
                                                 <tr>
-                                                    <td>{{ $key + 1 }}</td>
+                                                    <td>{{ $std['id'] }}</td>
                                                     <td>{{ $std['name'] }}</td>
+                                                    <td>{{ $std['email'] }}</td>
                                                     <td>{{ $std['title'] }}</td>
-                                                    <td>{{ $std['exam_date'] }}</td>
                                                     <td>
 
                                                         @if ($std['submitted'] == null)
