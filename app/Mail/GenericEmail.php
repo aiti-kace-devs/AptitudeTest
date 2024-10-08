@@ -31,7 +31,7 @@ class GenericEmail extends Mailable implements ShouldQueue
     public function envelope()
     {
         return new Envelope(
-            subject: 'Exam Feedback Miscommunication',
+            subject: 'Complete Your Aptitude Test',
         );
     }
 

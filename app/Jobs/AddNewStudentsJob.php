@@ -63,7 +63,12 @@ class AddNewStudentsJob implements ShouldQueue
 
             // Exam validation
             if (!empty($student['exam_name'])) {
-                $exam = Oex_exam_master::where('title', $student['exam_name'])->first();
+                $exam = null;
+                if (strtolower($student['exam_name']) == 'random') {
+                    $exam = Oex_exam_master::inRandomOrder()->first();
+                } else {
+                    $exam = Oex_exam_master::where('title', $student['exam_name'])->first();
+                }
                 if ($exam == null) {
                     abort(422, 'Exam not found');
                 }
