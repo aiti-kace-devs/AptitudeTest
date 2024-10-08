@@ -56,7 +56,15 @@ class StudentOperation extends Controller
     //join exam page
     public function join_exam($id)
     {
-        $question = Oex_question_master::where('exam_id', $id)->inRandomOrder()->get();
+        $questionSets = Oex_question_master::select('exam_id')
+        ->distinct()
+        ->pluck('exam_id');
+        $randomExamId = $questionSets->random();
+        $question = Oex_question_master::where('exam_id', $randomExamId)
+        ->inRandomOrder()
+        ->get();
+
+        // $question = Oex_question_master::where('exam_id', $id)->inRandomOrder()->get();
         $user_exam = user_exam::where('exam_id', $id)->where('user_id', Session::get('id'))->get()->first();
 
         if ($user_exam && $user_exam->submitted) {
