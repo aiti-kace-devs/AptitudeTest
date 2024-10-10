@@ -56,7 +56,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/delete_registered_students/{id}', [AdminController::class, 'delete_registered_students']);
         Route::get('/apply_exam/{id}', [AdminController::class, 'apply_exam']);
         Route::get('/admin_view_result/{id}', [AdminController::class, 'admin_view_result']);
-
+        Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
         Route::post('/edit_question_inner', [AdminController::class, 'edit_question_inner']);
         Route::post('/add_new_question', [AdminController::class, 'add_new_question']);
         Route::post('/edit_students_final', [AdminController::class, 'edit_students_final']);
@@ -74,6 +74,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
 /* Student section routes */
 Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group(function () {
 
+    Route::get('/select-session/{user_id}', [StudentOperation::class, 'select_session_view']);
+    Route::post('/select-session/{user_id}', [StudentOperation::class, 'confirm_session'])->name('select-session');
 
     Route::middleware(['auth:web'])->group(function () {
         Route::get('/dashboard', [StudentOperation::class, 'dashboard']);

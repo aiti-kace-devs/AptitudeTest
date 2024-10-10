@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\StudentAdmitted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Models\Oex_student;
@@ -9,11 +10,16 @@ use App\Models\Oex_exam_master;
 use App\Models\Oex_question_master;
 use App\Models\Oex_result;
 use App\Models\User;
+use App\Models\CourseSession;
+use App\Models\Course;
+use App\Models\UserAdmission;
 use App\Models\user_exam;
 use Illuminate\Support\Carbon;
 use App\Helpers\GoogleSheets;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Jobs\AdmitStudentJob;
 
 class StudentOperation extends Controller
 {
@@ -57,12 +63,12 @@ class StudentOperation extends Controller
     public function join_exam($id)
     {
         $questionSets = Oex_question_master::select('exam_id')
-        ->distinct()
-        ->pluck('exam_id');
+            ->distinct()
+            ->pluck('exam_id');
         $randomExamId = $questionSets->random();
         $question = Oex_question_master::where('exam_id', $randomExamId)
-        ->inRandomOrder()
-        ->get();
+            ->inRandomOrder()
+            ->get();
 
         // $question = Oex_question_master::where('exam_id', $id)->inRandomOrder()->get();
         $user_exam = user_exam::where('exam_id', $id)->where('user_id', Session::get('id'))->get()->first();
@@ -264,5 +270,129 @@ class StudentOperation extends Controller
             'flash' => 'Exam reset successfully',
             'key' => 'success',
         ]);
+    }
+
+    public function select_session_view($user_id)
+    {
+        $admission = UserAdmission::where('user_id', $user_id)->first();
+        if ($admission->confirmed) {
+            return view('student.session-select.index', [
+                "confirmed" => true,
+                "session" => CourseSession::where('id', $admission->session)->first(),
+            ]);
+        }
+        $courseDetails = Course::find($admission->course_id);
+        $sessions = CourseSession::where('course_id', $courseDetails->id)->get();
+        // $sessions->each(function($s){
+        //     $used = UserAdmission::where('session', $s->id)->whereNotNull('confirmed')->count();
+
+        // });
+        $user = User::select('id', 'name', 'userId')->where('userId', $user_id)->first();
+        return view('student.session-select.index', [
+            "user" => $user,
+            "sessions" => $sessions,
+            "course" => $courseDetails,
+            "confirmed" => false
+        ]);
+    }
+
+    public function confirm_session($user_id, Request $request)
+    {
+
+        try {
+            $data = $request->validate([
+                'session_id' => 'required|exists:course_sessions,id'
+            ]);
+
+            $admission = UserAdmission::where('user_id', $user_id)->first();
+            $courseDetails = Course::find($admission->course_id);
+            $session = CourseSession::where('course_id', $courseDetails->id)
+                ->where('id', $data['session_id'])
+                ->first();
+
+            if (!$session) {
+                return redirect(url('student/select-session' . $data['user_id']))->with([
+                    'flash' => 'Unable to confirm session. Try again later',
+                    'key' => 'error',
+                ]);
+            }
+
+            $slotLeft = $session->slotLeft();
+
+            if ($slotLeft < 1) {
+                return redirect(url('student/select-session' . $data['user_id']))->with([
+                    'flash' => 'Unable to confirm session. No slots available',
+                    'key' => 'error',
+                ]);
+            }
+
+            $admission->confirmed = now();
+            $admission->session = $session->id;
+            $admission->email_sent = now();
+            $admission->location = $courseDetails->location;
+            $admission->save();
+
+            AdmitStudentJob::dispatch($admission);
+            return redirect(url('student/select-session/' . $user_id))->with([
+                'flash' => 'Confirmation successful',
+                'key' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            return redirect(url('student/select-session/' . $user_id))->with([
+                'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
+                'key' => 'error',
+            ]);
+        }
+    }
+
+    public function admit_student(Request $request)
+    {
+
+        try {
+            $students = $request->get('students');
+            if ($students) {
+                foreach ($students as $student) {
+                    $course_name = $student['course'] ?? null;
+                    $location = $student['location'] ?? null;
+                    $user_id = $student['user_id'] ?? null;
+
+                    if (!$course_name || !$location || !$user_id) {
+                        break;
+                    }
+                    $course = Course::where('course_name', $course_name)->where('location', $location)->first();
+                    if (!$course) {
+                        break;
+                    }
+
+                    $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
+                    $user = User::where('userId', $user_id)->first();
+                    $url = url('student/select-session/' . $user_id);
+
+                    if ($oldAdmission && !$oldAdmission->email_sent) {
+                        Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
+                        $oldAdmission->email_sent = now();
+                        $oldAdmission->save();
+                        break;
+                    }
+
+
+                    $admission = new UserAdmission();
+                    $admission->user_id = $user_id;
+                    $admission->course_id = $course->id;
+                    $admission->email_sent = now();
+                    $admission->save();
+
+                    Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
+                }
+            }
+
+            return ["message" => "success"];
+        } catch (\Exception $e) {
+            // return redirect(url('student/select-session/' . $user_id))->with([
+            //     'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
+            //     'key' => 'error',
+            // ]);
+            abort(503);
+        }
     }
 }
