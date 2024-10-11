@@ -132,12 +132,12 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                 ],
                 "Microsoft Artificial Intelligence" => [
                     "mode" => [
-                        "Virtual" => [3, 4, 8, 9, 11],
-                        "In-Person" => [1, 2, 5, 6, 7, 10, 12],
+                        "Virtual" => [1, 2, 5, 7],
+                        "In-Person" => [3, 4, 6, 8],
                     ],
                     "startDate" => "14th October, 2024",
                     "venue" => "Kumasi Technical University (KsTU), Main Campus - Kumasi",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)"
                 ],
                 "Web Technology" => [
                     "mode" => [
@@ -146,6 +146,44 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     ],
                     "startDate" => "14th October, 2024",
                     "venue" => "Kumasi Technical University (KsTU), Main Campus - Kumasi",
+                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                ],
+            ],
+            "Northern" => [
+                "Data Analytics with Power BI" => [
+                    "mode" => [
+                        "Virtual" => [3, 4, 7, 8, 9, 11],
+                        "In-Person" => [1, 2, 5, 6, 10, 12],
+                    ],
+                    "startDate" => "14th October, 2024",
+                    "venue" => "Tamale Technical University (TaTU)",
+                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                ],
+                "Cyber Ops" => [
+                    "mode" => [
+                        "Virtual" => [1, 2, 5, 6, 7, 11],
+                        "In-Person" => [3, 4, 9, 10],
+                    ],
+                    "startDate" => "14th October, 2024",
+                    "venue" => "Tamale Technical University (TaTU)",
+                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                ],
+                "Digital Marketing" => [
+                    "mode" => [
+                        "Virtual" => [1, 2, 5, 6, 7, 11],
+                        "In-Person" => [3, 4, 9, 10],
+                    ],
+                    "startDate" => "14th October, 2024",
+                    "venue" => "Tamale Technical University (TaTU)",
+                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                ],
+                "Web Technology" => [
+                    "mode" => [
+                        "Virtual" => [1, 2, 5, 6, 7, 11],
+                        "In-Person" => [3, 4, 8, 9, 10, 12],
+                    ],
+                    "startDate" => "14th October, 2024",
+                    "venue" => "Tamale Technical University (TaTU)",
                     "duration" => "12 Weeks / 3 months (Weekdays Only)"
                 ],
             ],
