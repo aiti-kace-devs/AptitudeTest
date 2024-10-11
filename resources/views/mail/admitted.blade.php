@@ -9,6 +9,8 @@ Start Date: {{$data['startDate']}}.
 
 Training Duration: {{$data['duration']}}.
 
+A link will be shared for the virtual classes before {{$data['startDate']}}.
+
 Mode:
 <x-mail::table>
 |  Week |  Mode |
@@ -18,8 +20,9 @@ Mode:
 @endforeach
 </x-mail::table>
 
-Venue: {{$data['venue']}}
-Required Resource: Laptop
+Venue: {{$data['venue']}}.
+
+Required Resource: Laptop.
 
 Kindly select a session that fits your schedule by clicking on the button below
 

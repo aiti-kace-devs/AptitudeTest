@@ -348,6 +348,7 @@ class StudentOperation extends Controller
     public function admit_student(Request $request)
     {
 
+        $count = 0;
         try {
             $students = $request->get('students');
             if ($students) {
@@ -383,10 +384,11 @@ class StudentOperation extends Controller
                     $admission->save();
 
                     Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
+                    $count++;
                 }
             }
 
-            return ["message" => "success"];
+            return ["success" => "true", "message" => "admitted {$count} students"];
         } catch (\Exception $e) {
             // return redirect(url('student/select-session/' . $user_id))->with([
             //     'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
