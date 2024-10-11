@@ -384,7 +384,7 @@ class StudentOperation extends Controller
                         $admission->email_sent = now();
                         $admission->save();
 
-                        Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
+                        Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
                         $count++;
                     }
                 }
