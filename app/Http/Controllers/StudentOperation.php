@@ -274,7 +274,7 @@ class StudentOperation extends Controller
 
     public function select_session_view($user_id)
     {
-        $admission = UserAdmission::where('user_id', $user_id)->first();
+        $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
         if ($admission->confirmed) {
             return view('student.session-select.index', [
                 "confirmed" => true,
@@ -304,7 +304,7 @@ class StudentOperation extends Controller
                 'session_id' => 'required|exists:course_sessions,id'
             ]);
 
-            $admission = UserAdmission::where('user_id', $user_id)->first();
+            $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
             $courseDetails = Course::find($admission->course_id);
             $session = CourseSession::where('course_id', $courseDetails->id)
                 ->where('id', $data['session_id'])
@@ -376,15 +376,17 @@ class StudentOperation extends Controller
                         break;
                     }
 
+                    if (!$oldAdmission) {
 
-                    $admission = new UserAdmission();
-                    $admission->user_id = $user_id;
-                    $admission->course_id = $course->id;
-                    $admission->email_sent = now();
-                    $admission->save();
+                        $admission = new UserAdmission();
+                        $admission->user_id = $user_id;
+                        $admission->course_id = $course->id;
+                        $admission->email_sent = now();
+                        $admission->save();
 
-                    Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
-                    $count++;
+                        Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
+                        $count++;
+                    }
                 }
             }
 

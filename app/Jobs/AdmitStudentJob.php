@@ -49,7 +49,7 @@ class AdmitStudentJob implements ShouldQueue
         if (!$user || !$session) {
             return;
         }
-        Mail::to($user->email)->queue(new ConfirmationSuccessful($user->name, $session->name, $session->course_time));
+        Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))->queue(new ConfirmationSuccessful($user->name, $session->name, $session->course_time));
         GoogleSheets::updateGoogleSheets($this->admission->user_id, [
             "confirmed" => true,
             "session" => $session->session,
