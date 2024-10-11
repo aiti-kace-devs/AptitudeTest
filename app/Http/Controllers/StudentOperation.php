@@ -392,11 +392,12 @@ class StudentOperation extends Controller
 
             return ["success" => "true", "message" => "admitted {$count} students"];
         } catch (\Exception $e) {
+            return $e->getMessage();
             // return redirect(url('student/select-session/' . $user_id))->with([
             //     'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
             //     'key' => 'error',
             // ]);
-            abort(503);
+            // abort(503);
         }
     }
 }
