@@ -387,6 +387,15 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     "venue" => " GI-KACE, Sunyani Penkwase Lowcost",
                     "duration" => "12 Weeks / 3 months (Weekdays Only)"
                 ],
+                "Microsoft Artificial Intelligence" => [
+                    "mode" => [
+                        "Virtual" => [1, 2, 5, 7],
+                        "In-Person" => [3, 4, 6, 8],
+                    ],
+                    "startDate" => "14th October, 2024",
+                    "venue" => "GI-KACE, Sunyani Penkwase Lowcost",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)"
+                ],
             ],
             "Volta - Nurses Training College, Ho" => [
                 "AI for Office Productivity" => [
