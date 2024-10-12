@@ -1,16 +1,20 @@
 <x-mail::message>
-# Hello
+# Dear Applicant,
 
-Good News.
 <br>
-We have reopened the examination portal for you to take your test.
-You have until Wednesday 9th October, 2024. 11:30pm.
-<br>
-Please complete your exams as soon as possible.
+Once again congratulations on your selection to participate in the FREE ‘eskills4Jobs’ training.
+Be reminded that classes will commence on Monday, October 14, 2024.
+<x-mail::panel>
+<b>To ensure a seamless learning experience, ALL CLASSES for the first week will now be conducted online.</b>
+</x-mail::panel>
+A link to join the virtual classroom will be sent to you shortly.
+We're eager to guide you through this transformative learning experience.
 
 <x-mail::panel>
-For more information, kindly send a whatsapp message on 0556660355 or call us on 0536466032
+If you have any questions or require further assistance, please don't hesitate to contact us 0556660355/ 0536466032
 </x-mail::panel>
+
+<b>This email supersedes any previous communications regarding the training.</b>
 
 Thank you.<br>
 {{ config('app.name') }}
