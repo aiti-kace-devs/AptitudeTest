@@ -377,7 +377,7 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     "duration" => "12 Weeks / 3 months (Weekdays Only)"
                 ],
             ],
-            "Bono - GI-KACE, Sunyani Lowcost" => [
+            "Bono - GI-KACE, Sunyani Penkwase Lowcost" => [
                 "Data Analytics with Power BI" => [
                     "mode" => [
                         "Virtual" => [3, 4, 7, 8, 9, 11],
