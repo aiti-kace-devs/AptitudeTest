@@ -1,20 +1,28 @@
 <x-mail::message>
-# Dear Applicant,
+# Hello Participant,
 
 <br>
-Once again congratulations on your selection to participate in the FREE ‘eskills4Jobs’ training.
-Be reminded that classes will commence on Monday, October 14, 2024.
-<x-mail::panel>
-<b>To ensure a seamless learning experience, ALL CLASSES for the first week will now be conducted online.</b>
-</x-mail::panel>
-A link to join the virtual classroom will be sent to you shortly.
-We're eager to guide you through this transformative learning experience.
+We're excited to announce that our training begins tomorrow, October 14th.
+As previously mentioned, all classes for the first week will be held online.
+
+Virtual Week 1 : 14th - 18th October, 2024
+
+<b>Please make sure you've confirmed your participation by selecting a session.</b>
+
+<x-mail::button :url="url('student/meeting-link')">
+Class Meeting Link
+</x-mail::button>
+
+If you're having trouble clicking the button, log into your exam portal and look for the "Class Meeting Link."
+
+Please note: This email is the most up-to-date information regarding the training.
 
 <x-mail::panel>
 If you have any questions or require further assistance, please don't hesitate to contact us 0556660355/ 0536466032
 </x-mail::panel>
 
-<b>This email supersedes any previous communications regarding the training.</b>
+See you tomorrow!
+
 
 Thank you.<br>
 {{ config('app.name') }}

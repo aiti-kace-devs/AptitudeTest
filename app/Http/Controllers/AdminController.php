@@ -22,6 +22,8 @@ use App\Models\Admin;
 use App\Models\Oex_result;
 use App\Mail\ExamLoginCredentials;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
+
 use App\Helpers\GoogleSheets;
 use App\Models\Course;
 
@@ -33,6 +35,7 @@ class AdminController extends Controller
         $user_count = User::get()->count();
         $exam_count = Oex_exam_master::get()->count();
         $admin_count = Admin::get()->count();
+
         return view('admin.dashboard', ['student' => $user_count, 'exam' => $exam_count, 'admin' => $admin_count]);
     }
 
@@ -441,24 +444,20 @@ class AdminController extends Controller
     public function generate_qrcode_page()
     {
 
-        $locations = Course::distinct('location')->get()->all();
         $courses = Course::distinct('course_name')->get()->all();
 
-
         return view('admin.qr-generator', [
-            "locations" => $locations,
+            // "locations" => $locations,
             "courses" => $courses
         ]);
     }
 
     public function scan_qrcode_page()
     {
-        $locations = Course::select('location')->distinct('location')->get();
-        $courses = Course::select('course_name')->distinct('course_name')->get();
-
+        $courses = Course::all();
 
         return view('admin.qr-scanner', [
-            "locations" => $locations,
+            // "locations" => $locations,
             "courses" => $courses
         ]);
     }

@@ -10,34 +10,38 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Attendance;
 use ReallySimpleJWT\Token;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Jobs\UpdateAttendanceOnSheetJob;
 
 class AttendanceController extends Controller
 {
-    public function generateQRCodeData($courseId)
+    public function generateQRCodeData(Request $request)
     {
-        $course = Course::find($courseId);
-        if (!$course) {
-            throw new \Exception('Course not found.');
-        }
-
-        // $scret should be 12 char and must containe upper,lower,number and specialchar
-        $secret = env('APP_KEY');
-
-        $data = json_encode([
-            'course_id' => $course->id,
-            'location' => $course->location,
-            'date' => Carbon::now()->format('Y-m-d'),
+        $data = $request->validate([
+            'course_id' => 'exists:courses,id',
+            'date' => 'date|before_or_equal:' . now()->toDateString()
         ]);
 
-        $expiration = Carbon::now()->addHours(2)->timestamp;
+        // $course = Course::findOrFail($courseId);
+        $course = Course::findOrFail($data['course_id']);
+
+
+        // $scret should be 12 char and must containe upper,lower,number and specialchar
+        $secret = env('JWT_KEY');
+
+        $dataToEncode = json_encode([
+            'course_id' => $course->id,
+            'location' => $course->location,
+            'date' => $data['date'],
+        ]);
+
+        $expiration = Carbon::now()->addMinutes(30)->timestamp;
 
         $issuer = 'attendance_app';
         // dd($secret);
 
-        $token = Token::create($data, $secret, $expiration, $issuer);
+        $token = Token::create($dataToEncode, $secret, $expiration, $issuer);
 
-        return $token;
+        return response()->json(["data" => $token]);
         // $loginUrl = url('/login?scanned_data=' . urlencode($token));
         // $qrCode = QrCode::size(300)->generate($loginUrl);
 
@@ -50,7 +54,7 @@ class AttendanceController extends Controller
 
         $scannedToken = $request->input('scanned_data');
 
-        $secret = env('APP_KEY');
+        $secret = env('JWT_KEY');
 
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Please log in to record attendance.');
@@ -99,11 +103,44 @@ class AttendanceController extends Controller
         }
     }
 
+    public function confirmAttendance(Request $request)
+    {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,userId',
+            'course_id' => 'required|exists:courses,id',
+            'date' => 'required|date|before_or_equal:' . now()->toDateString(),
+        ]);
+
+
+        $userAdmitted = UserAdmission::where('user_id', $data['user_id'])->whereNotNull('confirmed')->first();
+        if (!$userAdmitted) {
+            return response()->json(['message' => 'User not admitted. Cannot confirm attendance', 'success' => false]);
+        }
+
+        $alreadyConfirmed = Attendance::where('user_id', $data['user_id'])->where('date', $data['date'])->first();
+        if ($alreadyConfirmed) {
+            return response()->json(['message' => 'Attendance already confirmed.', 'success' => true]);
+        }
+
+        $attendance = new Attendance();
+        $attendance->user_id = $data['user_id'];
+        $attendance->course_id = $data['course_id'];
+        $attendance->date = $data['date'];
+        $attendance->save();
+
+        UpdateAttendanceOnSheetJob::dispatch($attendance);
+
+        return response()->json(['message' => 'Attendance recorded successfully.', 'success' => true]);
+    }
+
     public function viewAttendance()
     {
-        $userId = Auth::id();
-        $attendanceRecords = Attendance::where('user_id', $userId)->get();
+        $userId = Auth::user()->userId;
+        $attendance = Attendance::select('attendances.*', 'courses.created_at as course_created', 'courses.course_name')
+            ->where('user_id', $userId)
+            ->join('courses', 'courses.id', 'attendances.course_id')
+            ->get();
 
-        return view('dashboard.attendance', compact('attendanceRecords'));
+        return view('student.attendance', compact('attendance'));
     }
 }

@@ -26,6 +26,10 @@ class StudentOperation extends Controller
     //student dashboard
     public function dashboard()
     {
+        if (Auth::user()->isAdmitted()) {
+            return redirect('/student/id-qrcode');
+        }
+
         $data['portal_exams'] = user_exam::select(['user_exams.*', 'users.name', 'oex_exam_masters.*', 'oex_categories.name as category_name'])
             ->selectRaw('(SELECT count(id) from oex_question_masters where exam_id = oex_exam_masters.id) as question_count', [])
             ->join('users', 'users.id', '=', 'user_exams.user_id')
@@ -46,6 +50,9 @@ class StudentOperation extends Controller
     //Exam page
     public function exam()
     {
+        if (Auth::user()->isAdmitted()) {
+            return redirect('/student/id-qrcode');
+        }
         $student_info = user_exam::select(['user_exams.*', 'users.name', 'oex_exam_masters.title', 'oex_exam_masters.exam_date', 'users.created_at as registered'])
             ->join('users', 'users.id', '=', 'user_exams.user_id')
             ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
@@ -62,6 +69,10 @@ class StudentOperation extends Controller
     //join exam page
     public function join_exam($id)
     {
+        if (Auth::user()->isAdmitted()) {
+            return redirect('/student/id-qrcode');
+        }
+
         $questionSets = Oex_question_master::select('exam_id')
             ->distinct()
             ->pluck('exam_id');

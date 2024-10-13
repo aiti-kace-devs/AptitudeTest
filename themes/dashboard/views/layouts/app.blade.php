@@ -8,6 +8,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title> @yield('title')</title>
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
     <!-- Google Font: Source Sans Pro -->
@@ -145,17 +147,17 @@
                                 <p>Registered students</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">
                                 <i class="fas fa-qrcode nav-icon"></i>
                                 <p>Generate QR Code</p>
                             </a>
-                        </li>
+                        </li> --}}
 
                         <li class="nav-item">
                             <a href="{{ url('admin/scan_qrcode') }}" class="nav-link">
                                 <i class="fas fa-camera nav-icon"></i>
-                                <p>Scan QR Code</p>
+                                <p>Scan/Generate QR Code</p>
                             </a>
                         </li>
 

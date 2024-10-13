@@ -45,4 +45,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function isAdmitted()
+    {
+        return UserAdmission::where('user_id', $this->userId)
+            ->whereNotNull('confirmed')->count() == 1;
+    }
+
+    public function admissionEmailSent()
+    {
+        return UserAdmission::where('user_id', $this->userId)
+            ->whereNotNull('email_sent')->count() == 1;
+    }
 }

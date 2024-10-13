@@ -27,12 +27,37 @@
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
 
+                <div class="col-12">
+                    <!-- Default box -->
+                    <div class="card">
 
-                <!-- /.row -->
-                <!-- Main row -->
+                        <div class="card-body">
+                            <table class="table table-striped table-bordered table-hover datatable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Course</th>
+                                        <th>Date</th>
+                                        <th>Confirmed On</th>
 
-                <!-- /.row (main row) -->
-            </div><!-- /.container-fluid -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($attendance as $attend)
+                                        <tr class="bg-success text-dark">
+                                            <td>{{ $attend->id }}</td>
+                                            <td>{{ $attend->course_name }}</td>
+                                            <td>{{ $attend->date }}</td>
+                                            <td>{{ $attend->created_at }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            <!-- /.row -->
+                            <!-- Main row -->
+
+                            <!-- /.row (main row) -->
+                        </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->
     </div>

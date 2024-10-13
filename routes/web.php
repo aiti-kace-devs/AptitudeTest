@@ -69,7 +69,9 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::post('/add_new_students', [AdminController::class, 'add_new_students']);
         Route::get('/reset-exam/{exam_id}/student/{user_id}', [StudentOperation::class, 'reset_exam'])->name('reset-exam');
         Route::get('/generate_qrcode', [AdminController::class, 'generate_qrcode_page']);
+        Route::post('/generate_qrcode', [AttendanceController::class, 'generateQRCodeData']);
         Route::get('/scan_qrcode', [AdminController::class, 'scan_qrcode_page']);
+        Route::post('/confirm_attendance', [AttendanceController::class, 'confirmAttendance']);
     });
 });
 
@@ -104,7 +106,7 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
         // Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
 
         Route::post('/start-exam/{id}', [StudentOperation::class, 'start_exam']);
-
+        Route::get('/mark_attendance', [AttendanceController::class, 'recordAttendance'])->name('mark-attendance');
         Route::get('/logout', [AuthenticatedSessionController::class, 'destroy']);
     });
 });

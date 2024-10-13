@@ -93,7 +93,7 @@
         </nav>
         <!-- /.navbar -->
 
-        @unless (isset($noSide) == true)
+        @unless (isset($noSide) == true && !Auth::user())
             <!-- Main Sidebar Container -->
             <aside class="main-sidebar sidebar-dark-primary elevation-4">
                 <!-- Brand Logo -->
@@ -122,52 +122,63 @@
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                             data-accordion="false">
                             <!-- Add icons to the links using the .nav-icon class
-                                                           with font-awesome or any other icon font library -->
+                                                                                                           with font-awesome or any other icon font library -->
+                            @if (!Auth::user()->isAdmitted())
+                                <li class="nav-item">
+                                    <a href="{{ url('student/dashboard') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Dashboard
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('student/exam') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Exam
+                                        </p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if (!Auth::user()->isAdmitted() && Auth::user()->admissionEmailSent())
+                                <li class="nav-item">
+                                    <a href="{{ url('student/select-session/' . Auth::user()->userId) }}" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Choose Session
+                                        </p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if (Auth::user()->isAdmitted())
+                                <li class="nav-item">
+                                    <a href="{{ url('student/id-qrcode') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-qrcode"></i>
+                                        <p>
+                                            My ID (QR)
+                                        </p>
+                                    </a>
+                                </li>
 
-                            <li class="nav-item">
-                                <a href="{{ url('student/dashboard') }}" class="nav-link">
-                                    <i class="nav-icon fas fa-tachometer-alt"></i>
-                                    <p>
-                                        Dashboard
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ url('student/exam') }}" class="nav-link">
-                                    <i class="nav-icon fas fa-tachometer-alt"></i>
-                                    <p>
-                                        Exam
-                                    </p>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('student/meeting-link') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-video"></i>
+                                        <p>
+                                            Class Meeting Link
+                                        </p>
+                                    </a>
+                                </li>
 
-                            <li class="nav-item">
-                                <a href="{{ url('student/id-qrcode') }}" class="nav-link">
-                                    <i class="nav-icon fas fa-qrcode"></i>
-                                    <p>
-                                        My ID (QR)
-                                    </p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('student/meeting-link') }}" class="nav-link">
-                                    <i class="nav-icon fas fa-video"></i>
-                                    <p>
-                                        Class Meeting Link
-                                    </p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('student/attendance') }}" class="nav-link">
-                                    <i class="nav-icon fas fa-calendar"></i>
-                                    <p>
-                                        Attendance
-                                    </p>
-                                </a>
-                            </li>
-
+                                <li class="nav-item">
+                                    <a href="{{ url('student/attendance') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-calendar"></i>
+                                        <p>
+                                            Attendance
+                                        </p>
+                                    </a>
+                                </li>
+                            @endif
                             <li class="nav-item">
                                 <a href="{{ url('student/logout') }}" class="nav-link">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -179,9 +190,9 @@
                             <!--
 
 
-                                                    </ul>
-                                                  </nav>
-                                                  <!-- /.sidebar-menu -->
+                                                                                                    </ul>
+                                                                                                  </nav>
+                                                                                                  <! /.sidebar-menu -->
                 </div>
                 <!-- /.sidebar -->
             </aside>
