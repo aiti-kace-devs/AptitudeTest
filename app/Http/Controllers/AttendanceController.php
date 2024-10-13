@@ -57,12 +57,20 @@ class AttendanceController extends Controller
         }
 
         if (Token::validate($scannedToken, $secret)) {
-            $decodedString = Token::getPayload($scannedToken);
-            $decodedData = json_decode($decodedString, true);
+            $decodedData = Token::getPayload($scannedToken);
+            $decodedUserIdData = json_decode($decodedData['user_id'], true);
+            if (is_array($decodedUserIdData) && isset($decodedUserIdData['course_id']) && isset($decodedUserIdData['location']) && isset($decodedUserIdData['date'])) {
+                $courseId = $decodedUserIdData['course_id'];
+                $location = $decodedUserIdData['location'];
+                $date = Carbon::parse($decodedUserIdData['date'])->format('Y-m-d');
+            } else {
+                $courseId = null;
+                $location = null;
+            }
 
-            $courseId = $decodedData['course_id'];
-            $location = $decodedData['location'];
-            $date = Carbon::parse($decodedData['date'])->format('Y-m-d');
+            // $courseId = $decodedData['course_id'];
+            // $location = $decodedData['location'];
+            // $date = Carbon::parse($decodedData['date'])->format('Y-m-d');
 
             $loggedUserId = Auth::id();
 
