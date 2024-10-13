@@ -18,14 +18,13 @@ class AttendanceController extends Controller
     {
         $data = $request->validate([
             'course_id' => 'exists:courses,id',
-            'date' => 'date|before_or_equal:' . now()->toDateString()
+            'date' => 'date|before_or_equal:' . now()->toDateString(),
         ]);
 
         // $course = Course::findOrFail($courseId);
         $course = Course::findOrFail($data['course_id']);
 
-
-        // $scret should be 12 char and must containe upper,lower,number and specialchar
+        // $scret should be 12 char and must contain upper,lower,number and specialchar
         $secret = env('JWT_KEY');
 
         $dataToEncode = json_encode([
@@ -41,7 +40,7 @@ class AttendanceController extends Controller
 
         $token = Token::create($dataToEncode, $secret, $expiration, $issuer);
 
-        return response()->json(["data" => $token]);
+        return response()->json(['data' => $token]);
         // $loginUrl = url('/login?scanned_data=' . urlencode($token));
         // $qrCode = QrCode::size(300)->generate($loginUrl);
 
@@ -50,15 +49,9 @@ class AttendanceController extends Controller
 
     public function recordAttendance(Request $request)
     {
-        $confirmedAdmissions = UserAdmission::whereNotNull('confirmed')->pluck('user_id')->toArray();
-
         $scannedToken = $request->input('scanned_data');
 
         $secret = env('JWT_KEY');
-
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please log in to record attendance.');
-        }
 
         if (Token::validate($scannedToken, $secret)) {
             $decodedData = Token::getPayload($scannedToken);
@@ -72,34 +65,28 @@ class AttendanceController extends Controller
                 $location = null;
             }
 
-            // $courseId = $decodedData['course_id'];
-            // $location = $decodedData['location'];
-            // $date = Carbon::parse($decodedData['date'])->format('Y-m-d');
-
             $loggedUserId = Auth::id();
+            $confirmedAdmission = UserAdmission::where('user_id', $loggedUserId)->whereNotNull('confirmed')->first();
 
-            if (in_array($loggedUserId, $confirmedAdmissions)) {
-                $attendanceRecord = Attendance::where('user_id', $loggedUserId)->where('course_id', $courseId)->where('location', $location)->whereDate('date', $date)->first();
-
-                if ($attendanceRecord) {
-                    return redirect()->back()->with('message', 'Attendance for today is already recorded.');
-                } else {
-                    $attendance = new Attendance();
-                    $attendance->user_id = $loggedUserId;
-                    $attendance->course_id = $courseId;
-                    $attendance->location = $location;
-                    $attendance->date = $date;
-                    $attendance->save();
-
-                    $userId = Auth::user()->userId;
-                    GoogleSheets::updateGoogleSheets($userId, ['attendance' => true]);
-                    return redirect()->back()->with('message', 'Attendance recorded successfully.');
-                }
-            } else {
-                return redirect()->back()->with('error', 'You are not authorized to record attendance.');
+            if (!$confirmedAdmission) {
+                return response()->json(['message' => 'User not admitted. Cannot confirm attendance', 'success' => false]);
             }
-        } else {
-            return redirect()->back()->with('error', 'Invalid or expired QR code.');
+
+            $attendanceRecord = Attendance::where('user_id', $confirmedAdmission)->whereDate('date', $date)->first();
+
+            if ($attendanceRecord) {
+                return response()->json(['message' => 'Attendance already confirmed.', 'success' => true]);
+            }
+            $attendance = new Attendance();
+            $attendance->user_id = $loggedUserId;
+            $attendance->course_id = $courseId;
+            $attendance->location = $location;
+            $attendance->date = $date;
+            $attendance->save();
+
+            UpdateAttendanceOnSheetJob::dispatch($attendance);
+            return redirect('/student/attendance');
+            // return response()->json(['message' => 'Attendance recorded successfully.', 'success' => true]);
         }
     }
 
@@ -111,13 +98,16 @@ class AttendanceController extends Controller
             'date' => 'required|date|before_or_equal:' . now()->toDateString(),
         ]);
 
-
-        $userAdmitted = UserAdmission::where('user_id', $data['user_id'])->whereNotNull('confirmed')->first();
+        $userAdmitted = UserAdmission::where('user_id', $data['user_id'])
+            ->whereNotNull('confirmed')
+            ->first();
         if (!$userAdmitted) {
             return response()->json(['message' => 'User not admitted. Cannot confirm attendance', 'success' => false]);
         }
 
-        $alreadyConfirmed = Attendance::where('user_id', $data['user_id'])->where('date', $data['date'])->first();
+        $alreadyConfirmed = Attendance::where('user_id', $data['user_id'])
+            ->where('date', $data['date'])
+            ->first();
         if ($alreadyConfirmed) {
             return response()->json(['message' => 'Attendance already confirmed.', 'success' => true]);
         }
@@ -136,10 +126,7 @@ class AttendanceController extends Controller
     public function viewAttendance()
     {
         $userId = Auth::user()->userId;
-        $attendance = Attendance::select('attendances.*', 'courses.created_at as course_created', 'courses.course_name')
-            ->where('user_id', $userId)
-            ->join('courses', 'courses.id', 'attendances.course_id')
-            ->get();
+        $attendance = Attendance::select('attendances.*', 'courses.created_at as course_created', 'courses.course_name')->where('user_id', $userId)->join('courses', 'courses.id', 'attendances.course_id')->get();
 
         return view('student.attendance', compact('attendance'));
     }

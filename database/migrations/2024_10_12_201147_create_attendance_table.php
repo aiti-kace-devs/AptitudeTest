@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('user_id');
             $table->string('course_id');
+            $table->string('location');
             $table->date('date');
             $table->timestamps();
         });

@@ -41,13 +41,9 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-        $scannedData = request()->input('scanned_data');
 
-        if ($scannedData) {
-            return redirect()->route('record-attendance', ['scanned_data' => $scannedData]);
-        }
-
-        return redirect(RouteServiceProvider::HOME);
+        return redirect()->intended(RouteServiceProvider::HOME);
+        // return redirect(RouteServiceProvider::HOME);
     }
 
     /**

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('course_name');
             $table->string('course')->nullable();
-            $table->string('location');
+            $table->string('location')->nullable();
             $table->timestamps();
         });
 
