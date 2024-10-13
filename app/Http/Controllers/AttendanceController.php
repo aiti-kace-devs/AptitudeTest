@@ -3,33 +3,45 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\GoogleSheets;
+use App\Models\Course;
 use App\Models\UserAdmission;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Attendance;
 use ReallySimpleJWT\Token;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AttendanceController extends Controller
 {
-    public function generateQRCodeData($location, $courseId)
+    public function generateQRCodeData($courseId)
     {
-        $secret = env('APP_KEY', 'base64:WVUMYOASkJ4hdLI+sJNfordWS1dH20y70ZqTSBhrCqY=');
+        $course = Course::find($courseId);
+        if (!$course) {
+            throw new \Exception('Course not found.');
+        }
+
+        // $scret should be 12 char and must containe upper,lower,number and specialchar
+        $secret = env('APP_KEY');
 
         $data = json_encode([
-            'course_id' => $courseId,
-            'location' => $location,
+            'course_id' => $course->id,
+            'location' => $course->location,
             'date' => Carbon::now()->format('Y-m-d'),
-            // 'expiry' => Carbon::now()->addHours(2)->timestamp
         ]);
 
         $expiration = Carbon::now()->addHours(2)->timestamp;
 
         $issuer = 'attendance_app';
+        // dd($secret);
 
         $token = Token::create($data, $secret, $expiration, $issuer);
 
         return $token;
+        // $loginUrl = url('/login?scanned_data=' . urlencode($token));
+        // $qrCode = QrCode::size(300)->generate($loginUrl);
+
+        // return view('attendance.qrcode', compact('qrCode', 'token'));
     }
 
     public function recordAttendance(Request $request)
@@ -40,6 +52,10 @@ class AttendanceController extends Controller
 
         $secret = env('APP_KEY');
 
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please log in to record attendance.');
+        }
+
         if (Token::validate($scannedToken, $secret)) {
             $decodedString = Token::getPayload($scannedToken);
             $decodedData = json_decode($decodedString, true);
@@ -48,23 +64,23 @@ class AttendanceController extends Controller
             $location = $decodedData['location'];
             $date = Carbon::parse($decodedData['date'])->format('Y-m-d');
 
-            $userId = Auth::id();
+            $loggedUserId = Auth::id();
 
-            if (in_array($userId, $confirmedAdmissions)) {
-                $attendanceRecord = Attendance::where('userId', $userId)->where('course_id', $courseId)->where('location', $location)->whereDate('date', $date)->first();
+            if (in_array($loggedUserId, $confirmedAdmissions)) {
+                $attendanceRecord = Attendance::where('user_id', $loggedUserId)->where('course_id', $courseId)->where('location', $location)->whereDate('date', $date)->first();
 
                 if ($attendanceRecord) {
                     return redirect()->back()->with('message', 'Attendance for today is already recorded.');
                 } else {
                     $attendance = new Attendance();
-                    $attendance->userId = $userId;
+                    $attendance->user_id = $loggedUserId;
                     $attendance->course_id = $courseId;
                     $attendance->location = $location;
                     $attendance->date = $date;
-                    $attendance->attendance_status = 'present';
                     $attendance->save();
 
-                    GoogleSheets::updateGoogleSheets($userId, ["attendance" => true]);
+                    $userId = Auth::user()->userId;
+                    GoogleSheets::updateGoogleSheets($userId, ['attendance' => true]);
                     return redirect()->back()->with('message', 'Attendance recorded successfully.');
                 }
             } else {

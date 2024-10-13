@@ -30,18 +30,23 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
-       
+
         $user = User::where('email',$request->email)->get()->first();
-        
+
         if($user){
             $request->session()->put('id',$user->id);
         }
-        
-        
+
+
         $request->authenticate();
-        
+
         $request->session()->regenerate();
-        
+        $scannedData = request()->input('scanned_data');
+
+        if ($scannedData) {
+            return redirect()->route('record-attendance', ['scanned_data' => $scannedData]);
+        }
+
         return redirect(RouteServiceProvider::HOME);
     }
 
