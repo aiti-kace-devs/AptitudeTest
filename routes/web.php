@@ -5,6 +5,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentOperation;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AttendanceController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +88,9 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
         Route::get('/show_result/{id}', [StudentOperation::class, 'show_result']);
         Route::get('/apply_exam/{id}', [StudentOperation::class, 'apply_exam']);
         Route::get('/view_result/{id}', [StudentOperation::class, 'view_result']);
+        Route::post('/attendance/record', [AttendanceController::class, 'recordAttendance'])->name('attendance.record');
+        Route::get('/attendance', [AttendanceController::class, 'viewAttendance'])->name('attendance.show');
+
         // Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
 
         Route::post('/start-exam/{id}', [StudentOperation::class, 'start_exam']);
@@ -93,6 +98,8 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
         Route::get('/logout', [AuthenticatedSessionController::class, 'destroy']);
     });
 });
+
+
 
 
 require __DIR__ . '/auth.php';
