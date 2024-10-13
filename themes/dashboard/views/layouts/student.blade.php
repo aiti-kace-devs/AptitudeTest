@@ -97,7 +97,7 @@
             <!-- Main Sidebar Container -->
             <aside class="main-sidebar sidebar-dark-primary elevation-4">
                 <!-- Brand Logo -->
-                <a href="index3.html" class="brand-link">
+                <a href="/" class="brand-link">
                     <span class="brand-text font-weight-light">{{ config('app.name') }}</span>
                 </a>
 
@@ -122,7 +122,7 @@
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                             data-accordion="false">
                             <!-- Add icons to the links using the .nav-icon class
-                                   with font-awesome or any other icon font library -->
+                                                           with font-awesome or any other icon font library -->
 
                             <li class="nav-item">
                                 <a href="{{ url('student/dashboard') }}" class="nav-link">
@@ -142,6 +142,33 @@
                             </li>
 
                             <li class="nav-item">
+                                <a href="{{ url('student/id-qrcode') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-qrcode"></i>
+                                    <p>
+                                        My ID (QR)
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('student/meeting-link') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-video"></i>
+                                    <p>
+                                        Class Meeting Link
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('student/attendance') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-calendar"></i>
+                                    <p>
+                                        Attendance
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
                                 <a href="{{ url('student/logout') }}" class="nav-link">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
                                     <p>
@@ -152,9 +179,9 @@
                             <!--
 
 
-                            </ul>
-                          </nav>
-                          <!-- /.sidebar-menu -->
+                                                    </ul>
+                                                  </nav>
+                                                  <!-- /.sidebar-menu -->
                 </div>
                 <!-- /.sidebar -->
             </aside>

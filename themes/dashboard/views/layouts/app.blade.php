@@ -146,6 +146,20 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">
+                                <i class="fas fa-qrcode nav-icon"></i>
+                                <p>Generate QR Code</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ url('admin/scan_qrcode') }}" class="nav-link">
+                                <i class="fas fa-camera nav-icon"></i>
+                                <p>Scan QR Code</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="{{ url('admin/logout') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Logout</p>
@@ -272,6 +286,7 @@
             }, 500);
         }
     </script>
+    @stack('scripts')
 </body>
 
 </html>

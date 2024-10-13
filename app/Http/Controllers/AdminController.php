@@ -23,6 +23,7 @@ use App\Models\Oex_result;
 use App\Mail\ExamLoginCredentials;
 use Illuminate\Support\Facades\Mail;
 use App\Helpers\GoogleSheets;
+use App\Models\Course;
 
 class AdminController extends Controller
 {
@@ -435,5 +436,30 @@ class AdminController extends Controller
         $data['exam_info'] = Oex_exam_master::where('id', $std_exam->exam_id)->first();
 
         return view('admin.admin_view_result', $data);
+    }
+
+    public function generate_qrcode_page()
+    {
+
+        $locations = Course::distinct('location')->get()->all();
+        $courses = Course::distinct('course_name')->get()->all();
+
+
+        return view('admin.qr-generator', [
+            "locations" => $locations,
+            "courses" => $courses
+        ]);
+    }
+
+    public function scan_qrcode_page()
+    {
+        $locations = Course::select('location')->distinct('location')->get();
+        $courses = Course::select('course_name')->distinct('course_name')->get();
+
+
+        return view('admin.qr-scanner', [
+            "locations" => $locations,
+            "courses" => $courses
+        ]);
     }
 }

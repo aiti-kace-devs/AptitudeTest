@@ -400,4 +400,36 @@ class StudentOperation extends Controller
             // abort(503);
         }
     }
+
+    public function get_attendance_page()
+    {
+        return view('student.attendance');
+    }
+
+    public function get_details_page()
+    {
+        $user = UserAdmission::select('users.*', 'users.name as student_name', 'courses.*', 'course_sessions.session as selected_session', 'course_sessions.*', 'user_admission.*')
+            ->where('user_id', Auth::user()->userId)
+            ->join('courses', 'user_admission.course_id', '=', 'courses.id')
+            ->join('users', 'user_admission.user_id', '=', 'users.userId')
+            ->join('course_sessions', 'user_admission.session', '=', 'course_sessions.id')
+            ->first();
+
+        return view('student.id-qr', [
+            'user' => $user
+        ]);
+    }
+
+    public function get_scanner_page()
+    {
+        return view('student.qr-scanner');
+    }
+
+    public function get_meeting_link_page()
+    {
+        $session = CourseSession::find(UserAdmission::where('user_id', Auth::user()->userId)->firstOrFail()->session);
+        return view('student.meeting-link', [
+            'session' => $session
+        ]);
+    }
 }

@@ -68,6 +68,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::post('/edit_exam_sub', [AdminController::class, 'edit_exam_sub']);
         Route::post('/add_new_students', [AdminController::class, 'add_new_students']);
         Route::get('/reset-exam/{exam_id}/student/{user_id}', [StudentOperation::class, 'reset_exam'])->name('reset-exam');
+        Route::get('/generate_qrcode', [AdminController::class, 'generate_qrcode_page']);
+        Route::get('/scan_qrcode', [AdminController::class, 'scan_qrcode_page']);
     });
 });
 
@@ -90,6 +92,14 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
         Route::get('/view_result/{id}', [StudentOperation::class, 'view_result']);
         Route::post('/attendance/record', [AttendanceController::class, 'recordAttendance'])->name('attendance.record');
         Route::get('/attendance', [AttendanceController::class, 'viewAttendance'])->name('attendance.show');
+        Route::get('/id-qrcode', [StudentOperation::class, 'get_details_page']);
+        Route::get('/scan-qrcode', [StudentOperation::class, 'get_scanner_page']);
+        Route::get('/meeting-link', [StudentOperation::class, 'get_meeting_link_page']);
+
+
+        // Route::get('/ateendance', [StudentOperation::class, 'view_result']);
+
+
 
         // Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
 
