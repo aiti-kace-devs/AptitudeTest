@@ -43,9 +43,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($attendance as $attend)
+                                    @foreach ($attendance as $key => $attend)
                                         <tr class="bg-success text-dark">
-                                            <td>{{ $attend->id }}</td>
+                                            <td>{{ $key + 1 }}</td>
                                             <td>{{ $attend->course_name }}</td>
                                             <td>{{ $attend->date }}</td>
                                             <td>{{ $attend->created_at }}</td>

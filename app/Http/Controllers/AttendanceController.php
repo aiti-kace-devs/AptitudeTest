@@ -19,6 +19,8 @@ class AttendanceController extends Controller
         $data = $request->validate([
             'course_id' => 'exists:courses,id',
             'date' => 'date|before_or_equal:' . now()->toDateString(),
+            'online' => 'sometimes',
+            'validity' => 'sometimes'
         ]);
 
         // $course = Course::findOrFail($courseId);
@@ -31,16 +33,18 @@ class AttendanceController extends Controller
             'course_id' => $course->id,
             'location' => $course->location,
             'date' => $data['date'],
+            'online' => $data['online'] ?? false
         ]);
 
-        $expiration = Carbon::now()->addMinutes(30)->timestamp;
+        $toAdd = $data['validity'] ?? 30;
+
+        $expiration = Carbon::now()->addMinutes($toAdd)->timestamp;
 
         $issuer = 'attendance_app';
         // dd($secret);
-
         $token = Token::create($dataToEncode, $secret, $expiration, $issuer);
-
-        return response()->json(['data' => $token]);
+        $url = url('/student/mark_attendance?scanned_data=' . $token);
+        return response()->json(['data' => $token, 'url' => $url]);
         // $loginUrl = url('/login?scanned_data=' . urlencode($token));
         // $qrCode = QrCode::size(300)->generate($loginUrl);
 
@@ -53,40 +57,94 @@ class AttendanceController extends Controller
 
         $secret = env('JWT_KEY');
 
-        if (Token::validate($scannedToken, $secret)) {
-            $decodedData = Token::getPayload($scannedToken);
-            $decodedUserIdData = json_decode($decodedData['user_id'], true);
-            if (is_array($decodedUserIdData) && isset($decodedUserIdData['course_id']) && isset($decodedUserIdData['location']) && isset($decodedUserIdData['date'])) {
-                $courseId = $decodedUserIdData['course_id'];
-                $location = $decodedUserIdData['location'];
+        try {
+            if (Token::validate($scannedToken, $secret)) {
+                $decodedData = Token::getPayload($scannedToken);
+                $decodedUserIdData = json_decode($decodedData['user_id'], true);
+                if (
+                    !is_array($decodedUserIdData)
+                    || !isset($decodedUserIdData['course_id'])
+                    || !isset($decodedUserIdData['date'])
+                ) {
+                    redirect('/student/attendance')->with([
+                        'flash' => 'Unable to confirm attendance',
+                        'key' => 'error'
+                    ]);
+                }
+
                 $date = Carbon::parse($decodedUserIdData['date'])->format('Y-m-d');
+
+                $user_id = Auth::user()->userId;
+
+                $confirmedAdmission = UserAdmission::where('user_id', $user_id)->whereNotNull('confirmed')->first();
+
+
+
+                if (!$confirmedAdmission) {
+                    return redirect(url('/student/attendance'))->with([
+                        'flash' => 'User not admitted. Cannot confirm attendance',
+                        'key' => 'error',
+                    ]);
+                }
+
+                // if online, ignore location
+                $course = Course::find($decodedUserIdData['course_id']);
+                $admittedCourse = Course::find($confirmedAdmission['course_id']);
+
+                // dump($course);
+                // dump($admittedCourse);
+                // dd($admittedCourse);
+
+                if ($course->course_name != $admittedCourse->course_name) {
+                    return redirect(url('/student/attendance'))->with([
+                        'flash' => 'User not admitted unto this course',
+                        'key' => 'error',
+                    ]);
+                }
+
+
+                if ($course->location != $admittedCourse->course_name && $decodedUserIdData['online'] == "false") {
+                    return redirect(url('/student/attendance'))->with([
+                        'flash' => 'User not admitted unto this course location',
+                        'key' => 'error',
+                    ]);
+                }
+
+                $attendanceRecord = Attendance::where('user_id', $user_id)->whereDate('date', $date)->first();
+
+
+                if ($attendanceRecord) {
+                    return redirect(url('/student/attendance'))->with([
+                        'flash' => 'Attendance already confirmed.',
+                        'key' => 'success',
+                    ]);
+                }
+
+
+                // dd($admittedCourse);
+                $attendance = new Attendance();
+                $attendance->user_id = $user_id;
+                $attendance->course_id = $admittedCourse->id;
+                $attendance->date = $date;
+                $attendance->save();
+
+                UpdateAttendanceOnSheetJob::dispatch($attendance);
+                return redirect(url('/student/attendance'))->with([
+                    'flash' => 'Attendance confirmed successfully.',
+                    'key' => 'success',
+                ]);
+                // return response()->json(['message' => 'Attendance recorded successfully.', 'success' => true]);
             } else {
-                $courseId = null;
-                $location = null;
+                redirect('/student/attendance')->with([
+                    'flash' => 'Link expired',
+                    'key' => 'error'
+                ]);
             }
-
-            $loggedUserId = Auth::id();
-            $confirmedAdmission = UserAdmission::where('user_id', $loggedUserId)->whereNotNull('confirmed')->first();
-
-            if (!$confirmedAdmission) {
-                return response()->json(['message' => 'User not admitted. Cannot confirm attendance', 'success' => false]);
-            }
-
-            $attendanceRecord = Attendance::where('user_id', $confirmedAdmission)->whereDate('date', $date)->first();
-
-            if ($attendanceRecord) {
-                return response()->json(['message' => 'Attendance already confirmed.', 'success' => true]);
-            }
-            $attendance = new Attendance();
-            $attendance->user_id = $loggedUserId;
-            $attendance->course_id = $courseId;
-            $attendance->location = $location;
-            $attendance->date = $date;
-            $attendance->save();
-
-            UpdateAttendanceOnSheetJob::dispatch($attendance);
-            return redirect('/student/attendance');
-            // return response()->json(['message' => 'Attendance recorded successfully.', 'success' => true]);
+        } catch (\Exception $e) {
+            redirect('/student/attendance')->with([
+                'flash' => 'Unable to confirm attendance',
+                'key' => 'error'
+            ]);
         }
     }
 

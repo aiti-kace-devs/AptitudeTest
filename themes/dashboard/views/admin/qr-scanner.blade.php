@@ -28,7 +28,7 @@
                 <!-- Small boxes (Stat box) -->
                 <form name="qr-form">
                     <div class="row">
-                        <div class="mb-4 col-md-6">
+                        <div class="mb-4 col-md-4">
                             <label for="course_id" class="form-label">Select Course</label>
                             <select name="course_id" class="form-control">
                                 <option value="">Choose One</option>
@@ -39,18 +39,19 @@
                                 @endforeach
                             </select>
                         </div>
-                        {{-- <div class="mb-4 col-md-4">
-                            <label for="location" class="form-label">Select Course</label>
-                            <select name="course" class="form-control">
-                                <option value="">Choose One</option>
-
-                                @foreach ($courses as $course)
-                                    <option value="{{ $course->course_name }}">{{ $course->course_name }}</option>
-                                @endforeach
+                        <div class="mb-4 col-md-2">
+                            <label for="validity" class="form-label">Validity In Mins</label>
+                            <input class="form-control" type="number" name="validity" id="" max="120"
+                                value="30">
+                        </div>
+                        <div class="mb-4 col-md-2">
+                            <label for="online" class="form-label">Online</label>
+                            <select name="online" class="form-control">
+                                <option value="false">No</option>
+                                <option value="true">Yes</option>
                             </select>
-                        </div> --}}
-
-                        <div class="mb-4 col-md-6">
+                        </div>
+                        <div class="mb-4 col-md-4">
                             <label for="date" class="form-label">Select Date</label>
                             <input class="form-control" type="date" name="date" id=""
                                 max="{{ now()->toDateString() }}" value="{{ now()->toDateString() }}">
@@ -216,7 +217,7 @@
 
             if (data) {
                 new QRCode(document.getElementById("qrcode"), {
-                    text: "{{ route('student.mark-attendance') }}?scanned_data=" + data,
+                    text: data['url'],
                     width: 450,
                     height: 450,
                     colorDark: "#000000",
@@ -225,7 +226,12 @@
                 });
             }
             qrcodeElem.prepend(
-                `<h3>This Code Expires In <span  id="timer" class="js-timeout">25: 00</span>. A new code will re-generate automatically </h3>`
+                `<h3>This Code Expires In <span  id="timer" class="js-timeout">${values['validity']}: 00</span>. A new code will re-generate automatically </h3>
+                <br>
+                <div>
+                    <a style="width:400px;white-space:wrap" href="${data['url']}">Copy This Link</a>
+                </div>
+                `
             )
             countdown();
             codeIinterval = setInterval(generateCode, 1000 * 60 * 25);
@@ -252,12 +258,14 @@
                     },
                     body: JSON.stringify({
                         course_id: values['course_id'],
-                        date: values['date']
+                        date: values['date'],
+                        online: values['online'],
+                        validity: values['validity'],
                     })
                 });
                 if (response.ok) {
                     const token = await response.json();
-                    return token['data'];
+                    return token;
                 }
                 return null;
             } catch (error) {
