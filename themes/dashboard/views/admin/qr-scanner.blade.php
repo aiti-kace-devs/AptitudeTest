@@ -59,15 +59,15 @@
             </div>
             <div class="row g-3 flex justify-content-center align-tems-center mb-4">
                 <button type="button" class="btn btn-primary col-auto" onclick="startScanner()">Start
-                    Scanner</button>
-                <button type="button" class="btn btn-danger ml-4" onclick="stopScanner()">Stop Scanner</button>
-                <button type="button" class="btn btn-success ml-4" onclick="generateCode()">Genrate Code</button>
-                <button type="button" class="btn btn-danger ml-4" onclick="stopCodeGeneration()">Stop Code
+                    QR Code Scanner</button>
+                <button type="button" class="btn btn-danger ml-4" onclick="stopScanner()">Stop QR Code Scanner</button>
+                <button type="button" class="btn btn-success ml-4" onclick="generateCode()">Generate QR Code</button>
+                <button type="button" class="btn btn-danger ml-4" onclick="stopCodeGeneration()">Stop QR Code
                     Generation</button>
 
             </div>
 
-            <div class="col-12 flex justify-content-center align-tems-center">
+            <div class="col-12 flex justify-content-center align-tems-center" style="height: 90vh;overflow-y:scroll">
                 <video class="col-12" id="scanner"></video>
                 <div class="col-12" id="qrcode"></div>
             </div>
@@ -88,7 +88,7 @@
     <script src="{{ asset('assets/js/qr-scanner.min.js') }}"></script>
     <script src="{{ asset('assets/js/easy.qrcode.min.js') }}"></script>
     <script>
-        let interval = null;
+        let codeIinterval = null;
 
         let qrCode = null;
 
@@ -190,6 +190,7 @@
             if (values !== null) {
                 qrScanner.start();
             }
+
         }
 
         function stopScanner() {
@@ -201,8 +202,10 @@
 
         async function generateCode() {
             this.stopScanner();
+            stopCodeGeneration()
             const values = getFormValues();
             qrcodeElem.show();
+            qrcodeElem.html('');
             scannerElem.hide();
 
             if (values == null) {
@@ -221,12 +224,17 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
             }
+            qrcodeElem.prepend(
+                `<h3>This Code Expires In <span  id="timer" class="js-timeout">25: 00</span>. A new code will re-generate automatically </h3>`
+            )
+            countdown();
+            codeIinterval = setInterval(generateCode, 1000 * 60 * 25);
         }
 
         function stopCodeGeneration() {
             try {
                 qrcodeElem.hide();
-                clearInterval(interval);
+                clearInterval(codeIinterval);
                 qrCode.clear();
             } catch (e) {}
         }
@@ -256,6 +264,29 @@
                 console.log(error);
                 return null;
             }
+        }
+
+        let interval;
+
+        function countdown() {
+            clearInterval(interval);
+            interval = setInterval(function() {
+                var timer = $('.js-timeout').html();
+                timer = timer.split(':');
+                var minutes = timer[0];
+                var seconds = timer[1];
+                seconds -= 1;
+                if (minutes < 0) return;
+                else if (seconds < 0 && minutes != 0) {
+                    minutes -= 1;
+                    seconds = 59;
+                } else if (seconds < 10 && length.seconds != 2) seconds = '0' + seconds;
+
+                $('.js-timeout').html(minutes + ':' + seconds);
+                if (minutes < 11) {
+                    $('.js-timeout').css('color', 'red');
+                }
+            }, 1000);
         }
     </script>
 @endpush
