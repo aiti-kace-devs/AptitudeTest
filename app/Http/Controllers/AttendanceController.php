@@ -86,14 +86,9 @@ class AttendanceController extends Controller
                         'key' => 'error',
                     ]);
                 }
-
                 // if online, ignore location
                 $course = Course::find($decodedUserIdData['course_id']);
                 $admittedCourse = Course::find($confirmedAdmission['course_id']);
-
-                // dump($course);
-                // dump($admittedCourse);
-                // dd($admittedCourse);
 
                 if ($course->course_name != $admittedCourse->course_name) {
                     return redirect(url('/student/attendance'))->with([
@@ -103,7 +98,7 @@ class AttendanceController extends Controller
                 }
 
 
-                if ($course->location != $admittedCourse->course_name && $decodedUserIdData['online'] == "false") {
+                if ($course->location != $admittedCourse->location && $decodedUserIdData['online'] == "false") {
                     return redirect(url('/student/attendance'))->with([
                         'flash' => 'User not admitted unto this course location',
                         'key' => 'error',

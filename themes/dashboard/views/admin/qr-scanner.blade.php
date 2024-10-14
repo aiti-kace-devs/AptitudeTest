@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('title', 'Scan QR Code')
 @section('content')
+    <style>
+        canvas {
+            height: 400px;
+            width: 400px;
+            margin: 0 auto 0 auto;
+        }
+    </style>
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -58,7 +65,7 @@
                         </div>
                 </form>
             </div>
-            <div class="row g-3 flex justify-content-center align-tems-center mb-4">
+            <div class="row g-3 d-flex justify-content-center align-tems-center mb-4">
                 <button type="button" class="btn btn-primary col-auto" onclick="startScanner()">Start
                     QR Code Scanner</button>
                 <button type="button" class="btn btn-danger ml-4" onclick="stopScanner()">Stop QR Code Scanner</button>
@@ -68,9 +75,9 @@
 
             </div>
 
-            <div class="col-12 flex justify-content-center align-tems-center" style="height: 90vh;overflow-y:scroll">
+            <div class="row g-3 flex justify-content-center align-tems-center">
+                <div class="d-flex flex-column" id="qrcode" style="height: 85vh"></div>
                 <video class="col-12" id="scanner"></video>
-                <div class="col-12" id="qrcode"></div>
             </div>
 
 
@@ -218,8 +225,8 @@
             if (data) {
                 new QRCode(document.getElementById("qrcode"), {
                     text: data['url'],
-                    width: 450,
-                    height: 450,
+                    width: 400,
+                    height: 400,
                     colorDark: "#000000",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
@@ -229,12 +236,11 @@
                 `<h3>This Code Expires In <span  id="timer" class="js-timeout">${values['validity']}: 00</span>. A new code will re-generate automatically </h3>
                 <br>
                 <div>
-                    <a style="width:400px;white-space:wrap" href="${data['url']}">Copy This Link</a>
+                    <button onclick="copyToClipBoard(this)" class="btn btn-info" data-link="${data['url']}">Click to copy link</button>
                 </div>
-                `
-            )
+                `)
             countdown();
-            codeIinterval = setInterval(generateCode, 1000 * 60 * 25);
+            codeIinterval = setInterval(generateCode, 1000 * 60 * values['validity']);
         }
 
         function stopCodeGeneration() {
@@ -295,6 +301,19 @@
                     $('.js-timeout').css('color', 'red');
                 }
             }, 1000);
+        }
+
+        function copyToClipBoard(elem) {
+            const link = $(elem).attr('data-link');
+            navigator.clipboard.writeText(link);
+            Swal.fire({
+                text: "Copied to clipboard",
+                timer: 2000,
+                toast: true,
+                icon: 'info',
+                showConfirmButton: false,
+                position: 'top-end'
+            });
         }
     </script>
 @endpush

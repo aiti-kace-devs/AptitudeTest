@@ -9,8 +9,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\Course;
 use App\Helpers\GoogleSheets;
+use Carbon\Carbon;
 
 class UpdateAttendanceOnSheetJob implements ShouldQueue
 {
@@ -34,12 +34,11 @@ class UpdateAttendanceOnSheetJob implements ShouldQueue
      */
     public function handle()
     {
-        $course = Course::find($this->attendance->course_id);
-
-        // TODO: work on the attendance update
-        // GoogleSheets::updateGoogleSheets($this->attendance->user_id, [
-
-        // ]);
-
+        $data = [
+            "attendance" => true,
+            "date" => (new Carbon($this->attendance->date))->format('d/m/Y'),
+            "sheetTitle" => env('SHEET_TITLE', "Test Sheet")
+        ];
+        GoogleSheets::updateGoogleSheets($this->attendance->user_id, $data);
     }
 }
