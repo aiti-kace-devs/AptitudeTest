@@ -239,15 +239,17 @@
                     <button onclick="copyToClipBoard(this)" class="btn btn-info" data-link="${data['url']}">Click to copy link</button>
                 </div>
                 `)
-            countdown();
             codeIinterval = setInterval(generateCode, 1000 * 60 * values['validity']);
+            countdown();
         }
 
         function stopCodeGeneration() {
             try {
-                qrcodeElem.hide();
                 clearInterval(codeIinterval);
-                qrCode.clear();
+                qrcodeElem.html('');
+                qrcodeElem.hide();
+                clearInterval(interval);
+                qrCode?.clear();
             } catch (e) {}
         }
 

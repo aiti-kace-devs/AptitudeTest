@@ -58,7 +58,7 @@ class AttendanceController extends Controller
         $secret = env('JWT_KEY');
 
         try {
-            if (Token::validate($scannedToken, $secret)) {
+            if (Token::validate($scannedToken, $secret) && Token::validateExpiration($scannedToken)) {
                 $decodedData = Token::getPayload($scannedToken);
                 $decodedUserIdData = json_decode($decodedData['user_id'], true);
                 if (
@@ -130,7 +130,7 @@ class AttendanceController extends Controller
                 ]);
                 // return response()->json(['message' => 'Attendance recorded successfully.', 'success' => true]);
             } else {
-                redirect('/student/attendance')->with([
+                return redirect('/student/attendance')->with([
                     'flash' => 'Link expired',
                     'key' => 'error'
                 ]);
