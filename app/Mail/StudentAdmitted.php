@@ -39,104 +39,6 @@ class StudentAdmitted extends Mailable implements ShouldQueue
         $this->subject = " eSkills4jobs - {$course}";
         $this->name = $name;
         $this->course = $course;
-        $this->courses = [
-            "Data Analytics with Power BI" => [
-                "mode" => [
-                    "Virtual" => [3, 4, 7, 8, 9, 11],
-                    "In-Person" => [1, 2, 5, 6, 10, 12],
-                ],
-            ],
-            "Cyber Ops" => [
-                "mode" => [
-                    "Virtual" => [1, 2, 5, 6, 7, 11],
-                    "In-Person" => [3, 4, 9, 10],
-                ],
-            ],
-            "Digital Marketing" => [
-                "mode" => [
-                    "Virtual" => [1, 2, 5, 6, 7, 11],
-                    "In-Person" => [3, 4, 9, 10],
-                ],
-                "startDate" => "14th October, 2024",
-            ],
-            "Web Technology" => [
-                "mode" => [
-                    "Virtual" => [1, 2, 5, 6, 7, 11],
-                    "In-Person" => [3, 4, 8, 9, 10, 12],
-                ],
-            ],
-            "Data Science" => [
-                "mode" => [
-                    "Virtual" => [3, 4, 8, 9, 11],
-                    "In-Person" => [1, 2, 5, 6, 7, 10, 12],
-                ],
-            ],
-            "AI for Office Productivity" => [
-                "mode" => [
-                    "Virtual" => [1, 2, 5, 6, 7, 11],
-                    "In-Person" => [3, 4, 9, 10],
-                ],
-            ],
-            "Microsoft Artificial Intelligence" => [
-                "mode" => [
-                    "Virtual" => [1, 2, 5, 7],
-                    "In-Person" => [3, 4, 6, 8],
-                ],
-            ],
-        ];
-
-        $this->locations = [
-            "Greater Accra - GI-KACE, Ridge" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Ashanti - KsTU, Main Campus" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Kumasi Technical University (KsTU), Main Campus - Kumasi",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Northern" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Upper East - GI-KACE, Ministries Enclave - Bolgatanga" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Eastern - Koforidua Technical University" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Bono - GI-KACE, Sunyani Lowcost" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Bono East" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Volta - Nurses Training College, Ho" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Central - Methodist School, Cape Coast & Elmina" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-            "Western North - Juaboso Senior High School" => [
-                "startDate" => "14th October, 2024",
-                "venue" => "Tamale Technical University (TaTU)",
-                "duration" => "12 Weeks / 3 months (Weekdays Only)"
-            ],
-        ];
     }
 
     /**
@@ -182,36 +84,40 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                         "Virtual" => [3, 4, 7, 8, 9, 11],
                         "In-Person" => [1, 2, 5, 6, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "GI-KACE, Ridge - Accra",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/LPeUUYA7vanJwSmOsddnIH",
                 ],
                 "Cyber Ops" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "GI-KACE, Ridge - Accra",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/IQAuUuVLBV17nRlR17izzx",
                 ],
                 "Digital Marketing" => [
                     "mode" => [
-                        "Virtual" => [1, 2, 5, 6, 7, 11],
-                        "In-Person" => [3, 4, 9, 10],
+                        "Virtual" => [2, 3, 4, 5],
+                        "In-Person" => [1, 6],
                     ],
-                    "startDate" => "14th October, 2024",
+                    "startDate" => "4th November, 2024",
                     "venue" => "GI-KACE, Ridge - Accra",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "duration" => "4 Weeks / 1 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/Itf9RIncR5O70GVs3LF4wB",
                 ],
                 "Web Technology" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "GI-KACE, Ridge - Accra",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/HzY7RFcgain6sjbKCV2VHC",
                 ],
             ],
             "Ashanti - KsTU, Main Campus" => [
@@ -220,36 +126,40 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                         "Virtual" => [3, 4, 8, 9, 11],
                         "In-Person" => [1, 2, 5, 6, 7, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Kumasi Technical University (KsTU), Main Campus - Kumasi",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/FGPjMtIs8uDEBATZ89xUxs",
                 ],
                 "AI for Office Productivity" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 9, 10],
                     ],
-                    "startDate" => "11th November, 2024",
                     "venue" => "Kumasi Technical University (KsTU), Main Campus - Kumasi",
-                    "duration" => "4 Weeks / 1 month (Weekdays Only)"
+                    "startDate" => "11th November, 2024",
+                    "duration" => "4 Weeks / 1 month (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/L4N5ZeVOmuOEmt7J5URsOL",
                 ],
                 "Microsoft Artificial Intelligence" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 7],
                         "In-Person" => [3, 4, 6, 8],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Kumasi Technical University (KsTU), Main Campus - Kumasi",
-                    "duration" => "8 Weeks / 2 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/BmWlE5mEDDBDiXpqXJoYtU",
                 ],
                 "Web Technology" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Kumasi Technical University (KsTU), Main Campus - Kumasi",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/HzY7RFcgain6sjbKCV2VHC",
                 ],
             ],
             "Northern" => [
@@ -258,83 +168,83 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                         "Virtual" => [3, 4, 7, 8, 9, 11],
                         "In-Person" => [1, 2, 5, 6, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Tamale Technical University (TaTU)",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/LPeUUYA7vanJwSmOsddnIH",
                 ],
                 "Cyber Ops" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Tamale Technical University (TaTU)",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/IQAuUuVLBV17nRlR17izzx",
                 ],
                 "Digital Marketing" => [
                     "mode" => [
-                        "Virtual" => [1, 2, 5, 6, 7, 11],
-                        "In-Person" => [3, 4, 9, 10],
+                        "Virtual" => [2, 3, 4, 5],
+                        "In-Person" => [1, 6],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Tamale Technical University (TaTU)",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "4th November, 2024",
+                    "duration" => "4 Weeks / 1 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/Itf9RIncR5O70GVs3LF4wB",
                 ],
                 "Web Technology" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Tamale Technical University (TaTU)",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/HzY7RFcgain6sjbKCV2VHC",
                 ],
             ],
             "Central - Methodist School, Cape Coast & Elmina" => [
-                "Data Analytics with Power BI" => [
-                    "mode" => [
-                        "Virtual" => [3, 4, 7, 8, 9, 11],
-                        "In-Person" => [1, 2, 5, 6, 10, 12],
-                    ],
-                    "startDate" => "14th October, 2024",
-                    "venue" => "Cape Coast Technical University (CTU), Cape Coast",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
-                ],
                 "Cyber Ops" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Cape Coast Technical University (CTU), Cape Coast",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/IQAuUuVLBV17nRlR17izzx",
+
                 ],
                 "Digital Marketing" => [
                     "mode" => [
-                        "Virtual" => [1, 2, 5, 6, 7, 11],
-                        "In-Person" => [3, 4, 9, 10],
+                        "Virtual" => [2, 3, 4, 5],
+                        "In-Person" => [1, 6],
                     ],
-                    "startDate" => "14th October, 2024",
+                    "startDate" => "4th November, 2024",
                     "venue" => "Cape Coast Technical University (CTU), Cape Coast",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "duration" => "6 Weeks / 1.5 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/Itf9RIncR5O70GVs3LF4wB",
                 ],
                 "Web Technology" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Cape Coast Technical University (CTU), Cape Coast",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/HzY7RFcgain6sjbKCV2VHC",
                 ],
                 "Data Science" => [
                     "mode" => [
                         "Virtual" => [3, 4, 8, 9, 11],
                         "In-Person" => [1, 2, 5, 6, 7, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Cape Coast Technical University (CTU), Cape Coast",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/FGPjMtIs8uDEBATZ89xUxs",
                 ],
             ],
             "Upper East - GI-KACE, Ministries Enclave - Bolgatanga" => [
@@ -343,27 +253,41 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                         "Virtual" => [3, 4, 7, 8, 9, 11],
                         "In-Person" => [1, 2, 5, 6, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "GI-KACE, Ministries Enclave - Bolgatanga",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/LPeUUYA7vanJwSmOsddnIH",
                 ],
                 "Cyber Ops" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "GI-KACE, Ministries Enclave - Bolgatanga",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/IQAuUuVLBV17nRlR17izzx",
+
                 ],
                 "Data Science" => [
                     "mode" => [
                         "Virtual" => [3, 4, 8, 9, 11],
                         "In-Person" => [1, 2, 5, 6, 7, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "GI-KACE, Ministries Enclave - Bolgatanga",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/FGPjMtIs8uDEBATZ89xUxs",
+                ],
+                "Graphic Designing" => [
+                    "mode" => [
+                        "Virtual" => [1, 2, 3],
+                        "In-Person" => [4, 5, 6],
+                    ],
+                    "startDate" => "28th October, 2024",
+                    "venue" => "GI-KACE, Ministries Enclave - Bolgatanga",
+                    "duration" => "6 Weeks / 1.5 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/BloVr6iIuiMChPWyyskwyO",
                 ],
             ],
             "Eastern - Koforidua Technical University" => [
@@ -372,9 +296,19 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                         "Virtual" => [3, 4, 7, 8, 9, 11],
                         "In-Person" => [1, 2, 5, 6, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Koforidua Technical University (KTU)",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/LPeUUYA7vanJwSmOsddnIH",
+                ],
+                "Graphic Designing" => [
+                    "mode" => [
+                        "Virtual" => [1, 2, 3],
+                        "In-Person" => [4, 5, 6],
+                    ],
+                    "startDate" => "28th October, 2024",
+                    "venue" => "Koforidua Technical University (KTU)",
+                    "duration" => "6 Weeks / 1.5 months (Weekdays Only)"
                 ],
             ],
             "Bono - GI-KACE, Sunyani Penkwase Lowcost" => [
@@ -383,9 +317,10 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                         "Virtual" => [3, 4, 7, 8, 9, 11],
                         "In-Person" => [1, 2, 5, 6, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => " GI-KACE, Sunyani Penkwase Lowcost",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/LPeUUYA7vanJwSmOsddnIH",
                 ],
                 "Microsoft Artificial Intelligence" => [
                     "mode" => [
@@ -394,7 +329,8 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     ],
                     "startDate" => "14th October, 2024",
                     "venue" => "GI-KACE, Sunyani Penkwase Lowcost",
-                    "duration" => "8 Weeks / 2 months (Weekdays Only)"
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/BmWlE5mEDDBDiXpqXJoYtU",
                 ],
             ],
             "Volta - Nurses Training College, Ho" => [
@@ -403,18 +339,20 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 9, 10],
                     ],
-                    "startDate" => "11th November, 2024",
                     "venue" => "Nurses Training College, Ho",
-                    "duration" => "4 Weeks / 1 month (Weekdays Only)"
+                    "startDate" => "11th November, 2024",
+                    "duration" => "4 Weeks / 1 month (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/L4N5ZeVOmuOEmt7J5URsOL",
                 ],
                 "Cyber Ops" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
                         "In-Person" => [3, 4, 8, 9, 10, 12],
                     ],
-                    "startDate" => "14th October, 2024",
                     "venue" => "Nurses Training College, Ho",
-                    "duration" => "12 Weeks / 3 months (Weekdays Only)"
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/IQAuUuVLBV17nRlR17izzx",
                 ],
             ],
 

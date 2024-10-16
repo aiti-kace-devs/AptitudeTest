@@ -16,8 +16,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('queue:retry all')
-            ->everySixHours();
+        // $schedule->command('queue:retry all')
+        // ->everySixHours();
 
         $schedule->command('queue:work', ['--sleep=3', '--tries=3', '--max-time=300'])
             ->everyFiveMinutes();
@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:prune-failed', ['--hours=24'])
             ->dailyAt('01:00');
 
-        $schedule->command('email:sendFeedback')->hourly();
+        // $schedule->command('email:sendFeedback')->hourly();
     }
 
     /**

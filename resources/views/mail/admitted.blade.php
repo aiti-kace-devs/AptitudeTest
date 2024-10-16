@@ -7,27 +7,20 @@ Kindly take note of the following details:
 
 Start Date: {{$data['startDate']}}.
 
-Training Duration: {{$data['duration']}}.
-
-A link will be shared for the virtual classes before {{$data['startDate']}}.
-
-Mode:
-<x-mail::table>
-|  Week |  Mode |
-| ------------- |-------------:|
-@foreach($data['modes'] as $week => $mode)
-| {{$week}}    | {{$mode}}|
-@endforeach
-</x-mail::table>
-
-Venue: {{$data['venue']}}.
-
-Required Resource: Laptop.
+Training Duration: {{$data['duration']}}. <br>
+Venue: {{$data['venue']}}. <br>
+Required Resource: Laptop. <br>
 
 Kindly select a session that fits your schedule by clicking on the button below
 
 <x-mail::button :url="$url">
 Select Session
+</x-mail::button>
+
+Please join the WhatsApp Group for {{$course}} for quick information, by clicking the button below:
+
+<x-mail::button :url="$data['whatsapp']" color="success">
+Join WhatsApp Group
 </x-mail::button>
 
 <x-mail::panel>
