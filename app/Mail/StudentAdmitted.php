@@ -308,7 +308,18 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     ],
                     "startDate" => "28th October, 2024",
                     "venue" => "Koforidua Technical University (KTU)",
-                    "duration" => "6 Weeks / 1.5 months (Weekdays Only)"
+                    "duration" => "6 Weeks / 1.5 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/BloVr6iIuiMChPWyyskwyO",
+                ],
+                "Digital Marketing" => [
+                    "mode" => [
+                        "Virtual" => [2, 3, 4, 5],
+                        "In-Person" => [1, 6],
+                    ],
+                    "startDate" => "4th November, 2024",
+                    "venue" => "Koforidua Technical University (KTU)",
+                    "duration" => "4 Weeks / 1 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/Itf9RIncR5O70GVs3LF4wB",
                 ],
             ],
             "Bono - GI-KACE, Sunyani Penkwase Lowcost" => [
