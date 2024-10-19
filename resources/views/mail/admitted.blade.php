@@ -11,17 +11,14 @@ Training Duration: {{$data['duration']}}. <br>
 Venue: {{$data['venue']}}. <br>
 Required Resource: Laptop. <br>
 
-Kindly select a session that fits your schedule by clicking on the button below
 
-<x-mail::button :url="$url">
-Select Session
-</x-mail::button>
+<x-mail::button :url="$url">Select Session</x-mail::button>
+<x-mail::button :url="$data['whatsapp']" color="success">Join WhatsApp Group</x-mail::button>
+<x-mail::button :url="$data['resource']" color="error">Course Materials</x-mail::button>
 
-Please join the WhatsApp Group for {{$course}} for quick information, by clicking the button below:
-
-<x-mail::button :url="$data['whatsapp']" color="success">
-Join WhatsApp Group
-</x-mail::button>
+Kindly select a session that fits your schedule by clicking on the "Select Session" button.<br>
+Join the WhatsApp Group for {{$course}} for more information, by clicking the "Join WhatsApp Group" button<br>
+Find all materials and lecture videos by clicking on the "Course Materials" button
 
 <x-mail::panel>
 Note: Only applicants who have selected their sessions will move to the next stage.

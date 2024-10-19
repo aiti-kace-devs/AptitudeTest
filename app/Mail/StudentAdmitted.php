@@ -26,7 +26,6 @@ class StudentAdmitted extends Mailable implements ShouldQueue
     public $locations = [];
 
 
-
     /**
      * Create a new message instance.
      *
@@ -320,6 +319,17 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     "venue" => "Koforidua Technical University (KTU)",
                     "duration" => "4 Weeks / 1 months (Weekdays Only)",
                     "whatsapp" => "https://chat.whatsapp.com/Itf9RIncR5O70GVs3LF4wB",
+                ],
+                "Web Technology" => [
+                    "mode" => [
+                        "Virtual" => [1, 2, 5, 6, 7, 11],
+                        "In-Person" => [3, 4, 8, 9, 10, 12],
+                    ],
+                    "venue" => "GI-KACE, Ridge - Accra",
+                    "startDate" => "14th October, 2024",
+                    "duration" => "8 Weeks / 2 months (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/HzY7RFcgain6sjbKCV2VHC",
+                    "resource" => "https://cloud.aiti-kace.com.gh/index.php/s/SNWPaYeHxegXYgX"
                 ],
             ],
             "Bono - GI-KACE, Sunyani Penkwase Lowcost" => [
