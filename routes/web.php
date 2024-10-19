@@ -97,6 +97,8 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
         Route::get('/id-qrcode', [StudentOperation::class, 'get_details_page']);
         Route::get('/scan-qrcode', [StudentOperation::class, 'get_scanner_page']);
         Route::get('/meeting-link', [StudentOperation::class, 'get_meeting_link_page']);
+        Route::post('/update-details', [StudentOperation::class, 'updateDetails'])->name('updateDetails');
+
 
 
         // Route::get('/ateendance', [StudentOperation::class, 'view_result']);

@@ -24,23 +24,36 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
+                @if (session('message'))
+                <div class="alert alert-success">
+                    {{ session('message') }}
+                </div>
+            @elseif (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
                 <!-- Small boxes (Stat box) -->
+                <form action="{{ route('student.updateDetails') }}" method="POST">
+                    @csrf
+                    {{-- @method('PATCH') --}}
                 <div class="row g-3 flex mb-2 align-items-center">
                     <div class="col-12 mb-3">
                         <label class="form-label col-md-3">Fullname</label>
-                        <input type="text" value=" {{ $user->student_name }}" class="form-control col-md-7 mr-2">
+                        <input id="name" type="text" value=" {{ $user->student_name }}" name="name" class="form-control col-md-7 mr-2">
                     </div>
                     <div class="col-12 mb-3">
                         <label class="form-label col-md-3">Ghana Card Number</label>
-                        <input id="ghcard" type="text" value=" {{ $user->ghcard }}"
+                        <input id="ghcard" type="text" value=" {{ $user->ghcard }}" name="ghcard"
                             class="form-control col-md-7 mr-2">
                     </div>
                     <div class="col-12">
-                        <button type="button" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
                         <p class="text-sm text-danger">You can only update your details once, make sure you verify all
                             details before submitting</p>
                     </div>
                 </div>
+                </form>
 
                 <div class="text-md">Location : {{ $user->location }} </div>
                 <div class="text-md">Course : {{ $user->course_name }}</div>

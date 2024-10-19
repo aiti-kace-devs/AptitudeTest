@@ -62,7 +62,6 @@ class StudentOperation extends Controller
             ->get()
             ->toArray();
 
-
         return view('student.exam', ['student_info' => $student_info]);
     }
 
@@ -73,13 +72,9 @@ class StudentOperation extends Controller
             return redirect('/student/id-qrcode');
         }
 
-        $questionSets = Oex_question_master::select('exam_id')
-            ->distinct()
-            ->pluck('exam_id');
+        $questionSets = Oex_question_master::select('exam_id')->distinct()->pluck('exam_id');
         $randomExamId = $questionSets->random();
-        $question = Oex_question_master::where('exam_id', $randomExamId)
-            ->inRandomOrder()
-            ->get();
+        $question = Oex_question_master::where('exam_id', $randomExamId)->inRandomOrder()->get();
 
         // $question = Oex_question_master::where('exam_id', $id)->inRandomOrder()->get();
         $user_exam = user_exam::where('exam_id', $id)->where('user_id', Session::get('id'))->get()->first();
@@ -105,14 +100,12 @@ class StudentOperation extends Controller
         $userCreatedAt = new Carbon(Auth::user()->created_at);
         $userCreatedAtPlusTwoDays = $userCreatedAt->addDays(2);
 
-
         if ($userCreatedAtPlusTwoDays->isBefore($now)) {
             return redirect(url('student/exam'))->with([
                 'flash' => 'Unable to take exam. Time to take exams has elapsed',
                 'key' => 'error',
             ]);
         }
-
 
         $usedTime = 0;
         if ($user_exam && $user_exam->started) {
@@ -207,8 +200,10 @@ class StudentOperation extends Controller
         $total = $yes_ans + $no_ans;
         $percentage = round(($yes_ans / $total) * 100);
         echo $res->save();
-        $storedResult = Oex_result::where('user_id', $user->id)->where('exam_id', $request->exam_id)->first();
-        GoogleSheets::updateGoogleSheets($userId, ["result" => $storedResult->yes_ans]);
+        $storedResult = Oex_result::where('user_id', $user->id)
+            ->where('exam_id', $request->exam_id)
+            ->first();
+        GoogleSheets::updateGoogleSheets($userId, ['result' => $storedResult->yes_ans]);
 
         return redirect(url('student/exam'))->with([
             'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
@@ -261,7 +256,6 @@ class StudentOperation extends Controller
 
     public function reset_exam($exam_id, $user_id)
     {
-
         $user = User::findOrFail($user_id);
         $user->created_at = Carbon::now()->toDateTimeString();
         $user->updated_at = Carbon::now()->toDateTimeString();
@@ -288,8 +282,8 @@ class StudentOperation extends Controller
         $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
         if ($admission->confirmed) {
             return view('student.session-select.index', [
-                "confirmed" => true,
-                "session" => CourseSession::where('id', $admission->session)->first(),
+                'confirmed' => true,
+                'session' => CourseSession::where('id', $admission->session)->first(),
             ]);
         }
         $courseDetails = Course::find($admission->course_id);
@@ -300,19 +294,18 @@ class StudentOperation extends Controller
         // });
         $user = User::select('id', 'name', 'userId')->where('userId', $user_id)->first();
         return view('student.session-select.index', [
-            "user" => $user,
-            "sessions" => $sessions,
-            "course" => $courseDetails,
-            "confirmed" => false
+            'user' => $user,
+            'sessions' => $sessions,
+            'course' => $courseDetails,
+            'confirmed' => false,
         ]);
     }
 
     public function confirm_session($user_id, Request $request)
     {
-
         try {
             $data = $request->validate([
-                'session_id' => 'required|exists:course_sessions,id'
+                'session_id' => 'required|exists:course_sessions,id',
             ]);
 
             $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
@@ -358,7 +351,6 @@ class StudentOperation extends Controller
 
     public function admit_student(Request $request)
     {
-
         $count = 0;
         try {
             $students = $request->get('students');
@@ -388,20 +380,21 @@ class StudentOperation extends Controller
                     }
 
                     if (!$oldAdmission) {
-
                         $admission = new UserAdmission();
                         $admission->user_id = $user_id;
                         $admission->course_id = $course->id;
                         $admission->email_sent = now();
                         $admission->save();
 
-                        Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
+                        Mail::to($user->email)
+                            ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
+                            ->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
                         $count++;
                     }
                 }
             }
 
-            return ["success" => "true", "message" => "admitted {$count} students"];
+            return ['success' => 'true', 'message' => "admitted {$count} students"];
         } catch (\Exception $e) {
             return $e->getMessage();
             // return redirect(url('student/select-session/' . $user_id))->with([
@@ -427,7 +420,7 @@ class StudentOperation extends Controller
             ->first();
 
         return view('student.id-qr', [
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -440,7 +433,31 @@ class StudentOperation extends Controller
     {
         $session = CourseSession::find(UserAdmission::where('user_id', Auth::user()->userId)->firstOrFail()->session);
         return view('student.meeting-link', [
-            'session' => $session
+            'session' => $session,
         ]);
+    }
+
+    public function updateDetails(Request $request)
+    {
+        $currentUserId = Auth::user()->id;
+        $user = User::findOrFail($currentUserId);
+
+        if ($user->created_at == $user->updated_at) {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'ghcard' => 'required|string|max:255',
+            ]);
+
+            $user->name = $validatedData['name'];
+            $user->ghcard = $validatedData['ghcard'];
+            $user->save();
+
+            session()->flash('message', 'Your details have been updated successfully.');
+
+            return redirect()->back();
+        } else {
+            session()->flash('error', 'You have already updated your details once.');
+            return redirect()->back();
+        }
     }
 }
