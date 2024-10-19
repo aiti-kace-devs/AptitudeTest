@@ -26,9 +26,20 @@
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
                 <div class="row g-3 flex mb-2 align-items-center">
-                    <label class="form-label col-md-1">Fullname</label>
-                    <input type="text" value=" {{ $user->student_name }}" class="form-control col-md-7 mr-2">
-                    <button type="button" class="btn btn-primary">Update</button>
+                    <div class="col-12 mb-3">
+                        <label class="form-label col-md-3">Fullname</label>
+                        <input type="text" value=" {{ $user->student_name }}" class="form-control col-md-7 mr-2">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label col-md-3">Ghana Card Number</label>
+                        <input id="ghcard" type="text" value=" {{ $user->ghcard }}"
+                            class="form-control col-md-7 mr-2">
+                    </div>
+                    <div class="col-12">
+                        <button type="button" class="btn btn-primary">Update</button>
+                        <p class="text-sm text-danger">You can only update your details once, make sure you verify all
+                            details before submitting</p>
+                    </div>
                 </div>
 
                 <div class="text-md">Location : {{ $user->location }} </div>
@@ -37,8 +48,6 @@
                 <div class="text-lg font-bold mt-2">Student ID for Attendance</div>
                 <div id="qrcode"></div>
                 <button type="button" class="btn btn-primary" onclick="downloadQRCode()">Download</button>
-
-
                 <!-- /.row -->
                 <!-- Main row -->
 
@@ -52,6 +61,7 @@
 
 
 @push('scripts')
+    <script src=”https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js”></script>
     <script src="{{ asset('assets/js/easy.qrcode.min.js') }}"></script>
     <script>
         const innerWidth = Math.floor(window.innerWidth * (7 / 9));
@@ -68,5 +78,8 @@
         function downloadQRCode() {
             qrcode.download("StudentID-{{ Auth::user()->userId }}")
         }
+
+
+        $("#ghcard").inputmask("GHA-d{9}-d{1}");
     </script>
 @endpush
