@@ -25,34 +25,52 @@
         <section class="content">
             <div class="container-fluid">
                 @if (session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @elseif (session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
+                    <div class="alert alert-success">
+                        {{ session('message') }}
+                    </div>
+                @elseif (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+
                 <!-- Small boxes (Stat box) -->
-                <form action="{{ route('student.updateDetails') }}" method="POST">
+                <form action="{{ route('student.updateDetails') }}" method="POST" name="student-details">
                     @csrf
                     {{-- @method('PATCH') --}}
-                <div class="row g-3 flex mb-2 align-items-center">
-                    <div class="col-12 mb-3">
-                        <label class="form-label col-md-3">Fullname</label>
-                        <input id="name" type="text" value=" {{ $user->student_name }}" name="name" class="form-control col-md-7 mr-2">
+                    <div class="row g-3 flex mb-2 align-items-center">
+                        <div class="col-12 mb-2">
+                            <label class="form-label col-12">Fullname (as appears on your Ghana Card/ any National ID)
+                            </label>
+                            <input id="name" type="text" required value=" {{ $user->student_name }}" name="name"
+                                class="form-control col-12" @if ($user->detailsUpdated()) disabled @endif>
+                        </div>
+                        <div class="input-group col-12 mb-2">
+                            <label class="form-label col-12">Ghana Card Number</label>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">GHA-</span>
+                            </div>
+                            <input id="ghcard" type="text" required value=" {{ $user->ghcard }}" name="ghcard"
+                                placeholder="123456789-1" @if ($user->detailsUpdated()) disabled @endif
+                                class="form-control  @error('ghcard') is-invalid @enderror col-12 mr-2">
+                        </div>
+                        @error('ghcard')
+                            <div role="alert" class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        <div class="col-12">
+                            @if ($user->user_updated != $user->user_created)
+                                <p class="text-sm text-danger">You have already updated your details</p>
+                            @else
+                                <button onclick="confirmUpdateDetails()" type="button"
+                                    class="btn btn-primary">Update</button>
+                                <p class="text-sm text-danger">You can only update your details once, make sure you verify
+                                    all
+                                    details before submitting</p>
+                            @endif
+                        </div>
                     </div>
-                    <div class="col-12 mb-3">
-                        <label class="form-label col-md-3">Ghana Card Number</label>
-                        <input id="ghcard" type="text" value=" {{ $user->ghcard }}" name="ghcard"
-                            class="form-control col-md-7 mr-2">
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Update</button>
-                        <p class="text-sm text-danger">You can only update your details once, make sure you verify all
-                            details before submitting</p>
-                    </div>
-                </div>
                 </form>
 
                 <div class="text-md">Location : {{ $user->location }} </div>
@@ -74,7 +92,7 @@
 
 
 @push('scripts')
-    <script src=”https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js”></script>
+    <script src="{{ asset('assets/js/jquery.inputmask.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/easy.qrcode.min.js') }}"></script>
     <script>
         const innerWidth = Math.floor(window.innerWidth * (7 / 9));
@@ -93,6 +111,32 @@
         }
 
 
-        $("#ghcard").inputmask("GHA-d{9}-d{1}");
+        $("#ghcard").inputmask({
+            mask: "155555555-5",
+            definitions: {
+                '5': {
+                    validator: "[0-9]"
+                },
+                '1': {
+                    validator: "[1-9]"
+                },
+            }
+        });
+
+        function confirmUpdateDetails() {
+            Swal.fire({
+                title: 'Confirm Submission',
+                text: `Are you sure you want to submit this update. This cannot be undone. Make sure all details are correct`,
+                icon: 'info',
+                backdrop: `rgba(0,0,0,0.95)`,
+                confirmButtonText: 'Yes, Submit',
+                cancelButtonText: 'No, Cancel',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                preConfirm: async () => {
+                    $('[name="student-details"]').submit()
+                }
+            })
+        }
     </script>
 @endpush

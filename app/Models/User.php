@@ -58,4 +58,9 @@ class User extends Authenticatable
         return UserAdmission::where('user_id', $this->userId)
             ->whereNotNull('email_sent')->count() == 1;
     }
+
+    public function detailsUpdated()
+    {
+        return $this->updated_at != $this->created_at;
+    }
 }

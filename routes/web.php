@@ -72,9 +72,9 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::post('/generate_qrcode', [AttendanceController::class, 'generateQRCodeData']);
         Route::get('/scan_qrcode', [AdminController::class, 'scan_qrcode_page']);
         Route::post('/confirm_attendance', [AttendanceController::class, 'confirmAttendance']);
+        Route::get('/verification', [AdminController::class, 'verification_page'])->name('verification');
         Route::get('/verify_details', [AdminController::class, 'verifyDetails'])->name('verify-details');
-        Route::post('/admin/verify-student/{id}', [AdminController::class, 'verifyStudent'])->name('verify-student');
-
+        Route::post('/verify-student/{id}', [AdminController::class, 'verifyStudent'])->name('verify-student');
     });
 });
 

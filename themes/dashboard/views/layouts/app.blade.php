@@ -162,6 +162,13 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="{{ url('admin/verification') }}" class="nav-link">
+                                <i class="fas fa-id-card nav-icon"></i>
+                                <p>Student Verification</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="{{ url('admin/logout') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Logout</p>

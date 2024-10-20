@@ -412,11 +412,11 @@ class StudentOperation extends Controller
 
     public function get_details_page()
     {
-        $user = UserAdmission::select('users.*', 'users.name as student_name', 'courses.*', 'course_sessions.session as selected_session', 'course_sessions.*', 'user_admission.*')
-            ->where('user_id', Auth::user()->userId)
-            ->join('courses', 'user_admission.course_id', '=', 'courses.id')
-            ->join('users', 'user_admission.user_id', '=', 'users.userId')
+        $user = User::select('users.*', 'users.updated_at as user_updated', 'users.created_at as user_created', 'users.name as student_name', 'courses.*', 'course_sessions.session as selected_session', 'course_sessions.*', 'user_admission.*')
+            ->where('userId', Auth::user()->userId)
+            ->join('user_admission', 'user_admission.user_id', '=', 'users.userId')
             ->join('course_sessions', 'user_admission.session', '=', 'course_sessions.id')
+            ->join('courses', 'user_admission.course_id', '=', 'courses.id')
             ->first();
 
         return view('student.id-qr', [
@@ -439,25 +439,28 @@ class StudentOperation extends Controller
 
     public function updateDetails(Request $request)
     {
-        $currentUserId = Auth::user()->id;
-        $user = User::findOrFail($currentUserId);
+        $user = Auth::user();
 
         if ($user->created_at == $user->updated_at) {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
-                'ghcard' => 'required|string|max:255',
-            ]);
+                'ghcard' => 'required|string|regex:/^[1-9]{1}[0-9]{8}-[0-9]{1}$/|max:16',
+            ], [], ['ghcard' => "Ghana Card number"]);
 
             $user->name = $validatedData['name'];
-            $user->ghcard = $validatedData['ghcard'];
+            $user->ghcard = "GHA-" . $validatedData['ghcard'];
             $user->save();
 
-            session()->flash('message', 'Your details have been updated successfully.');
 
-            return redirect()->back();
+            return redirect()->back()->with([
+                'flash' => 'Your details have been updated successfully.',
+                'key' => 'success'
+            ]);
         } else {
-            session()->flash('error', 'You have already updated your details once.');
-            return redirect()->back();
+            return redirect()->back()->with([
+                'flash' => 'You have already updated your details once.',
+                'key' => 'error'
+            ]);
         }
     }
 }

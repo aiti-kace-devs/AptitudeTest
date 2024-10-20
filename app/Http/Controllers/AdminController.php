@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\UserRegistered;
 use App\Jobs\AddNewStudentsJob;
 use App\Jobs\ProcessStudentRegistrationJob;
-use App\Models\UserAdmission;
+use App\Jobs\UpdateSheetWithGhanaCardDetails;
 use Illuminate\Http\Request;
 use App\Models\Oex_category;
 use App\Models\Oex_exam_master;
@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\user_exam;
 use App\Models\Admin;
 use App\Models\Oex_result;
+use App\Models\UserAdmission;
 use App\Mail\ExamLoginCredentials;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
@@ -464,37 +465,79 @@ class AdminController extends Controller
     }
 
     public function verifyDetails(Request $request)
-{
-    $courses = Course::all();
+    {
+        $courses = Course::all();
 
-    $students = collect();
-    $selectedCourse = null;
+        $students = collect();
+        $selectedCourse = null;
 
-    if ($request->has('course_id')) {
-        $selectedCourse = Course::find($request->input('course_id'));
+        if ($request->has('course_id')) {
+            $selectedCourse = Course::find($request->input('course_id'));
 
-        if ($selectedCourse) {
-            $students = UserAdmission::where('course_id', $selectedCourse->id)
-                ->join('users', 'user_admission.user_id', '=', 'users.userId')
-                ->select('users.*')
-                ->get();
+            if ($selectedCourse) {
+                $students = UserAdmission::where('course_id', $selectedCourse->id)
+                    ->join('users', 'user_admission.user_id', '=', 'users.userId')
+                    ->select('users.*')
+                    ->get();
+            }
         }
+
+        return view('admin.verify_student_details', compact('courses', 'students', 'selectedCourse'));
     }
 
-    return view('admin.verify_student_details', compact('courses', 'students', 'selectedCourse'));
-}
+    public function verifyStudent($id)
+    {
+        $student = User::find($id);
 
-public function verifyStudent($id)
-{
-    $student = User::find($id);
+        // match with ghana card format
+        $correctFormat = preg_match('/GHA-[1-9]{1}[0-9]{8}-[0-9]{1}$/', $student->ghcard);
+        if ($student && $correctFormat) {
+            $adminId = Auth::id();
+            $student->verification_date = now();
+            $student->verified_by = $adminId;
+            $student->save();
+            $student->verified_by_name = Admin::find($student->verified_by)->name;
 
-    if ($student) {
-        $adminId = Auth::id();
-        $student->verification_date = now();
-        $student->verified_by = $adminId;
-        $student->save();
+            UpdateSheetWithGhanaCardDetails::dispatch($student);
+
+            return response()->json([
+                "success" => true,
+                "message" => "Verification successsful",
+                "student" => $student
+            ]);
+        }
+        return response()->json([
+            "success" => false,
+            "message" => "Unable to verify. Card Number format is wrong",
+
+        ]);
     }
 
-    return redirect()->back()->with('message', 'Student details verified successfully.');
-}
+    public function verification_page(Request $request)
+    {
+        $allCourses = Course::all();
+        $students = [];
+
+        $selectedCourse = $request->input('course_id');
+
+        if (isset($selectedCourse)) {
+            $students = UserAdmission::select(
+                'users.*',
+                'user_admission.created_at as admission_created',
+                'user_admission.updated_at as admission_updated',
+                \DB::raw('(select admins.name from admins where admins.id = users.verified_by) as verified_by_name')
+            )->join('users', 'users.userId', 'user_admission.user_id')
+
+                ->where('course_id', $selectedCourse)->get();
+            $selectedCourse = Course::find($selectedCourse);
+        }
+
+
+        return view('admin.verification', [
+            'courses' => $allCourses,
+            'students' => $students,
+            'selectedCourse' => $selectedCourse
+
+        ]);
+    }
 }

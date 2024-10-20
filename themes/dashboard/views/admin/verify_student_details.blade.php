@@ -58,14 +58,18 @@
                                                 <td>{{ $student->ghcard }}</td>
                                                 {{-- <td>{{ $student->verification_date }}</td> --}}
                                                 <td>
-                                                    @if(!$student->verification_date && !$student->verified_by)
-                                                    <form method="POST" action="{{ route('admin.verify-student', $student['id']) }}">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-success btn-sm">Verify</button>
-                                                    </form>
-                                                @else
-                                                    <span class="badge badge-primary">Verified on {{ $student->verification_date }}</span>
-                                                @endif                                                </td>
+                                                    @if (!$student->verification_date && !$student->verified_by)
+                                                        <form method="POST"
+                                                            action="{{ route('admin.verify-student', $student['id']) }}">
+                                                            @csrf
+                                                            <button type="submit"
+                                                                class="btn btn-success btn-sm">Verify</button>
+                                                        </form>
+                                                    @else
+                                                        <span class="badge badge-primary">Verified on
+                                                            {{ $student->verification_date }}</span>
+                                                    @endif
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
