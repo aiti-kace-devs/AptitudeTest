@@ -34,7 +34,12 @@
                     </div>
                 @endif
 
-
+                @php
+                    function detailsUpdated($user)
+                    {
+                        return $user->user_updated != $user->user_created;
+                    }
+                @endphp
                 <!-- Small boxes (Stat box) -->
                 <form action="{{ route('student.updateDetails') }}" method="POST" name="student-details">
                     @csrf
@@ -44,7 +49,7 @@
                             <label class="form-label col-12">Fullname (as appears on your Ghana Card/ any National ID)
                             </label>
                             <input id="name" type="text" required value=" {{ $user->student_name }}" name="name"
-                                class="form-control col-12" @if ($user->detailsUpdated()) disabled @endif>
+                                class="form-control col-12" @if (detailsUpdated($user)) disabled @endif>
                         </div>
                         <div class="input-group col-12 mb-2">
                             <label class="form-label col-12">Ghana Card Number</label>
@@ -52,7 +57,7 @@
                                 <span class="input-group-text" id="basic-addon1">GHA-</span>
                             </div>
                             <input id="ghcard" type="text" required value=" {{ $user->ghcard }}" name="ghcard"
-                                placeholder="123456789-1" @if ($user->detailsUpdated()) disabled @endif
+                                placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
                                 class="form-control  @error('ghcard') is-invalid @enderror col-12 mr-2">
                         </div>
                         @error('ghcard')
