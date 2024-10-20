@@ -121,7 +121,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ url('admin/exam_category') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Category</p>
@@ -146,7 +146,7 @@
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Registered students</p>
                             </a>
-                        </li>
+                        </li> --}}
                         {{-- <li class="nav-item">
                             <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">
                                 <i class="fas fa-qrcode nav-icon"></i>

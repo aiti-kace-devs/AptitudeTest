@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\UserRegistered;
 use App\Jobs\AddNewStudentsJob;
 use App\Jobs\ProcessStudentRegistrationJob;
+use App\Models\UserAdmission;
 use Illuminate\Http\Request;
 use App\Models\Oex_category;
 use App\Models\Oex_exam_master;
@@ -461,4 +462,39 @@ class AdminController extends Controller
             "courses" => $courses
         ]);
     }
+
+    public function verifyDetails(Request $request)
+{
+    $courses = Course::all();
+
+    $students = collect();
+    $selectedCourse = null;
+
+    if ($request->has('course_id')) {
+        $selectedCourse = Course::find($request->input('course_id'));
+
+        if ($selectedCourse) {
+            $students = UserAdmission::where('course_id', $selectedCourse->id)
+                ->join('users', 'user_admission.user_id', '=', 'users.userId')
+                ->select('users.*')
+                ->get();
+        }
+    }
+
+    return view('admin.verify_student_details', compact('courses', 'students', 'selectedCourse'));
+}
+
+public function verifyStudent($id)
+{
+    $student = User::find($id);
+
+    if ($student) {
+        $adminId = Auth::id();
+        $student->verification_date = now();
+        $student->verified_by = $adminId;
+        $student->save();
+    }
+
+    return redirect()->back()->with('message', 'Student details verified successfully.');
+}
 }
