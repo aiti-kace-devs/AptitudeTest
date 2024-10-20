@@ -61,7 +61,12 @@
                                                 <td>{{ $student['email'] }}</td>
                                                 <td>{{ $student['ghcard'] }}</td>
                                                 <td>
-                                                    {{ $student['verified_by_name'] }} ({{ $student['verification_date'] }})
+                                                    @if ($student['verification_date'])
+                                                        {{ $student['verified_by_name'] }}
+                                                        ({{ $student['verification_date'] }})
+                                                    @else
+                                                        --
+                                                    @endif
                                                 </td>
                                                 <td>
                                                     @if (!$student->ghcard)

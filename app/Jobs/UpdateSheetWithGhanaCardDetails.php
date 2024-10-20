@@ -34,7 +34,8 @@ class UpdateSheetWithGhanaCardDetails implements ShouldQueue
         $data = [
             "verification" => true,
             "card_number" => $this->student->ghcard,
-            "sheetTitle" => env('SHEET_TITLE', "Test Sheet")
+            "name" => strtoupper($this->student->name),
+            "sheetTitle" => env('SHEET_TITLE', "Test Sheet"),
         ];
         GoogleSheets::updateGoogleSheets($this->student->user_id, $data);
     }
