@@ -37,6 +37,6 @@ class UpdateSheetWithGhanaCardDetails implements ShouldQueue
             "name" => strtoupper($this->student->name),
             "sheetTitle" => env('SHEET_TITLE', "Test Sheet"),
         ];
-        GoogleSheets::updateGoogleSheets($this->student->user_id, $data);
+        GoogleSheets::updateGoogleSheets($this->student->userId, $data);
     }
 }
