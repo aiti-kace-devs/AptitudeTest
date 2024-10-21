@@ -37,7 +37,7 @@
                 @php
                     function detailsUpdated($user)
                     {
-                        return $user->user_updated != $user->user_created;
+                        return $user->user_updated != $user->user_created && !$user->ghcard;
                     }
                 @endphp
                 <!-- Small boxes (Stat box) -->
@@ -117,13 +117,10 @@
 
 
         $("#ghcard").inputmask({
-            mask: "155555555-5",
+            mask: "555555555-5",
             definitions: {
                 '5': {
                     validator: "[0-9]"
-                },
-                '1': {
-                    validator: "[1-9]"
                 },
             }
         });

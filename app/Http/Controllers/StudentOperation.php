@@ -444,7 +444,7 @@ class StudentOperation extends Controller
         if ($user->created_at == $user->updated_at) {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
-                'ghcard' => 'required|string|regex:/^[1-9]{1}[0-9]{8}-[0-9]{1}$/|max:16',
+                'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
             ], [], ['ghcard' => "Ghana Card number"]);
 
             $user->name = $validatedData['name'];
