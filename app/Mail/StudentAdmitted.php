@@ -31,7 +31,7 @@ class StudentAdmitted extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($name, $course, $location, $url)
+    public function __construct($name, $course, $location, $url = null)
     {
         $this->setDetails($course, $location);
         $this->url = $url ?? 'https://';

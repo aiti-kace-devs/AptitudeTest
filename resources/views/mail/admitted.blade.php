@@ -11,8 +11,9 @@ Training Duration: {{$data['duration']}}. <br>
 Venue: {{$data['venue']}}. <br>
 Required Resource: Laptop. <br>
 
-
+@if($url)
 <x-mail::button :url="$url">Select Session</x-mail::button>
+@endif
 <x-mail::button :url="$data['whatsapp']" color="success">Join WhatsApp Group</x-mail::button>
 @if($data['resource'])
 <x-mail::button :url="$data['resource']" color="error">Course Materials</x-mail::button>
