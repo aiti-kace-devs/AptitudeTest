@@ -64,6 +64,8 @@
                                                             @csrf
                                                             <button type="submit"
                                                                 class="btn btn-success btn-sm">Verify</button>
+                                                            <a href="{{ route('admin.reset-verify', $student['id']) }}"
+                                                                class="btn btn-danger btn-sm">Reset</a>
                                                         </form>
                                                     @else
                                                         <span class="badge badge-primary">Verified on

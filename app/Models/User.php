@@ -63,4 +63,9 @@ class User extends Authenticatable
     {
         return $this->updated_at != $this->created_at;
     }
+
+    public function isSuper()
+    {
+        return $this->is_super;
+    }
 }
