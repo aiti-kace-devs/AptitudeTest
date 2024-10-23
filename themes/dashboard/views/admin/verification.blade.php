@@ -76,6 +76,8 @@
                                                         <button type="button" onclick="verifyStudent(this)"
                                                             data-id="{{ $student->id }}" data-name="{{ $student->name }}"
                                                             class="btn btn-success btn-sm">Verify</button>
+                                                        <a href="{{ route('admin.reset-verify', $student['id']) }}"
+                                                            class="btn btn-danger btn-sm">Reset</a>
                                                     @else
                                                         <span class="badge badge-success">Verified</span>
                                                     @endif

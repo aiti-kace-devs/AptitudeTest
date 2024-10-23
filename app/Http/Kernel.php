@@ -65,5 +65,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'theme' => \Qirolab\Theme\Middleware\ThemeMiddleware::class,
         'apikey.check' => \App\Http\Middleware\CheckAPIKey::class,
+        'admin.super' => \App\Http\Middleware\SuperAdmin::class,
+
     ];
 }
