@@ -6,6 +6,7 @@ use App\Events\UserRegistered;
 use App\Jobs\AddNewStudentsJob;
 use App\Jobs\ProcessStudentRegistrationJob;
 use App\Jobs\UpdateSheetWithGhanaCardDetails;
+use App\Jobs\AdmitStudentJob;
 use App\Models\Attendance;
 use App\Models\CourseSession;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ use App\Models\Admin;
 use App\Models\Oex_result;
 use App\Models\UserAdmission;
 use App\Mail\ExamLoginCredentials;
+use App\Mail\StudentAdmitted;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 
@@ -310,7 +312,15 @@ class AdminController extends Controller
     //Registered student page
     public function registered_students()
     {
-        $data['users'] = User::get()->all();
+        $data['users'] = User::select('users.*', 'user_admission.id as admitted', 'courses.course_name', 'course_sessions.name as session_name')
+            ->leftJoin('user_admission', 'users.userId', '=', 'user_admission.user_id')
+            ->leftJoin('courses', 'user_admission.course_id', '=', 'courses.id')
+            ->leftJoin('course_sessions', 'user_admission.session', '=', 'course_sessions.id')
+            ->get();
+        $courses = Course::all();
+        $sessions = CourseSession::all();
+        $data['courses'] = $courses;
+        $data['sessions'] = $sessions;
 
         return view('admin.registered_students', $data);
     }
@@ -513,6 +523,8 @@ class AdminController extends Controller
         ]);
     }
 
+
+
     public function verification_page(Request $request)
     {
         $allCourses = Course::all();
@@ -561,6 +573,76 @@ class AdminController extends Controller
             'attendance' => $attendance,
             'selectedCourse' => $selectedCourse,
             'selectedDate' => $selectedDate,
+        ]);
+    }
+
+    public function admit_student(Request $request)
+    {
+        $validated = $request->validate([
+            'course_id' => 'required|exists:courses,id',
+            'session_id' => 'required|exists:course_sessions,id',
+            'user_id' => 'required|exists:users,userId'
+        ]);
+
+        $course = Course::find($validated['course_id']);
+        $session = CourseSession::find($validated['session_id']);
+        if ($session->course_id != $course->id) {
+            return redirect()->back()->with([
+                'flash' => 'Session not valid for selected course',
+                'key' => 'error',
+            ]);
+        }
+
+        $user_id = $validated['user_id'];
+        try {
+            $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
+            $user = User::where('userId', $user_id)->first();
+            $url = url('student/select-session/' . $user_id);
+
+            if ($oldAdmission && !$oldAdmission->email_sent) {
+                Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
+                $oldAdmission->email_sent = now();
+                $oldAdmission->save();
+            }
+
+            if (!$oldAdmission) {
+                $admission = new UserAdmission();
+                $admission->user_id = $user_id;
+                $admission->course_id = $course->id;
+                $admission->email_sent = now();
+                $admission->session = $session->id;
+                $admission->confirmed = now();
+                $admission->location = $course->location;
+                $admission->save();
+
+
+                Mail::to($user->email)
+                    ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
+                    ->queue(new StudentAdmitted(name: $user->name, course: $course->course_name, location: $course->location, url: $url));
+
+                AdmitStudentJob::dispatch($admission);
+            }
+            return redirect()->back()->with([
+                'flash' => 'Student admitted successfully',
+                'key' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            return redirect(url('student/select-session/' . $user_id))->with([
+                'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
+                'key' => 'error',
+            ]);
+        }
+    }
+
+    public function reset_verify($userId)
+    {
+        $u = User::findOrFail($userId);
+        $u->ghcard = null;
+        $u->updated_at = $u->created_at;
+        $u->save();
+        return redirect()->back()->with([
+            'flash' => 'Student reset successfully',
+            'key' => 'success',
         ]);
     }
 }
