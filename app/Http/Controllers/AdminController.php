@@ -606,12 +606,10 @@ class AdminController extends Controller
                 'key' => 'success',
             ]);
         } catch (\Exception $e) {
-            // return $e->getMessage();
             return redirect(url('student/select-session/' . $user_id))->with([
                 'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
                 'key' => 'error',
             ]);
-            // abort(503);
         }
     }
 
