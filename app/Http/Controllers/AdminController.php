@@ -6,6 +6,8 @@ use App\Events\UserRegistered;
 use App\Jobs\AddNewStudentsJob;
 use App\Jobs\ProcessStudentRegistrationJob;
 use App\Jobs\UpdateSheetWithGhanaCardDetails;
+use App\Models\Attendance;
+use App\Models\CourseSession;
 use Illuminate\Http\Request;
 use App\Models\Oex_category;
 use App\Models\Oex_exam_master;
@@ -445,12 +447,11 @@ class AdminController extends Controller
 
     public function generate_qrcode_page()
     {
-
         $courses = Course::distinct('course_name')->get()->all();
 
         return view('admin.qr-generator', [
             // "locations" => $locations,
-            "courses" => $courses
+            'courses' => $courses,
         ]);
     }
 
@@ -460,7 +461,7 @@ class AdminController extends Controller
 
         return view('admin.qr-scanner', [
             // "locations" => $locations,
-            "courses" => $courses
+            'courses' => $courses,
         ]);
     }
 
@@ -501,15 +502,14 @@ class AdminController extends Controller
             UpdateSheetWithGhanaCardDetails::dispatch($student);
 
             return response()->json([
-                "success" => true,
-                "message" => "Verification successsful",
-                "student" => $student
+                'success' => true,
+                'message' => 'Verification successsful',
+                'student' => $student,
             ]);
         }
         return response()->json([
-            "success" => false,
-            "message" => "Unable to verify. Card Number format is wrong",
-
+            'success' => false,
+            'message' => 'Unable to verify. Card Number format is wrong',
         ]);
     }
 
@@ -521,23 +521,46 @@ class AdminController extends Controller
         $selectedCourse = $request->input('course_id');
 
         if (isset($selectedCourse)) {
-            $students = UserAdmission::select(
-                'users.*',
-                'user_admission.created_at as admission_created',
-                'user_admission.updated_at as admission_updated',
-                \DB::raw('(select admins.name from admins where admins.id = users.verified_by) as verified_by_name')
-            )->join('users', 'users.userId', 'user_admission.user_id')
+            $students = UserAdmission::select('users.*', 'user_admission.created_at as admission_created', 'user_admission.updated_at as admission_updated', \DB::raw('(select admins.name from admins where admins.id = users.verified_by) as verified_by_name'))
+                ->join('users', 'users.userId', 'user_admission.user_id')
 
-                ->where('course_id', $selectedCourse)->get();
+                ->where('course_id', $selectedCourse)
+                ->get();
             $selectedCourse = Course::find($selectedCourse);
         }
-
 
         return view('admin.verification', [
             'courses' => $allCourses,
             'students' => $students,
-            'selectedCourse' => $selectedCourse
+            'selectedCourse' => $selectedCourse,
+        ]);
+    }
 
+    public function viewAttendanceByDate(Request $request)
+    {
+        $courses = Course::all();
+        $attendance = collect();
+        $selectedCourse = null;
+        $selectedDate = null;
+
+        if ($request->has('course_id') && $request->has('date')) {
+            $selectedCourse = Course::find($request->input('course_id'));
+            $selectedDate = $request->input('date');
+
+            if ($selectedCourse && $selectedDate) {
+                $attendance = Attendance::select('attendances.*', 'users.name', 'users.email')
+                    ->join('users', 'users.userId', '=', 'attendances.user_id')
+                    ->where('attendances.course_id', $selectedCourse->id)
+                    ->whereDate('attendances.date', '=', $selectedDate)
+                    ->get();
+            }
+        }
+
+        return view('admin.view_attendance', [
+            'courses' => $courses,
+            'attendance' => $attendance,
+            'selectedCourse' => $selectedCourse,
+            'selectedDate' => $selectedDate,
         ]);
     }
 }

@@ -169,6 +169,14 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="{{ url('admin/view_attendance') }}" class="nav-link">
+                                <i class="fas fa-clipboard-list nav-icon"></i>
+                                <p>View Attendance</p>
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
                             <a href="{{ url('admin/logout') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Logout</p>
