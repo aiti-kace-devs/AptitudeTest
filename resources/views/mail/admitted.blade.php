@@ -14,11 +14,13 @@ Required Resource: Laptop. <br>
 
 <x-mail::button :url="$url">Select Session</x-mail::button>
 <x-mail::button :url="$data['whatsapp']" color="success">Join WhatsApp Group</x-mail::button>
+@if($data['resource'])
 <x-mail::button :url="$data['resource']" color="error">Course Materials</x-mail::button>
+@endif
 
 Kindly select a session that fits your schedule by clicking on the "Select Session" button.<br>
 Join the WhatsApp Group for {{$course}} for more information, by clicking the "Join WhatsApp Group" button<br>
-Find all materials and lecture videos by clicking on the "Course Materials" button
+@if($data['resource'])Find all materials and lecture videos by clicking on the "Course Materials" button @endif
 
 <x-mail::panel>
 Note: Only applicants who have selected their sessions will move to the next stage.
