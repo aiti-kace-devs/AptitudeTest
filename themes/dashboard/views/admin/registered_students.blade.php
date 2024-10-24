@@ -68,7 +68,8 @@
                                                         @endif
                                                         @if ($p['admitted'] && !$p['session_name'])
                                                             <a href="{{ url('/student/select-session/' . $p['userId']) }}"
-                                                                class="btn btn-primary btn-sm">Choose Session</a>
+                                                                target="_blank" class="btn btn-primary btn-sm">Choose
+                                                                Session</a>
                                                         @endif
                                                         @if (Auth::user()->isSuper())
                                                             <a href="{{ url('admin/delete_registered_students/' . $p['id']) }}"
