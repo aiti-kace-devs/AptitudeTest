@@ -15,9 +15,9 @@ Required Resource: Laptop. <br>
 <x-mail::button :url="$url">Select Session</x-mail::button>
 @endif
 <x-mail::button :url="$data['whatsapp']" color="success">Join WhatsApp Group</x-mail::button>
-@if($data['resource'])
+@isset($data['resource'])
 <x-mail::button :url="$data['resource']" color="error">Course Materials</x-mail::button>
-@endif
+@endisset
 
 Kindly select a session that fits your schedule by clicking on the "Select Session" button.<br>
 Join the WhatsApp Group for {{$course}} for more information, by clicking the "Join WhatsApp Group" button<br>
