@@ -21,7 +21,7 @@ Required Resource: Laptop. <br>
 
 Kindly select a session that fits your schedule by clicking on the "Select Session" button.<br>
 Join the WhatsApp Group for {{$course}} for more information, by clicking the "Join WhatsApp Group" button<br>
-@if($data['resource'])Find all materials and lecture videos by clicking on the "Course Materials" button @endif
+@isset($data['resource'])Find all materials and lecture videos by clicking on the "Course Materials" button @endisset
 
 <x-mail::panel>
 Note: Only applicants who have selected their sessions will move to the next stage.
