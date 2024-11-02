@@ -105,7 +105,7 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     ],
                     "startDate" => "4th November, 2024",
                     "venue" => "GI-KACE, Ridge - Accra",
-                    "duration" => "4 Weeks / 1 months (Weekdays Only)",
+                    "duration" => "4 Weeks / 1 month (Weekdays Only)",
                     "whatsapp" => "https://chat.whatsapp.com/Itf9RIncR5O70GVs3LF4wB",
                 ],
                 "Web Technology" => [
@@ -189,7 +189,7 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     ],
                     "venue" => "Tamale Technical University (TaTU)",
                     "startDate" => "4th November, 2024",
-                    "duration" => "4 Weeks / 1 months (Weekdays Only)",
+                    "duration" => "4 Weeks / 1 month (Weekdays Only)",
                     "whatsapp" => "https://chat.whatsapp.com/Itf9RIncR5O70GVs3LF4wB",
                 ],
                 "Web Technology" => [
@@ -317,7 +317,7 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     ],
                     "startDate" => "4th November, 2024",
                     "venue" => "Koforidua Technical University (KTU)",
-                    "duration" => "4 Weeks / 1 months (Weekdays Only)",
+                    "duration" => "4 Weeks / 1 month (Weekdays Only)",
                     "whatsapp" => "https://chat.whatsapp.com/Itf9RIncR5O70GVs3LF4wB",
                 ],
                 "Web Technology" => [
@@ -376,7 +376,18 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     "whatsapp" => "https://chat.whatsapp.com/IQAuUuVLBV17nRlR17izzx",
                 ],
             ],
-
+            "Bono East - Regional Coordinating Council, New Complex - Techiman" => [
+                "Data Analytics with Power BI" => [
+                    "mode" => [
+                        "Virtual" => [3, 4, 7, 8, 9, 11],
+                        "In-Person" => [1, 2, 5, 6, 10, 12],
+                    ],
+                    "venue" => "Regional Coordinating Council, New Complex - Techiman",
+                    "startDate" => "4th November, 2024",
+                    "duration" => "2 Weeks (Weekdays Only)",
+                    "whatsapp" => "https://chat.whatsapp.com/FpPY3MF939WAET1YMJ49In",
+                ],
+            ]
         ];
 
         $this->data = $data[$location][$course];
