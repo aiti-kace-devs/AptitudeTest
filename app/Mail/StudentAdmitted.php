@@ -203,7 +203,7 @@ class StudentAdmitted extends Mailable implements ShouldQueue
                     "whatsapp" => "https://chat.whatsapp.com/HzY7RFcgain6sjbKCV2VHC",
                 ],
             ],
-            "Central - Methodist School, Cape Coast & Elmina" => [
+            "Central - Cape Coast Technical University" => [
                 "Cyber Ops" => [
                     "mode" => [
                         "Virtual" => [1, 2, 5, 6, 7, 11],
