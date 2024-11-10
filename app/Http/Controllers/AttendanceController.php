@@ -85,22 +85,21 @@ class AttendanceController extends Controller
                 $admittedCourse = Course::find($confirmedAdmission['course_id']);
 
                 // if online for all, ignore both course id and location
-
                 if (isset($decodedUserIdData['online']) && $decodedUserIdData['online'] === 'onlineForAll') {
-                    $attendance = new Attendance();
-                    $attendance->user_id = $user_id;
-                    $attendance->course_id = $admittedCourse->id;
-                    $attendance->date = $date;
-                    $attendance->save();
-
-                    UpdateAttendanceOnSheetJob::dispatch($attendance);
-                    return redirect(url('/student/attendance'))->with([
-                        'flash' => 'Attendance confirmed successfully.',
-                        'key' => 'success',
-                    ]);
+                    if ($this->createAttendance($user_id, $admittedCourse->id, $date)) {
+                        return redirect(url('/student/attendance'))->with([
+                            'flash' => 'Attendance confirmed successfully.',
+                            'key' => 'success',
+                        ]);
+                    } else {
+                        return redirect(url('/student/attendance'))->with([
+                            'flash' => 'Attendance already confirmed.',
+                            'key' => 'success',
+                        ]);
+                    }
                 }
-                // if online, ignore location
 
+                // if online, ignore location
                 if ($course->course_name != $admittedCourse->course_name) {
                     return redirect(url('/student/attendance'))->with([
                         'flash' => 'User not admitted unto this course',
@@ -124,19 +123,12 @@ class AttendanceController extends Controller
                     ]);
                 }
 
-                // dd($admittedCourse);
-                $attendance = new Attendance();
-                $attendance->user_id = $user_id;
-                $attendance->course_id = $admittedCourse->id;
-                $attendance->date = $date;
-                $attendance->save();
-
-                UpdateAttendanceOnSheetJob::dispatch($attendance);
-                return redirect(url('/student/attendance'))->with([
-                    'flash' => 'Attendance confirmed successfully.',
-                    'key' => 'success',
-                ]);
-                // return response()->json(['message' => 'Attendance recorded successfully.', 'success' => true]);
+                if ($this->createAttendance($user_id, $admittedCourse->id, $date)) {
+                    return redirect(url('/student/attendance'))->with([
+                        'flash' => 'Attendance confirmed successfully.',
+                        'key' => 'success',
+                    ]);
+                }
             } else {
                 return redirect('/student/attendance')->with([
                     'flash' => 'Link expired',
@@ -144,13 +136,30 @@ class AttendanceController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            redirect('/student/attendance')->with([
+            return redirect('/student/attendance')->with([
                 'flash' => 'Unable to confirm attendance',
                 'key' => 'error',
             ]);
         }
     }
 
+    private function createAttendance($user_id, $course_id, $date)
+    {
+        $attendanceRecord = Attendance::where('user_id', $user_id)->whereDate('date', $date)->first();
+
+        if ($attendanceRecord) {
+            return false;
+        }
+
+        $attendance = new Attendance();
+        $attendance->user_id = $user_id;
+        $attendance->course_id = $course_id;
+        $attendance->date = $date;
+        $attendance->save();
+
+        UpdateAttendanceOnSheetJob::dispatch($attendance);
+        return true;
+    }
     public function confirmAttendance(Request $request)
     {
         $data = $request->validate([
