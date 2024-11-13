@@ -645,4 +645,9 @@ class AdminController extends Controller
             'key' => 'success',
         ]);
     }
+
+    public function getReportView()
+    {
+        return view('admin.reports');
+    }
 }
