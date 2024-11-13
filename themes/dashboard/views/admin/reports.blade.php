@@ -51,8 +51,8 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Student Name</th>
-                                            <th>Email</th>
+                                            <th>Course</th>
+                                            <th>Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>

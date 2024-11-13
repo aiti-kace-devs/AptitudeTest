@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\UserRegistered;
 use App\Jobs\AddNewStudentsJob;
+use Illuminate\Support\Facades\DB;
 use App\Jobs\ProcessStudentRegistrationJob;
 use App\Jobs\UpdateSheetWithGhanaCardDetails;
 use App\Jobs\AdmitStudentJob;
@@ -650,4 +651,28 @@ class AdminController extends Controller
     {
         return view('admin.reports');
     }
+
+    public function generateReport(Request $request)
+    {
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $courses = Course::all();
+
+        $attendanceData = Attendance::whereBetween('date', [$startDate, $endDate])
+            ->select('course_id', 'date', DB::raw('COUNT(*) as total'))
+            ->groupBy('course_id', 'date')
+            ->get()
+            ->groupBy('course_id');
+
+            $data = [
+                'courses' => $courses,
+                'attendanceData' => $attendanceData,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+            ];
+
+        return view('admin.reports', $data);
+    }
+
 }
