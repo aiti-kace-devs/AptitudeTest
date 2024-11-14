@@ -201,3 +201,4 @@ class AttendanceController extends Controller
         return view('student.attendance', compact('attendance'));
     }
 }
+

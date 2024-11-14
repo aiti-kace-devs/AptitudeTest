@@ -148,6 +148,13 @@
                                     <p>Registered students</p>
                                 </a>
                             </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/reports') }}" class="nav-link">
+                                    <i class="fa fa-chart nav-icon"></i>
+                                    <p>Reports</p>
+                                </a>
+                            </li>
                         @endif
                         {{-- <li class="nav-item">
                             <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">
