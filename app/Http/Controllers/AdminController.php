@@ -33,9 +33,13 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Helpers\GoogleSheets;
 use App\Models\Course;
+use App\Helpers\Common as CommonHelper;
+
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    use CommonHelper;
     // admin dashboard
     public function index()
     {
@@ -649,30 +653,61 @@ class AdminController extends Controller
 
     public function getReportView()
     {
-        return view('admin.reports');
-    }
-
-    public function generateReport(Request $request)
-    {
-        $startDate = $request->start_date;
-        $endDate = $request->end_date;
-
         $courses = Course::all();
 
-        $attendanceData = Attendance::whereBetween('date', [$startDate, $endDate])
-            ->select('course_id', 'date', DB::raw('COUNT(*) as total'))
-            ->groupBy('course_id', 'date')
-            ->get()
-            ->groupBy('course_id');
+        // find students that have attendance for the selected dates
 
-            $data = [
-                'courses' => $courses,
-                'attendanceData' => $attendanceData,
-                'startDate' => $startDate,
-                'endDate' => $endDate,
-            ];
+
+        $data = [
+            'courses' => $courses,
+            'attendanceData' => [],
+            'startDate' => now()->toDateString(),
+            'endDate' => now()->toDateString(),
+            'dates_array' => [],
+            'report_type' => null,
+            'dates' => '',
+        ];
 
         return view('admin.reports', $data);
     }
 
+    public function generateReport(Request $request)
+    {
+        $request->validate([
+            'report_type' => 'required|in:student_summary,course_summary',
+            'dates' => 'required',
+        ]);
+
+        $startDate = Carbon::parse(explode(' - ', $request->dates)[0]);
+        $endDate = Carbon::parse(explode(' - ', $request->dates)[1]);
+
+        $dates = $this->getWeekdays($startDate, $endDate);
+
+        $courses = Course::all();
+
+        // find students that have attendance for the selected dates
+        $attendanceData = DB::table('vDailyCourseAttendance', 'v1')
+            ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
+            ->select('v1.*')
+            ->selectRaw("(SELECT AVG(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as average", [$startDate, $endDate])
+            ->selectRaw("(SELECT SUM(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as attendance_total", [$startDate, $endDate])
+            ->orderBy('course_id', 'desc')
+            ->orderBy('attendance_date')
+            ->get()
+            ->groupBy(['course_name', 'attendance_date']);
+
+        // dd($attendanceData);
+
+        $data = [
+            'courses' => $courses,
+            'attendanceData' => $attendanceData,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'dates_array' => $dates,
+            'report_type' => $request->get('report_type'),
+            'dates' => $request->get('dates'),
+        ];
+
+        return view('admin.reports', $data);
+    }
 }

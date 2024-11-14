@@ -20,17 +20,20 @@
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
-
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
                             <!-- Default box -->
-                            <div class="row">
+                            <form class="row" method="POST" action="{{ route('admin.generateReport') }}">
+                                @csrf
                                 <div class="mb-4 col-md-4">
-                                    <label for="course_id" class="form-label">Select Course</label>
-                                    <select name="course_id" id="course_id" class="form-control">
-                                        <option value="">Select Course</option>
+                                    <label for="report_type" class="form-label">Report Type </label>
+                                    <select name="report_type" id="report_type" class="form-control">
+                                        <option value="course_summary" @if ($report_type == 'course_summary') selected @endif>
+                                            Course Attendance Summary</option>
+                                        <option value="student_summary" @if ($report_type == 'student_summary') selected @endif>
+                                            Student Attendance Summary</option>
 
                                         {{-- @foreach ($courses as $course)
                                             <option value="{{ $course->id }}"
@@ -41,28 +44,50 @@
                                     </select>
                                 </div>
                                 <div class="mb-4 col-md-4">
-                                    <label for="date">Select Date</label>
-                                    <input type="text" name="dates" id="selected_date" class="form-control" required>
+                                    <label for="dates">Select Date</label>
+                                    <input type="text" name="dates" id="selected_date" class="form-control"
+                                        value="{{ $dates }}" required>
                                 </div>
-                            </div>
+                                <div class="mb-4 col-md-4">
+                                    <input type="submit" class="btn btn-success mt-2" value="Generate Report" />
+                                </div>
+                            </form>
 
                             <div class="card-body">
+                                @if ($report_type)
+                                    <h1 class="text-uppercase mb-2 text-primary">{{ str_replace('_', ' ', $report_type) }}
+                                        Report For
+                                        {{ $dates }}</h1>
+                                @endif
                                 <table class="table table-striped table-bordered table-hover datatable">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Course</th>
-                                            <th>Date</th>
+                                            <th colspan="1"></th>
+                                            <th colspan="{{ count($dates_array) }}">Dates</th>
+                                            <th colspan="2">Statistics</th>
+
+                                        </tr>
+                                        <tr>
+                                            <th>Course Name</th>
+                                            @foreach ($dates_array as $date)
+                                                <th>{{ $date }}</th>
+                                            @endforeach
+                                            <th>Total</th>
+                                            <th>Average</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {{-- @foreach ($attendance as $key => $record)
+                                        @foreach ($attendanceData as $course => $record)
                                             <tr>
-                                                <td>{{ $key + 1 }}</td>
-                                                <td>{{ $record->name }}</td>
-                                                <td>{{ $record->email }}</td>
+                                                <td>{{ $course }}</td>
+                                                @foreach ($dates_array as $date)
+                                                    <th>{{ $record->get($date)?->values()[0]->total ?? 0 }}</th>
+                                                    {{-- <th>{{ dump($record) }}</th> --}}
+                                                @endforeach
+                                                <td>{{ $record->first()->values()[0]->attendance_total }}</td>
+                                                <td>{{ $record->first()->values()[0]->average }}</td>
                                             </tr>
-                                        @endforeach --}}
+                                        @endforeach
                                     </tbody>
                                     <tfoot>
 
@@ -86,6 +111,9 @@
         $(document).ready(function() {
             $('input[name="dates"]').daterangepicker({
                 showWeekNumbers: true,
+                locale: {
+                    format: 'MMMM D, YYYY'
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
