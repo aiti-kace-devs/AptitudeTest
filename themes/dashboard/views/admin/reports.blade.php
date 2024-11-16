@@ -25,7 +25,8 @@
                     <div class="row">
                         <div class="col-12">
                             <!-- Default box -->
-                            <form class="row" method="POST" action="{{ route('admin.generateReport') }}">
+                            <form class="row d-flex align-items-center" method="POST"
+                                action="{{ route('admin.generateReport') }}">
                                 @csrf
                                 <div class="mb-4 col-md-4">
                                     <label for="report_type" class="form-label">Report Type </label>
@@ -48,8 +49,12 @@
                                     <input type="text" name="dates" id="selected_date" class="form-control"
                                         value="{{ $dates }}" required>
                                 </div>
-                                <div class="mb-4 col-md-4">
+                                <div class="mb-1 col-md-4">
                                     <input type="submit" class="btn btn-success mt-2" value="Generate Report" />
+                                </div>
+                                <div class="mb-1 col-md-4">
+                                    <button type="submit" name="export" value="1" class="btn btn-primary mt-2">Export
+                                        Report</button>
                                 </div>
                             </form>
 
@@ -68,7 +73,13 @@
 
                                         </tr>
                                         <tr>
-                                            <th>Course Name</th>
+                                            <th>
+                                                @if ($report_type == 'course_summary')
+                                                    Course Name
+                                                @else
+                                                    Student Name
+                                                @endif
+                                            </th>
                                             @foreach ($dates_array as $date)
                                                 <th>{{ $date }}</th>
                                             @endforeach
@@ -77,17 +88,34 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($attendanceData as $course => $record)
-                                            <tr>
-                                                <td>{{ $course }}</td>
-                                                @foreach ($dates_array as $date)
-                                                    <th>{{ $record->get($date)?->values()[0]->total ?? 0 }}</th>
-                                                    {{-- <th>{{ dump($record) }}</th> --}}
-                                                @endforeach
-                                                <td>{{ $record->first()->values()[0]->attendance_total }}</td>
-                                                <td>{{ $record->first()->values()[0]->average }}</td>
-                                            </tr>
-                                        @endforeach
+                                        @if ($report_type == 'course_summary')
+                                            @foreach ($attendanceData as $course => $record)
+                                                <tr>
+                                                    <td>{{ $course }}</td>
+                                                    @foreach ($dates_array as $date)
+                                                        <th>{{ $record->get($date)?->values()[0]->total ?? 0 }}</th>
+                                                        {{-- <th>{{ dump($record) }}</th> --}}
+                                                    @endforeach
+                                                    <td>{{ $record->first()->values()[0]->attendance_total }}</td>
+                                                    <td>{{ $record->first()->values()[0]->average }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+
+                                        @if ($report_type == 'student_summary')
+                                            @foreach ($studentAttendanceData as $student => $record)
+                                                <tr>
+                                                    <td>{{ $student }}</td>
+                                                    @foreach ($dates_array as $date)
+                                                        <th>{{ $record->get($date)?->values()[0]->total ?? 0 }}</th>
+                                                        {{-- <th>{{ dump($record) }}</th> --}}
+                                                    @endforeach
+                                                    <td>{{ $record->first()->values()[0]->attendance_total }}</td>
+                                                    <td>{{ $record->first()->values()[0]->average }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+
                                     </tbody>
                                     <tfoot>
 
