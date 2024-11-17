@@ -90,3 +90,40 @@ $(document).on('click','.question_status',function(){
     })
 })
 
+$(document).on('submit', '#manage_form', function (e) {
+    e.preventDefault();
+    $.ajax({
+        type: method,
+        url: manageAction,
+        data: $(this).serialize(),
+        success: function (response) {
+            // Refresh the page after a short delay (1 second)
+            setTimeout(() => {
+                window.location.href = response.reload;
+            }, 1000);
+
+            toastr.success(response.message);
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                toastr.error('Something went wrong. Try again.');
+                let errors = xhr.responseJSON.errors;
+
+                $.each(errors, function (field, messages) {
+                    field = field.replace('.', '_')
+                    $('#' + field).addClass('is-invalid');
+                    $('.' + field + '_error').text(messages[0]);
+                });
+            } else {
+                // Handle other types of errors if needed
+                alert("An unexpected error occurred. Please try again.");
+            }
+        }
+    });
+});
+
+$('#manageModal').on('hide.bs.modal', function (event) {
+    $('#manage_form :input').removeClass('is-invalid');
+    $('#manage_form .invalid-feedback').text("");
+    $('#manage_form')[0].reset();
+});
