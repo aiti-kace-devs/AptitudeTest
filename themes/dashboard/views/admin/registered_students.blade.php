@@ -65,6 +65,10 @@
                                                         @if (!$p['admitted'])
                                                             <button class="btn btn-primary btn-sm"
                                                                 onclick="openModal('{{ $p['userId'] }}')">Admit</button>
+                                                        @else
+                                                            <button class="btn btn-info btn-sm"
+                                                                onclick="openModal('{{ $p['userId'] }}')">Change
+                                                                Admission</button>
                                                         @endif
                                                         @if ($p['admitted'] && !$p['session_name'])
                                                             <a href="{{ url('/student/select-session/' . $p['userId']) }}"
@@ -176,7 +180,6 @@
                 function openModal(id) {
                     $('#myModal').modal('show');
                     $('#user_id').val(id);
-
                 }
 
                 // form.

@@ -37,7 +37,7 @@
                 @php
                     function detailsUpdated($user)
                     {
-                        return $user->user_updated != $user->user_created && !$user->ghcard;
+                        return $user->user_updated != $user->user_created && $user->ghcard;
                     }
                 @endphp
                 <!-- Small boxes (Stat box) -->
@@ -65,7 +65,7 @@
                         @enderror
 
                         <div class="col-12">
-                            @if ($user->user_updated != $user->user_created)
+                            @if (detailsUpdated($user))
                                 <p class="text-sm text-danger">You have already updated your details</p>
                             @else
                                 <button onclick="confirmUpdateDetails()" type="button"

@@ -114,7 +114,8 @@
                                                 <tr>
                                                     <td>{{ $student }}</td>
                                                     @foreach ($dates_array as $date)
-                                                        <th>{{ $record->get($date)?->values()[0]->total ?? 0 }}</th>
+                                                        <th>{{ $record->get($date)?->values()[0]->total == 1 ? '✅' : '❌' }}
+                                                        </th>
                                                         {{-- <th>{{ dump($record) }}</th> --}}
                                                     @endforeach
                                                     <td>{{ $record->first()->values()[0]->attendance_total }}</td>
