@@ -36,12 +36,19 @@
                                         <option value="student_summary" @if ($report_type == 'student_summary') selected @endif>
                                             Student Attendance Summary</option>
 
-                                        {{-- @foreach ($courses as $course)
+                                    </select>
+                                </div>
+                                <div id="course_dropdown" class="mb-4 col-md-4" style="display: none;">
+                                    <label for="course" class="form-label">Select Course</label>
+                                    <select name="course_id" id="course_id" class="form-control" aria-hidden="true">
+                                        <option value="">Select Course</option>
+
+                                        @foreach ($courses as $course)
                                             <option value="{{ $course->id }}"
-                                                @if ($course->id == $selectedCourse?->id) selected @endif>
+                                                @if ($course->id == ($selectedCourse['id'] ?? null)) selected @endif>
                                                 {{ $course->location }} -
                                                 {{ $course->course_name }}</option>
-                                        @endforeach --}}
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="mb-4 col-md-4">
@@ -153,5 +160,20 @@
                 }
             });
         });
+
+        function toggleCourseDropdown() {
+            const reportType = document.getElementById('report_type').value;
+            const courseDropdown = document.getElementById('course_dropdown');
+            if (reportType === 'student_summary') {
+                courseDropdown.style.display = 'block';
+            } else {
+                courseDropdown.style.display = 'none';
+            }
+        }
+        document.getElementById('report_type').addEventListener('change', toggleCourseDropdown);
+        document.querySelector('form').addEventListener('submit', function(event) {
+            toggleCourseDropdown();
+        });
+        toggleCourseDropdown();
     </script>
 @endpush

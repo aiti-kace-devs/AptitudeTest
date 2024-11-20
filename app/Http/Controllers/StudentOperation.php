@@ -441,26 +441,41 @@ class StudentOperation extends Controller
     {
         $user = Auth::user();
 
-        if ($user->created_at == $user->updated_at) {
-            $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
-            ], [], ['ghcard' => "Ghana Card number"]);
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
+        ], [], ['ghcard' => "Ghana Card number"]);
 
-            $user->name = $validatedData['name'];
-            $user->ghcard = "GHA-" . $validatedData['ghcard'];
-            $user->save();
+        $user->name = $validatedData['name'];
+        $user->ghcard = "GHA-" . $validatedData['ghcard'];
+        $user->save();
 
 
-            return redirect()->back()->with([
-                'flash' => 'Your details have been updated successfully.',
-                'key' => 'success'
-            ]);
-        } else {
-            return redirect()->back()->with([
-                'flash' => 'You have already updated your details once.',
-                'key' => 'error'
-            ]);
-        }
+        return redirect()->back()->with([
+            'flash' => 'Your details have been updated successfully.',
+            'key' => 'success'
+        ]);
+
+        // if ($user->created_at == $user->updated_at) {
+        //     $validatedData = $request->validate([
+        //         'name' => 'required|string|max:255',
+        //         'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
+        //     ], [], ['ghcard' => "Ghana Card number"]);
+
+        //     $user->name = $validatedData['name'];
+        //     $user->ghcard = "GHA-" . $validatedData['ghcard'];
+        //     $user->save();
+
+
+        //     return redirect()->back()->with([
+        //         'flash' => 'Your details have been updated successfully.',
+        //         'key' => 'success'
+        //     ]);
+        // } else {
+        //     return redirect()->back()->with([
+        //         'flash' => 'You have already updated your details once.',
+        //         'key' => 'error'
+        //     ]);
+        // }
     }
 }

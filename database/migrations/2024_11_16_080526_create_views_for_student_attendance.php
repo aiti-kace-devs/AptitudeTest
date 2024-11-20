@@ -13,15 +13,17 @@ return new class extends Migration {
     public function up()
     {
         DB::statement("CREATE VIEW vUserCourseAttendance AS
-        SELECT u.userId AS user_id, u.name AS user_name, at.attendance_date, at.total, at.user_id AS attendance_user_id
-        FROM users u
+        SELECT ua.user_id AS user_id, u.name AS user_name, s.id AS course_id, s.location AS course_location, s.course_name AS course_name, at.attendance_date, at.total
+        FROM user_admission ua
+        LEFT JOIN users u ON u.userId = ua.user_id
+        LEFT JOIN courses s ON s.id = ua.course_id
         LEFT JOIN (
         SELECT DATE_FORMAT(a.date, '%Y-%m-%d') AS attendance_date,
                COUNT(*) AS total,
                MAX(a.user_id) AS user_id
         FROM attendances a
-        GROUP BY a.user_id , attendance_date order by a.user_id, attendance_date asc
-        ) AS at ON at.user_id = u.userId");
+        GROUP BY a.user_id , attendance_date
+        ) AS at ON at.user_id = ua.user_id");
     }
 
     /**
