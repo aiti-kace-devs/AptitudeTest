@@ -83,12 +83,12 @@
                                 </div>
 
                                 @if ($report_type)
-                                    <h1 class="text-uppercase mb-2 text-primary" id="reportHeading">
-                                        {{ $selectedCourse->location }}
+                                    <h4 class="text-uppercase mb-2 text-primary" id="reportHeading">
+                                        {{ $selectedCourse->location ?? '' }}
                                         {{ $selectedCourse['course_name'] ?? '' }}
                                         {{ str_replace('_', ' ', $report_type) }}
                                         Report For
-                                        {{ $dates }}</h1>
+                                        {{ $dates }}</h4>
                                 @endif
                                 <table class="table table-striped table-bordered table-hover datatable">
                                     <thead>
