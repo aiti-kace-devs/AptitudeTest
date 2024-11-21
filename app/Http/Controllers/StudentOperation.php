@@ -444,17 +444,22 @@ class StudentOperation extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
-            'gender' => 'required | in:male,female'
+            'gender' => 'required|in:male,female',
+            'mobile_no' => 'required|string|regex:/^[1-9][0-9]{8}$/|max:10'
         ], [], ['ghcard' => "Ghana Card number"]);
 
         if($user->name && $user->ghcard){
             $user->gender = $validatedData["gender"];
+            $user->mobile_no = "+233" . $validatedData['mobile_no'];
         } else {
             $user->name = $validatedData['name'];
             $user->ghcard = "GHA-" . $validatedData['ghcard'];
             $user->gender = $validatedData['gender'];
-            $user->save();
+            $user->mobile_no = "+233" . $validatedData['mobile_no'];
         }
+            // dd($user);
+            $user->save();
+
 
 
         return redirect()->back()->with([
