@@ -677,6 +677,7 @@ class AdminController extends Controller
             'report_type' => null,
             'dates' => '',
             'selectedCourse' => [],
+            'selectedDailyOption' => "no",
 
         ];
 
@@ -685,9 +686,10 @@ class AdminController extends Controller
 
     public function generateReport(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'report_type' => 'required|in:student_summary,course_summary',
             'dates' => 'required',
+            'course_id' => 'sometimes'
         ]);
 
         $startDate = Carbon::parse(explode(' - ', $request->dates)[0]);
@@ -698,7 +700,9 @@ class AdminController extends Controller
         $courses = Course::all();
         $selectedCourse = null;
         $studentAttendanceData = collect();
-        $courseId = $request->get('course_id');
+        $courseId = $validated['course_id'];
+
+
         // find students that have attendance for the selected dates
         $attendanceData = DB::table('vDailyCourseAttendance', 'v1')
             ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
@@ -711,16 +715,26 @@ class AdminController extends Controller
             ->groupBy(['course_name', 'attendance_date']);
 
         // dd($attendanceData);
-        if ($courseId) {
+        $whereOperator = $courseId == 'all' ? '<>' : '=';
+        $whereCourseId = $courseId == 'all' ? null : $courseId;
+
+        if ($request->get('report_type') == 'student_summary') {
             $studentAttendanceData = DB::table('vUserCourseAttendance', 'v1')
-                ->where('course_id', $courseId)
+                ->where('course_id', $whereOperator, $whereCourseId)
                 ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
-                ->select('v1.*')
+                ->select('v1.*', 'users.name as user_name')
                 ->selectRaw('(SELECT SUM(v2.total) from `vUserCourseAttendance` v2 where v2.user_id = v1.user_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.user_id ) as attendance_total', [$startDate, $endDate])
+                ->orderBy('course_name', 'asc')
                 ->orderBy('user_id', 'desc')
+                ->join('users', 'users.userId', '=', 'v1.user_id')
+                // ->join('courses', 'courses.id', '=', 'v1.user_id')
+                // ->join('users', 'users.userId', '=', 'v1.user_id')
                 ->orderBy('attendance_date')
                 ->get()
                 ->groupBy(['user_name', 'attendance_date']);
+            // ->toSql();
+
+            // dd($studentAttendanceData);
             $selectedCourse = Course::find($courseId);
         }
 
@@ -734,6 +748,7 @@ class AdminController extends Controller
             'report_type' => $request->get('report_type'),
             'dates' => $request->get('dates'),
             'selectedCourse' => $selectedCourse,
+            'selectedDailyOption' => $request->get('daily'),
         ];
 
         return view('admin.reports', $data);

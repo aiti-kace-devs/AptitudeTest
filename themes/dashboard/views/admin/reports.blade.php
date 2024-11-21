@@ -28,7 +28,7 @@
                             <form class="row d-flex align-items-center" method="POST"
                                 action="{{ route('admin.generateReport') }}">
                                 @csrf
-                                <div class="mb-4 col-md-4">
+                                <div class="mb-4 col-md-3">
                                     <label for="report_type" class="form-label">Report Type </label>
                                     <select name="report_type" id="report_type" class="form-control">
                                         <option value="course_summary" @if ($report_type == 'course_summary') selected @endif>
@@ -39,28 +39,38 @@
                                     </select>
                                 </div>
                                 <div id="course_dropdown" class="mb-4 col-md-4" style="display: none;">
-                                    <label for="course" class="form-label">Select Course</label>
-                                    <select name="course_id" id="course_id" class="form-control" aria-hidden="true">
-                                        <option value="">Select Course</option>
-
-                                        @foreach ($courses as $course)
-                                            <option value="{{ $course->id }}"
-                                                @if ($course->id == ($selectedCourse['id'] ?? null)) selected @endif>
-                                                {{ $course->location }} -
-                                                {{ $course->course_name }}</option>
-                                        @endforeach
-                                    </select>
+                                    <div class="d-flex">
+                                        <div class="col-9">
+                                            <label for="course" class="form-label">Select Course</label>
+                                            <select name="course_id" id="course_id" class="form-control" aria-hidden="true">
+                                                <option value="">Select Course</option>
+                                                <option value="all">All Courses</option>
+                                                @foreach ($courses as $course)
+                                                    <option value="{{ $course->id }}"
+                                                        @if ($course->id == ($selectedCourse['id'] ?? null)) selected @endif>
+                                                        {{ $course->location }} -
+                                                        {{ $course->course_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="daily" class="form-label">Daily?</label>
+                                            <select name="daily" id="daily" class="form-control" aria-hidden="true">
+                                                <option value="no" @if ('no' == ($selectedDailyOption ?? null)) selected @endif>No
+                                                </option>
+                                                <option value="yes" @if ('yes' == ($selectedDailyOption ?? null)) selected @endif>Yes
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mb-4 col-md-4">
+                                <div class="mb-4 col-md-2">
                                     <label for="dates">Select Date</label>
                                     <input type="text" name="dates" id="selected_date" class="form-control"
                                         value="{{ $dates }}" required>
                                 </div>
                                 <div class="mb-1 col-md-3">
                                     <input type="submit" class="btn btn-success mt-2" value="Generate Report" />
-                                </div>
-                                <div class="mb-1 col-md-3">
-                                    <input type="submit" class="btn btn-primary mt-2" value="Export Report" />
                                 </div>
                             </form>
 
@@ -73,19 +83,21 @@
                                 </div>
 
                                 @if ($report_type)
-                                    <h1 class="text-uppercase mb-2 text-primary">{{ $selectedCourse->location }} {{ $selectedCourse['course_name'] ?? '' }}
+                                    <h1 class="text-uppercase mb-2 text-primary" id="reportHeading">
+                                        {{ $selectedCourse->location }}
+                                        {{ $selectedCourse['course_name'] ?? '' }}
                                         {{ str_replace('_', ' ', $report_type) }}
                                         Report For
                                         {{ $dates }}</h1>
                                 @endif
                                 <table class="table table-striped table-bordered table-hover datatable">
                                     <thead>
-                                        <tr>
+                                        {{-- <tr>
                                             <th colspan="1"></th>
                                             <th colspan="{{ count($dates_array) }}">Dates</th>
                                             <th colspan="2">Statistics</th>
 
-                                        </tr>
+                                        </tr> --}}
                                         <tr>
                                             <th>
                                                 @if ($report_type == 'course_summary')
@@ -94,9 +106,14 @@
                                                     Student Name
                                                 @endif
                                             </th>
-                                            @foreach ($dates_array as $date)
-                                                <th>{{ $date }}</th>
-                                            @endforeach
+                                            @if ($report_type == 'student_summary')
+                                                <th>Course Name</th>
+                                            @endif
+                                            @if ($selectedDailyOption == 'yes')
+                                                @foreach ($dates_array as $date)
+                                                    <th>{{ $date }}</th>
+                                                @endforeach
+                                            @endif
                                             <th>Total</th>
                                             @if ($report_type == 'course_summary')
                                                 <th>Average</th>
@@ -122,11 +139,16 @@
                                             @foreach ($studentAttendanceData as $student => $record)
                                                 <tr>
                                                     <td>{{ $student }}</td>
-                                                    @foreach ($dates_array as $date)
-                                                        <th>{{ $record->get($date)?->values()[0]->total == 1 ? '✅' : '❌' }}
-                                                        </th>
-                                                        {{-- <th>{{ dump($record) }}</th> --}}
-                                                    @endforeach
+                                                    <td>{{ $record->first()[0]->course_name }}
+                                                        ({{ $record->first()[0]->course_location }})
+                                                    </td>
+                                                    @if ($selectedDailyOption == 'yes')
+                                                        @foreach ($dates_array as $date)
+                                                            <th>{{ $record->get($date)?->values()[0]->total == 1 ? '✅' : '❌' }}
+                                                            </th>
+                                                            {{-- <th>{{ dump($record) }}</th> --}}
+                                                        @endforeach
+                                                    @endif
                                                     <td>{{ $record->first()->values()[0]->attendance_total }}</td>
                                                 </tr>
                                             @endforeach
@@ -184,5 +206,7 @@
             toggleCourseDropdown();
         });
         toggleCourseDropdown();
+
+        $(document).prop('title', $('#reportHeading').text());
     </script>
 @endpush
