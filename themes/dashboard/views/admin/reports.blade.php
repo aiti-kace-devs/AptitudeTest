@@ -67,7 +67,8 @@
 
                             <div class="card-body">
                                 @if ($report_type)
-                                    <h1 class="text-uppercase mb-2 text-primary">{{ str_replace('_', ' ', $report_type) }}
+                                    <h1 class="text-uppercase mb-2 text-primary">{{ $selectedCourse['course_name'] ?? '' }}
+                                        {{ str_replace('_', ' ', $report_type) }}
                                         Report For
                                         {{ $dates }}</h1>
                                 @endif

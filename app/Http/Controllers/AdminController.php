@@ -317,7 +317,7 @@ class AdminController extends Controller
     //Registered student page
     public function registered_students()
     {
-        $data['users'] = User::select('users.*', 'user_admission.id as admitted', 'courses.course_name', 'course_sessions.name as session_name')->leftJoin('user_admission', 'users.userId', '=', 'user_admission.user_id')->leftJoin('courses', 'user_admission.course_id', '=', 'courses.id')->leftJoin('course_sessions', 'user_admission.session', '=', 'course_sessions.id')->get();
+        $data['users'] = User::select('users.*', 'user_admission.id as admitted', 'courses.course_name', 'course_sessions.name as session_name', 'user_admission.session as session_id', 'courses.id as course_id')->leftJoin('user_admission', 'users.userId', '=', 'user_admission.user_id')->leftJoin('courses', 'user_admission.course_id', '=', 'courses.id')->leftJoin('course_sessions', 'user_admission.session', '=', 'course_sessions.id')->get();
         $courses = Course::all();
         $sessions = CourseSession::all();
         $data['courses'] = $courses;
@@ -581,6 +581,7 @@ class AdminController extends Controller
             'course_id' => 'required|exists:courses,id',
             'session_id' => 'required|exists:course_sessions,id',
             'user_id' => 'required|exists:users,userId',
+            'change' => 'sometimes',
         ]);
 
         $course = Course::find($validated['course_id']);
@@ -595,15 +596,26 @@ class AdminController extends Controller
         }
 
         $user_id = $validated['user_id'];
+
+        $change = $validated['change'] == 'true';
+
         try {
             $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
             $user = User::where('userId', $user_id)->first();
             $url = url('student/select-session/' . $user_id);
+            $message = 'Student admitted successfully';
 
             if ($oldAdmission && !$oldAdmission->email_sent) {
                 Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
                 $oldAdmission->email_sent = now();
                 $oldAdmission->save();
+            }
+
+            if ($oldAdmission && $change) {
+                $oldAdmission->course_id = $course->id;
+                $oldAdmission->session = $session->id;
+                $oldAdmission->save();
+                $message = 'Student admission changed successfully';
             }
 
             if (!$oldAdmission) {
@@ -625,7 +637,7 @@ class AdminController extends Controller
             return redirect()
                 ->back()
                 ->with([
-                    'flash' => 'Student admitted successfully',
+                    'flash' => $message,
                     'key' => 'success',
                 ]);
         } catch (\Exception $e) {

@@ -67,7 +67,7 @@
                                                                 onclick="openModal('{{ $p['userId'] }}')">Admit</button>
                                                         @else
                                                             <button class="btn btn-info btn-sm"
-                                                                onclick="openModal('{{ $p['userId'] }}')">Change
+                                                                onclick="openModal('{{ $p['userId'] }}', '{{ $p['course_id'] }}', '{{ $p['session_id'] }}')">Change
                                                                 Admission</button>
                                                         @endif
                                                         @if ($p['admitted'] && !$p['session_name'])
@@ -114,6 +114,9 @@
                                 {{ csrf_field() }}
                                 <div class="col-sm-12">
                                     <input id="user_id" name="user_id" type="hidden" class="form-control" required>
+                                    <input id="change" name="change" value="false" type="hidden" class="form-control"
+                                        required>
+
                                     <div class="form-group">
                                         <label for="course_id" class="form-label">Select Course</label>
                                         <select id="course_id" name="course_id" class="form-control" required>
@@ -177,11 +180,21 @@
 
                 form
 
-                function openModal(id) {
-                    $('#myModal').modal('show');
+                function openModal(id, course = null, session = null) {
                     $('#user_id').val(id);
-                }
+                    $('#course_id').val(course);
+                    $('#session_id').val(session);
+                    if (course) {
+                        $('#myModal button').text('Change Admission');
+                        $('#change').val('true');
 
+                    } else {
+                        $('#myModal button').text('Admit');
+                        $('#change').val('false');
+                    }
+
+                    $('#myModal').modal('show');
+                }
                 // form.
             </script>
         @endpush
