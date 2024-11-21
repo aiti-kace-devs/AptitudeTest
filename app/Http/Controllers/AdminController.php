@@ -689,7 +689,9 @@ class AdminController extends Controller
         $validated = $request->validate([
             'report_type' => 'required|in:student_summary,course_summary',
             'dates' => 'required',
-            'course_id' => 'sometimes'
+            'course_id' => 'sometimes',
+            'daily' => 'sometimes'
+
         ]);
 
         $startDate = Carbon::parse(explode(' - ', $request->dates)[0]);
@@ -704,8 +706,12 @@ class AdminController extends Controller
 
 
         // find students that have attendance for the selected dates
-        $attendanceData = DB::table('vDailyCourseAttendance', 'v1')
-            ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
+        $attendanceData = DB::table('vDailyCourseAttendance', 'v1');
+        if (isset($validated['daily']) && $validated['daily'] == 'yes') {
+            $attendanceData = $attendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate]);
+        }
+
+        $attendanceData = $attendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
             ->select('v1.*')
             ->selectRaw('(SELECT AVG(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as average', [$startDate, $endDate])
             ->selectRaw('(SELECT SUM(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as attendance_total', [$startDate, $endDate])
@@ -720,9 +726,13 @@ class AdminController extends Controller
 
         if ($request->get('report_type') == 'student_summary') {
             $studentAttendanceData = DB::table('vUserCourseAttendance', 'v1')
-                ->where('course_id', $whereOperator, $whereCourseId)
-                ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
-                ->select('v1.*', 'users.name as user_name')
+                ->where('course_id', $whereOperator, $whereCourseId);
+
+            if (isset($validated['daily']) && $validated['daily'] == 'yes') {
+                $studentAttendanceData = $studentAttendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate]);
+            }
+
+            $studentAttendanceData = $studentAttendanceData->select('v1.*', 'users.name as user_name')
                 ->selectRaw('(SELECT SUM(v2.total) from `vUserCourseAttendance` v2 where v2.user_id = v1.user_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.user_id ) as attendance_total', [$startDate, $endDate])
                 ->orderBy('course_name', 'asc')
                 ->orderBy('user_id', 'desc')
@@ -747,7 +757,7 @@ class AdminController extends Controller
             'dates_array' => $dates,
             'report_type' => $request->get('report_type'),
             'dates' => $request->get('dates'),
-            'selectedCourse' => $selectedCourse,
+            'selectedCourse' => $selectedCourse ?? 'all',
             'selectedDailyOption' => $request->get('daily'),
         ];
 
