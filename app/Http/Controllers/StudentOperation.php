@@ -450,12 +450,12 @@ class StudentOperation extends Controller
 
         if($user->name && $user->ghcard){
             $user->gender = $validatedData["gender"];
-            $user->contact = "+233" . $validatedData['contact'];
+            $user->contact = "0" . $validatedData['contact'];
         } else {
             $user->name = $validatedData['name'];
             $user->ghcard = "GHA-" . $validatedData['ghcard'];
             $user->gender = $validatedData['gender'];
-            $user->contact = "+233" . $validatedData['contact'];
+            $user->contact = "0" . $validatedData['contact'];
         }
             // dd($user);
             $user->save();
