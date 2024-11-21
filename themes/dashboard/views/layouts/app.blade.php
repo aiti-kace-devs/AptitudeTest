@@ -34,7 +34,12 @@
     <link rel="stylesheet" href="{{ url('assets/plugins/daterangepicker/daterangepicker.css') }}">
     <!-- summernote -->
     <link rel="stylesheet" href="{{ url('assets/plugins/summernote/summernote-bs4.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+    {{-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css"> --}}
+
+    <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/buttons.bootstrap4.min.css') }}">
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -151,7 +156,7 @@
 
                             <li class="nav-item">
                                 <a href="{{ url('admin/reports') }}" class="nav-link">
-                                    <i class="fa fa-chart nav-icon"></i>
+                                    <i class="fa fa-chart-bar nav-icon"></i>
                                     <p>Reports</p>
                                 </a>
                             </li>
@@ -278,9 +283,35 @@
     <!-- daterangepicker -->
     <script src="{{ url('assets/plugins/moment/moment.min.js') }}"></script>
     <script src="{{ url('assets/plugins/daterangepicker/daterangepicker.js') }}"></script>
+    {{-- <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script> --}}
     <!-- Tempusdominus Bootstrap 4 -->
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    {{-- <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script> --}}
+    {{--
+    <script src="https://cdn.datatables.net/buttons/3.2.0/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script> --}}
+    {{--  --}}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/pdfmake.min.js"></script>
+
+    {{-- <script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script> --}}
+
+    {{-- datatables --}}
+    <script src="{{ url('assets/plugins/datatables-new/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/buttons.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/jszip.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/pdfmake.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/vfs_fonts.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/buttons.html5.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/buttons.print.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/buttons.colVis.min.js') }}"></script>
+
+    {{-- end datatables  --}}
     <script src="{{ url('assets/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
     <!-- Summernote -->
     <script src="{{ url('assets/plugins/summernote/summernote-bs4.min.js') }}"></script>
@@ -296,7 +327,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('.datatable').dataTable();
+            $('.datatable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": true,
+                "buttons": ["copy", "csv", {
+                    extend: 'pdfHtml5',
+                    orientation: 'landscape',
+                    pageSize: 'A3'
+                }]
+            }).buttons().container().appendTo('.dataTables_wrapper .col-md-6:eq(0)');
         });
     </script>
     <script>

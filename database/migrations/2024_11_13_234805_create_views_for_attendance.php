@@ -14,7 +14,9 @@ return new class extends Migration
     {
         DB::statement("CREATE VIEW vDailyCourseAttendance AS
        SELECT CONCAT(s.location, ' - ', s.course_name) AS course_name, at. attendance_date, at.total, at.course_id
-       FROM courses s LEFT JOIN (
+       FROM user_admission ua
+       LEFT JOIN courses s ON s.id = ua.course_id
+       LEFT JOIN (
        SELECT DATE_FORMAT(a.date, '%Y-%m-%d') AS attendance_date,
                COUNT(*) AS total,
                MAX(a.course_id) AS course_id

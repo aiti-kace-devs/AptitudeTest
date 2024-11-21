@@ -37,7 +37,7 @@
                 @php
                     function detailsUpdated($user)
                     {
-                        return $user->user_updated != $user->user_created && !$user->ghcard;
+                        return $user->user_updated != $user->user_created && $user->ghcard;
                     }
                 @endphp
                 <!-- Small boxes (Stat box) -->
@@ -49,23 +49,47 @@
                             <label class="form-label col-12">Fullname (as appears on your Ghana Card/ any National ID)
                             </label>
                             <input id="name" type="text" required value=" {{ $user->student_name }}" name="name"
-                                class="form-control col-12" @if (detailsUpdated($user)) disabled @endif>
+                                class="form-control col-12" @if (detailsUpdated($user)) readonly @endif>
                         </div>
                         <div class="input-group col-12 mb-2">
                             <label class="form-label col-12">Ghana Card Number</label>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1">GHA-</span>
                             </div>
-                            <input id="ghcard" type="text" required value=" {{ $user->ghcard }}" name="ghcard"
-                                placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
+                            <input id="ghcard" type="text" required value="{{ $user->ghcard }}" name="ghcard"
+                                placeholder="123456789-1" @if (detailsUpdated($user)) readonly @endif
                                 class="form-control  @error('ghcard') is-invalid @enderror col-12 mr-2">
                         </div>
                         @error('ghcard')
                             <div role="alert" class="alert alert-danger">{{ $message }}</div>
                         @enderror
 
+                        <div class="col-12 mb-2">
+                            <label class="form-label col-12">Gender</label>
+                            <select id="gender" name="gender" class="form-control" @if ($user->gender)
+                                disabled
+                            @endif required>
+                                <option value="">Select Gender</option>
+                                <option value="male" {{ $user->gender === 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ $user->gender === 'female' ? 'selected' : '' }}>Female</option>
+                            </select>
+                        </div>
+                        <div class="input-group col-12 mb-2">
+                            <label class="form-label col-12">Phone Number</label>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">+233</span>
+                            </div>
+                            <input id="mobile_no" type="text" required value="{{ $user->mobile_no }}" name="mobile_no"
+                                placeholder="201234567" @if ($user->mobile_no) disabled @endif
+                                class="form-control  @error('mobile_no') is-invalid @enderror col-12 mr-2">
+                        </div>
+                        @error('mobile_no')
+                            <div role="alert" class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+
                         <div class="col-12">
-                            @if ($user->user_updated != $user->user_created)
+                            @if (detailsUpdated($user) && null !== $user->gender && null !== $user->mobile_no)
                                 <p class="text-sm text-danger">You have already updated your details</p>
                             @else
                                 <button onclick="confirmUpdateDetails()" type="button"

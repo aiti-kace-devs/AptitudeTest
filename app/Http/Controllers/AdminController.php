@@ -317,11 +317,7 @@ class AdminController extends Controller
     //Registered student page
     public function registered_students()
     {
-        $data['users'] = User::select('users.*', 'user_admission.id as admitted', 'courses.course_name', 'course_sessions.name as session_name')
-            ->leftJoin('user_admission', 'users.userId', '=', 'user_admission.user_id')
-            ->leftJoin('courses', 'user_admission.course_id', '=', 'courses.id')
-            ->leftJoin('course_sessions', 'user_admission.session', '=', 'course_sessions.id')
-            ->get();
+        $data['users'] = User::select('users.*', 'user_admission.id as admitted', 'courses.course_name', 'course_sessions.name as session_name', 'user_admission.session as session_id', 'courses.id as course_id')->leftJoin('user_admission', 'users.userId', '=', 'user_admission.user_id')->leftJoin('courses', 'user_admission.course_id', '=', 'courses.id')->leftJoin('course_sessions', 'user_admission.session', '=', 'course_sessions.id')->get();
         $courses = Course::all();
         $sessions = CourseSession::all();
         $data['courses'] = $courses;
@@ -528,8 +524,6 @@ class AdminController extends Controller
         ]);
     }
 
-
-
     public function verification_page(Request $request)
     {
         $allCourses = Course::all();
@@ -586,28 +580,42 @@ class AdminController extends Controller
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
             'session_id' => 'required|exists:course_sessions,id',
-            'user_id' => 'required|exists:users,userId'
+            'user_id' => 'required|exists:users,userId',
+            'change' => 'sometimes',
         ]);
 
         $course = Course::find($validated['course_id']);
         $session = CourseSession::find($validated['session_id']);
         if ($session->course_id != $course->id) {
-            return redirect()->back()->with([
-                'flash' => 'Session not valid for selected course',
-                'key' => 'error',
-            ]);
+            return redirect()
+                ->back()
+                ->with([
+                    'flash' => 'Session not valid for selected course',
+                    'key' => 'error',
+                ]);
         }
 
         $user_id = $validated['user_id'];
+
+        $change = $validated['change'] == 'true';
+
         try {
             $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
             $user = User::where('userId', $user_id)->first();
             $url = url('student/select-session/' . $user_id);
+            $message = 'Student admitted successfully';
 
             if ($oldAdmission && !$oldAdmission->email_sent) {
                 Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
                 $oldAdmission->email_sent = now();
                 $oldAdmission->save();
+            }
+
+            if ($oldAdmission && $change) {
+                $oldAdmission->course_id = $course->id;
+                $oldAdmission->session = $session->id;
+                $oldAdmission->save();
+                $message = 'Student admission changed successfully';
             }
 
             if (!$oldAdmission) {
@@ -620,17 +628,18 @@ class AdminController extends Controller
                 $admission->location = $course->location;
                 $admission->save();
 
-
                 Mail::to($user->email)
                     ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
                     ->queue(new StudentAdmitted(name: $user->name, course: $course->course_name, location: $course->location, url: $url));
 
                 AdmitStudentJob::dispatch($admission);
             }
-            return redirect()->back()->with([
-                'flash' => 'Student admitted successfully',
-                'key' => 'success',
-            ]);
+            return redirect()
+                ->back()
+                ->with([
+                    'flash' => $message,
+                    'key' => 'success',
+                ]);
         } catch (\Exception $e) {
             return redirect(url('student/select-session/' . $user_id))->with([
                 'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
@@ -645,10 +654,12 @@ class AdminController extends Controller
         $u->ghcard = null;
         $u->updated_at = $u->created_at;
         $u->save();
-        return redirect()->back()->with([
-            'flash' => 'Student reset successfully',
-            'key' => 'success',
-        ]);
+        return redirect()
+            ->back()
+            ->with([
+                'flash' => 'Student reset successfully',
+                'key' => 'success',
+            ]);
     }
 
     public function getReportView()
@@ -656,7 +667,6 @@ class AdminController extends Controller
         $courses = Course::all();
 
         // find students that have attendance for the selected dates
-
 
         $data = [
             'courses' => $courses,
@@ -666,6 +676,9 @@ class AdminController extends Controller
             'dates_array' => [],
             'report_type' => null,
             'dates' => '',
+            'selectedCourse' => [],
+            'selectedDailyOption' => "no",
+
         ];
 
         return view('admin.reports', $data);
@@ -673,9 +686,10 @@ class AdminController extends Controller
 
     public function generateReport(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'report_type' => 'required|in:student_summary,course_summary',
             'dates' => 'required',
+            'course_id' => 'sometimes'
         ]);
 
         $startDate = Carbon::parse(explode(' - ', $request->dates)[0]);
@@ -684,28 +698,57 @@ class AdminController extends Controller
         $dates = $this->getWeekdays($startDate, $endDate);
 
         $courses = Course::all();
+        $selectedCourse = null;
+        $studentAttendanceData = collect();
+        $courseId = $validated['course_id'];
+
 
         // find students that have attendance for the selected dates
         $attendanceData = DB::table('vDailyCourseAttendance', 'v1')
             ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
             ->select('v1.*')
-            ->selectRaw("(SELECT AVG(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as average", [$startDate, $endDate])
-            ->selectRaw("(SELECT SUM(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as attendance_total", [$startDate, $endDate])
+            ->selectRaw('(SELECT AVG(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as average', [$startDate, $endDate])
+            ->selectRaw('(SELECT SUM(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as attendance_total', [$startDate, $endDate])
             ->orderBy('course_id', 'desc')
             ->orderBy('attendance_date')
             ->get()
             ->groupBy(['course_name', 'attendance_date']);
 
         // dd($attendanceData);
+        $whereOperator = $courseId == 'all' ? '<>' : '=';
+        $whereCourseId = $courseId == 'all' ? null : $courseId;
+
+        if ($request->get('report_type') == 'student_summary') {
+            $studentAttendanceData = DB::table('vUserCourseAttendance', 'v1')
+                ->where('course_id', $whereOperator, $whereCourseId)
+                ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
+                ->select('v1.*', 'users.name as user_name')
+                ->selectRaw('(SELECT SUM(v2.total) from `vUserCourseAttendance` v2 where v2.user_id = v1.user_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.user_id ) as attendance_total', [$startDate, $endDate])
+                ->orderBy('course_name', 'asc')
+                ->orderBy('user_id', 'desc')
+                ->join('users', 'users.userId', '=', 'v1.user_id')
+                // ->join('courses', 'courses.id', '=', 'v1.user_id')
+                // ->join('users', 'users.userId', '=', 'v1.user_id')
+                ->orderBy('attendance_date')
+                ->get()
+                ->groupBy(['user_name', 'attendance_date']);
+            // ->toSql();
+
+            // dd($studentAttendanceData);
+            $selectedCourse = Course::find($courseId);
+        }
 
         $data = [
             'courses' => $courses,
             'attendanceData' => $attendanceData,
+            'studentAttendanceData' => $studentAttendanceData,
             'startDate' => $startDate,
             'endDate' => $endDate,
             'dates_array' => $dates,
             'report_type' => $request->get('report_type'),
             'dates' => $request->get('dates'),
+            'selectedCourse' => $selectedCourse,
+            'selectedDailyOption' => $request->get('daily'),
         ];
 
         return view('admin.reports', $data);
