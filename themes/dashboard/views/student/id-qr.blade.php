@@ -79,17 +79,17 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1">+233</span>
                             </div>
-                            <input id="mobile_no" type="text" required value="{{ $user->mobile_no }}" name="mobile_no"
-                                placeholder="201234567" @if ($user->mobile_no) disabled @endif
-                                class="form-control  @error('mobile_no') is-invalid @enderror col-12 mr-2">
+                            <input id="contact" type="text" required value="{{ $user->contact }}" name="contact"
+                                placeholder="201234567" @if ($user->contact) disabled @endif
+                                class="form-control  @error('contact') is-invalid @enderror col-12 mr-2">
                         </div>
-                        @error('mobile_no')
+                        @error('contact')
                             <div role="alert" class="alert alert-danger">{{ $message }}</div>
                         @enderror
 
 
                         <div class="col-12">
-                            @if (detailsUpdated($user) && null !== $user->gender && null !== $user->mobile_no)
+                            @if (detailsUpdated($user) && null !== $user->gender && null !== $user->contact)
                                 <p class="text-sm text-danger">You have already updated your details</p>
                             @else
                                 <button onclick="confirmUpdateDetails()" type="button"
