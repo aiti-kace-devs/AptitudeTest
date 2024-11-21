@@ -716,7 +716,6 @@ class AdminController extends Controller
                 ->where('course_id', $courseId)
                 ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
                 ->select('v1.*')
-                ->selectRaw('(SELECT AVG(v2.total) from `vUserCourseAttendance` v2 where v2.user_id = v1.user_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.user_id ) as average', [$startDate, $endDate])
                 ->selectRaw('(SELECT SUM(v2.total) from `vUserCourseAttendance` v2 where v2.user_id = v1.user_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.user_id ) as attendance_total', [$startDate, $endDate])
                 ->orderBy('user_id', 'desc')
                 ->orderBy('attendance_date')

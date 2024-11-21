@@ -64,6 +64,17 @@
                             <div role="alert" class="alert alert-danger">{{ $message }}</div>
                         @enderror
 
+                        <div class="col-12 mb-2">
+                            <label class="form-label col-12">Gender</label>
+                            <select id="gender" name="gender" class="form-control" @if ($user->gender)
+                                disabled
+                            @endif required>
+                                <option value="">Select Gender</option>
+                                <option value="male" {{ $user->gender === 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ $user->gender === 'female' ? 'selected' : '' }}>Female</option>
+                            </select>
+                        </div>
+
                         <div class="col-12">
                             @if (detailsUpdated($user))
                                 <p class="text-sm text-danger">You have already updated your details</p>

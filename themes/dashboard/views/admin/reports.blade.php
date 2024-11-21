@@ -56,18 +56,24 @@
                                     <input type="text" name="dates" id="selected_date" class="form-control"
                                         value="{{ $dates }}" required>
                                 </div>
-                                <div class="mb-1 col-md-4">
+                                <div class="mb-1 col-md-3">
                                     <input type="submit" class="btn btn-success mt-2" value="Generate Report" />
                                 </div>
-                                <div class="mb-1 col-md-4">
-                                    <button type="submit" name="export" value="1" class="btn btn-primary mt-2">Export
-                                        Report</button>
+                                <div class="mb-1 col-md-3">
+                                    <input type="submit" class="btn btn-primary mt-2" value="Export Report" />
                                 </div>
                             </form>
 
                             <div class="card-body">
+                                <div class="">
+                                    @if ($report_type)
+                                        <label for="View Dates">View Dates</label>
+                                        <input type="checkbox" name="view_dates">
+                                    @endif
+                                </div>
+
                                 @if ($report_type)
-                                    <h1 class="text-uppercase mb-2 text-primary">{{ $selectedCourse['course_name'] ?? '' }}
+                                    <h1 class="text-uppercase mb-2 text-primary">{{ $selectedCourse->location }} {{ $selectedCourse['course_name'] ?? '' }}
                                         {{ str_replace('_', ' ', $report_type) }}
                                         Report For
                                         {{ $dates }}</h1>
@@ -92,7 +98,9 @@
                                                 <th>{{ $date }}</th>
                                             @endforeach
                                             <th>Total</th>
-                                            <th>Average</th>
+                                            @if ($report_type == 'course_summary')
+                                                <th>Average</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -120,7 +128,6 @@
                                                         {{-- <th>{{ dump($record) }}</th> --}}
                                                     @endforeach
                                                     <td>{{ $record->first()->values()[0]->attendance_total }}</td>
-                                                    <td>{{ $record->first()->values()[0]->average }}</td>
                                                 </tr>
                                             @endforeach
                                         @endif
