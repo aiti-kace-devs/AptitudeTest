@@ -20,7 +20,7 @@ class AttendanceController extends Controller
             'course_id' => 'exists:courses,id',
             'date' => 'date|before_or_equal:' . now()->toDateString(),
             'online' => 'sometimes',
-            'validity' => 'sometimes'
+            'validity' => 'sometimes',
         ]);
 
         // $course = Course::findOrFail($courseId);
@@ -33,7 +33,7 @@ class AttendanceController extends Controller
             'course_id' => $course->id,
             'location' => $course->location,
             'date' => $data['date'],
-            'online' => $data['online'] ?? false
+            'online' => $data['online'] ?? false,
         ]);
 
         $toAdd = $data['validity'] ?? 30;
@@ -61,14 +61,10 @@ class AttendanceController extends Controller
             if (Token::validate($scannedToken, $secret) && Token::validateExpiration($scannedToken)) {
                 $decodedData = Token::getPayload($scannedToken);
                 $decodedUserIdData = json_decode($decodedData['user_id'], true);
-                if (
-                    !is_array($decodedUserIdData)
-                    || !isset($decodedUserIdData['course_id'])
-                    || !isset($decodedUserIdData['date'])
-                ) {
+                if (!is_array($decodedUserIdData) || !isset($decodedUserIdData['course_id']) || !isset($decodedUserIdData['date'])) {
                     redirect('/student/attendance')->with([
                         'flash' => 'Unable to confirm attendance',
-                        'key' => 'error'
+                        'key' => 'error',
                     ]);
                 }
 
@@ -78,18 +74,32 @@ class AttendanceController extends Controller
 
                 $confirmedAdmission = UserAdmission::where('user_id', $user_id)->whereNotNull('confirmed')->first();
 
-
-
                 if (!$confirmedAdmission) {
                     return redirect(url('/student/attendance'))->with([
                         'flash' => 'User not admitted. Cannot confirm attendance',
                         'key' => 'error',
                     ]);
                 }
-                // if online, ignore location
+
                 $course = Course::find($decodedUserIdData['course_id']);
                 $admittedCourse = Course::find($confirmedAdmission['course_id']);
 
+                // if online for all, ignore both course id and location
+                if (isset($decodedUserIdData['online']) && $decodedUserIdData['online'] === 'onlineForAll') {
+                    if ($this->createAttendance($user_id, $admittedCourse->id, $date)) {
+                        return redirect(url('/student/attendance'))->with([
+                            'flash' => 'Attendance confirmed successfully.',
+                            'key' => 'success',
+                        ]);
+                    } else {
+                        return redirect(url('/student/attendance'))->with([
+                            'flash' => 'Attendance already confirmed.',
+                            'key' => 'success',
+                        ]);
+                    }
+                }
+
+                // if online, ignore location
                 if ($course->course_name != $admittedCourse->course_name) {
                     return redirect(url('/student/attendance'))->with([
                         'flash' => 'User not admitted unto this course',
@@ -97,8 +107,7 @@ class AttendanceController extends Controller
                     ]);
                 }
 
-
-                if ($course->location != $admittedCourse->location && $decodedUserIdData['online'] == "false") {
+                if ($course->location != $admittedCourse->location && $decodedUserIdData['online'] == 'false') {
                     return redirect(url('/student/attendance'))->with([
                         'flash' => 'User not admitted unto this course location',
                         'key' => 'error',
@@ -107,7 +116,6 @@ class AttendanceController extends Controller
 
                 $attendanceRecord = Attendance::where('user_id', $user_id)->whereDate('date', $date)->first();
 
-
                 if ($attendanceRecord) {
                     return redirect(url('/student/attendance'))->with([
                         'flash' => 'Attendance already confirmed.',
@@ -115,34 +123,43 @@ class AttendanceController extends Controller
                     ]);
                 }
 
-
-                // dd($admittedCourse);
-                $attendance = new Attendance();
-                $attendance->user_id = $user_id;
-                $attendance->course_id = $admittedCourse->id;
-                $attendance->date = $date;
-                $attendance->save();
-
-                UpdateAttendanceOnSheetJob::dispatch($attendance);
-                return redirect(url('/student/attendance'))->with([
-                    'flash' => 'Attendance confirmed successfully.',
-                    'key' => 'success',
-                ]);
-                // return response()->json(['message' => 'Attendance recorded successfully.', 'success' => true]);
+                if ($this->createAttendance($user_id, $admittedCourse->id, $date)) {
+                    return redirect(url('/student/attendance'))->with([
+                        'flash' => 'Attendance confirmed successfully.',
+                        'key' => 'success',
+                    ]);
+                }
             } else {
                 return redirect('/student/attendance')->with([
                     'flash' => 'Link expired',
-                    'key' => 'error'
+                    'key' => 'error',
                 ]);
             }
         } catch (\Exception $e) {
-            redirect('/student/attendance')->with([
+            return redirect('/student/attendance')->with([
                 'flash' => 'Unable to confirm attendance',
-                'key' => 'error'
+                'key' => 'error',
             ]);
         }
     }
 
+    private function createAttendance($user_id, $course_id, $date)
+    {
+        $attendanceRecord = Attendance::where('user_id', $user_id)->whereDate('date', $date)->first();
+
+        if ($attendanceRecord) {
+            return false;
+        }
+
+        $attendance = new Attendance();
+        $attendance->user_id = $user_id;
+        $attendance->course_id = $course_id;
+        $attendance->date = $date;
+        $attendance->save();
+
+        UpdateAttendanceOnSheetJob::dispatch($attendance);
+        return true;
+    }
     public function confirmAttendance(Request $request)
     {
         $data = $request->validate([
@@ -184,3 +201,4 @@ class AttendanceController extends Controller
         return view('student.attendance', compact('attendance'));
     }
 }
+

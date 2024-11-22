@@ -114,6 +114,7 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         @if (Auth::user()->isSuper())
+<<<<<<< HEAD
                         <li class="nav-item">
                             <a href="{{ url('admin/dashboard') }}" class="nav-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -192,6 +193,51 @@
                                 <p>Registered students</p>
                             </a>
                         </li>
+=======
+                            <li class="nav-item">
+                                <a href="{{ url('admin/dashboard') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>
+                                        Dashboard
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/exam_category') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Category</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/manage_exam') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manage Exam</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/manage_students') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Students</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/registered_students') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Registered students</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/reports') }}" class="nav-link">
+                                    <i class="fa fa-chart nav-icon"></i>
+                                    <p>Reports</p>
+                                </a>
+                            </li>
+>>>>>>> 626886628d282f8c56a6cb014d30e8a4ffb54d0f
                         @endif
                         {{-- <li class="nav-item">
                             <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">

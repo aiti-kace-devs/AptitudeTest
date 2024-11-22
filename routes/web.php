@@ -79,6 +79,10 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/verify_details', [AdminController::class, 'verifyDetails'])->name('verify-details');
         Route::post('/verify-student/{id}', [AdminController::class, 'verifyStudent'])->name('verify-student');
         Route::get('/view_attendance', [AdminController::class, 'viewAttendanceByDate'])->name('viewAttendanceByDate');
+        Route::get('/reports', [AdminController::class, 'getReportView'])->name('getReportView');
+        Route::post('/reports', [AdminController::class, 'generateReport'])->name('generateReport');
+
+
 
 
         Route::get('/reset-verify/{id}', [AdminController::class, 'reset_verify'])->name('reset-verify');

@@ -56,6 +56,8 @@
                             <select name="online" class="form-control">
                                 <option value="false">No</option>
                                 <option value="true">Yes</option>
+                                <option value="onlineForAll">Online For All</option>
+
                             </select>
                         </div>
                         <div class="mb-4 col-md-4">
