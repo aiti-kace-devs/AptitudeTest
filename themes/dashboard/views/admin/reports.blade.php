@@ -99,6 +99,7 @@
                                             @if ($report_type == 'student_summary')
                                                 <th>Course Name</th>
                                                 <th>Gender</th>
+                                                <th>Network Type</th>
                                                 <th>Phone Number</th>
                                             @endif
                                             @if ($selectedDailyOption == 'yes')
@@ -137,6 +138,7 @@
                                                         ({{ $record->first()[0]->course_location }})
                                                     </td>
                                                     <td>{{ $record->first()[0]->user_gender ?? 'N/A' }}</td>
+                                                    <td>{{ $record->first()[0]->user_network_type ?? 'N/A' }}</td>
                                                     <td>{{ $record->first()[0]->user_contact ?? 'N/A' }}</td>
                                                     @if ($selectedDailyOption == 'yes')
                                                         @foreach ($dates_array as $date)
