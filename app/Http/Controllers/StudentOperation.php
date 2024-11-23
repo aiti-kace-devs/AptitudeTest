@@ -442,20 +442,27 @@ class StudentOperation extends Controller
         $user = Auth::user();
 
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
-            'gender' => 'required|in:male,female',
-            'contact' => 'required|string|regex:/^[1-9][0-9]{8}$/|max:10'
+            'name' => 'sometimes|string|max:255',
+            'ghcard' => 'sometimes|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
+            'gender' => 'sometimes|in:male,female',
+            'contact' => 'sometimes|string|regex:/^[1-9][0-9]{8}$/|max:10',
+            'network_type' => 'sometimes|in:mtn,telecel,airteltigo'
         ], [], ['ghcard' => "Ghana Card number"]);
 
-        if($user->name && $user->ghcard){
+        if ($user->name && $user->ghcard && $user->gender && $user->contact){
+            $user->network_type = $validatedData['network_type'];
+        }
+        elseif ($user->name && $user->ghcard){
             $user->gender = $validatedData["gender"];
             $user->contact = "0" . $validatedData['contact'];
-        } else {
+            $user->network_type = $validatedData['network_type'];
+        }
+        else {
             $user->name = $validatedData['name'];
             $user->ghcard = "GHA-" . $validatedData['ghcard'];
             $user->gender = $validatedData['gender'];
             $user->contact = "0" . $validatedData['contact'];
+            $user->network_type = $validatedData['network_type'];
         }
             // dd($user);
             $user->save();

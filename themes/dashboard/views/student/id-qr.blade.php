@@ -49,7 +49,7 @@
                             <label class="form-label col-12">Fullname (as appears on your Ghana Card/ any National ID)
                             </label>
                             <input id="name" type="text" required value=" {{ $user->student_name }}" name="name"
-                                class="form-control col-12" @if (detailsUpdated($user)) readonly @endif>
+                                class="form-control col-12" @if (detailsUpdated($user)) disabled @endif>
                         </div>
                         <div class="input-group col-12 mb-2">
                             <label class="form-label col-12">Ghana Card Number</label>
@@ -57,7 +57,7 @@
                                 <span class="input-group-text" id="basic-addon1">GHA-</span>
                             </div>
                             <input id="ghcard" type="text" required value="{{ $user->ghcard }}" name="ghcard"
-                                placeholder="123456789-1" @if (detailsUpdated($user)) readonly @endif
+                                placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
                                 class="form-control  @error('ghcard') is-invalid @enderror col-12 mr-2">
                         </div>
                         @error('ghcard')
@@ -74,10 +74,25 @@
                                 <option value="female" {{ $user->gender === 'female' ? 'selected' : '' }}>Female</option>
                             </select>
                         </div>
+
+                        <div class="col-12 mb-2">
+                            <label class="form-label col-12">Network Type</label>
+                            <select id="network_type" name="network_type" class="form-control" @if ($user->network_type)
+                                disabled
+                            @endif required>
+                                <option value="">Select Network</option>
+                                <option value="mtn" {{ $user->network_type === 'mtn' ? 'selected' : '' }}>MTN</option>
+                                <option value="telecel" {{ $user->network_type === 'telecel' ? 'selected' : '' }}>Telecel</option>
+                                <option value="airteltigo" {{ $user->network_type === 'airteltigo' ? 'selected' : '' }}>AirtelTigo</option>
+                            </select>
+                        </div>
+
                         <div class="input-group col-12 mb-2">
                             <label class="form-label col-12">Phone Number</label>
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">+233</span>
+                                @if (!$user->contact)
+                                    <span class="input-group-text" id="basic-addon1">+233</span>
+                                @endif
                             </div>
                             <input id="contact" type="text" required value="{{ $user->contact }}" name="contact"
                                 placeholder="201234567" @if ($user->contact) disabled @endif
@@ -89,14 +104,14 @@
 
 
                         <div class="col-12">
-                            @if (detailsUpdated($user) && null !== $user->gender && null !== $user->contact)
+                            @if (detailsUpdated($user) && null !== $user->gender && null !== $user->network_type && null !== $user->contact)
                                 <p class="text-sm text-danger">You have already updated your details</p>
                             @else
                                 <button onclick="confirmUpdateDetails()" type="button"
                                     class="btn btn-primary">Update</button>
                                 <p class="text-sm text-danger">You can only update your details once, make sure you verify
                                     all
-                                    details before submitting</p>
+                                    details before submitting.</p>
                             @endif
                         </div>
                     </div>
