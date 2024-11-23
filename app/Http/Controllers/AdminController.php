@@ -732,7 +732,7 @@ class AdminController extends Controller
                 $studentAttendanceData = $studentAttendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate]);
             }
 
-            $studentAttendanceData = $studentAttendanceData->select('v1.*', 'users.name as user_name')
+            $studentAttendanceData = $studentAttendanceData->select('v1.*', 'users.name as user_name', 'users.gender as user_gender', 'users.contact as user_contact')
                 ->selectRaw('(SELECT SUM(v2.total) from `vUserCourseAttendance` v2 where v2.user_id = v1.user_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.user_id ) as attendance_total', [$startDate, $endDate])
                 ->orderBy('course_name', 'asc')
                 ->orderBy('user_id', 'desc')
