@@ -441,38 +441,47 @@ class StudentOperation extends Controller
     {
         $user = Auth::user();
 
-        $validatedData = $request->validate([
+        $rules = [
             'name' => 'sometimes|string|max:255',
-            'ghcard' => 'sometimes|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
             'gender' => 'sometimes|in:male,female',
             'contact' => 'sometimes|string|regex:/^[1-9][0-9]{8}$/|max:10',
-            'network_type' => 'sometimes|in:mtn,telecel,airteltigo'
-        ], [], ['ghcard' => "Ghana Card number"]);
+            'network_type' => 'sometimes|in:mtn,telecel,airteltigo',
+            'card_type' => 'required|in:ghcard,voters_id,drivers_license,passport',
+        ];
 
-        if ($user->name && $user->ghcard && $user->gender && $user->contact){
-            $user->network_type = $validatedData['network_type'];
+        if ($request->input('card_type') === 'ghcard') {
+            $rules['ghcard'] = 'sometimes|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16';
+        } else {
+            $rules['ghcard'] = 'sometimes|string|max:20';
         }
-        elseif ($user->name && $user->ghcard){
-            $user->gender = $validatedData["gender"];
-            $user->contact = "0" . $validatedData['contact'];
+
+        $validatedData = $request->validate($rules, [], ['ghcard' => 'Card number']);
+
+        if ($user->name && $user->ghcard && $user->gender && $user->contact) {
             $user->network_type = $validatedData['network_type'];
-        }
-        else {
-            $user->name = $validatedData['name'];
-            $user->ghcard = "GHA-" . $validatedData['ghcard'];
+        } elseif ($user->name && $user->ghcard) {
             $user->gender = $validatedData['gender'];
-            $user->contact = "0" . $validatedData['contact'];
+            $user->contact = '0' . $validatedData['contact'];
+            $user->network_type = $validatedData['network_type'];
+        } else {
+            $user->name = $validatedData['name'];
+            $user->ghcard =
+                $request->input('card_type') === 'ghcard'
+                    ? 'GHA-' . $validatedData['ghcard']
+                    : $validatedData['ghcard'];
+            $user->gender = $validatedData['gender'];
+            $user->contact = '0' . $validatedData['contact'];
             $user->network_type = $validatedData['network_type'];
         }
-            // dd($user);
-            $user->save();
+        // dd($user);
+        $user->save();
 
-
-
-        return redirect()->back()->with([
-            'flash' => 'Your details have been updated successfully.',
-            'key' => 'success'
-        ]);
+        return redirect()
+            ->back()
+            ->with([
+                'flash' => 'Your details have been updated successfully.',
+                'key' => 'success',
+            ]);
 
         // if ($user->created_at == $user->updated_at) {
         //     $validatedData = $request->validate([
@@ -483,7 +492,6 @@ class StudentOperation extends Controller
         //     $user->name = $validatedData['name'];
         //     $user->ghcard = "GHA-" . $validatedData['ghcard'];
         //     $user->save();
-
 
         //     return redirect()->back()->with([
         //         'flash' => 'Your details have been updated successfully.',

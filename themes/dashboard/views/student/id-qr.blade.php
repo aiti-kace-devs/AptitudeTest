@@ -51,6 +51,18 @@
                             <input id="name" type="text" required value=" {{ $user->student_name }}" name="name"
                                 class="form-control col-12" @if (detailsUpdated($user)) disabled @endif>
                         </div>
+
+                        <div class="col-12 mb-2">
+                            <label class="form-label col-12">Card Type</label>
+                            <select id="card_type" name="card_type" class="form-control" @if (detailsUpdated($user)) disabled @endif required>
+                                <option value="">Select Card Type</option>
+                                <option value="ghcard" {{ $user->card_type === 'ghcard' ? 'selected' : '' }}>Ghana Card</option>
+                                <option value="voters_id" {{ $user->card_type === 'voters_id' ? 'selected' : '' }}>Voter's ID</option>
+                                <option value="drivers_license" {{ $user->card_type === 'drivers_license' ? 'selected' : '' }}>Driver's License</option>
+                                <option value="passport" {{ $user->card_type === 'passport' ? 'selected' : '' }}>Passport</option>
+                            </select>
+                        </div>
+
                         <div class="input-group col-12 mb-2">
                             <label class="form-label col-12">Ghana Card Number</label>
                             <div class="input-group-prepend">
@@ -58,7 +70,7 @@
                             </div>
                             <input id="ghcard" type="text" required value="{{ $user->ghcard }}" name="ghcard"
                                 placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
-                                class="form-control  @error('ghcard') is-invalid @enderror col-12 mr-2">
+                                class="form-control @error('ghcard') is-invalid @enderror col-12 mr-2">
                         </div>
                         @error('ghcard')
                             <div role="alert" class="alert alert-danger">{{ $message }}</div>
@@ -66,9 +78,8 @@
 
                         <div class="col-12 mb-2">
                             <label class="form-label col-12">Gender</label>
-                            <select id="gender" name="gender" class="form-control" @if ($user->gender)
-                                disabled
-                            @endif required>
+                            <select id="gender" name="gender" class="form-control"
+                                @if ($user->gender) disabled @endif required>
                                 <option value="">Select Gender</option>
                                 <option value="male" {{ $user->gender === 'male' ? 'selected' : '' }}>Male</option>
                                 <option value="female" {{ $user->gender === 'female' ? 'selected' : '' }}>Female</option>
@@ -77,13 +88,14 @@
 
                         <div class="col-12 mb-2">
                             <label class="form-label col-12">Network Type</label>
-                            <select id="network_type" name="network_type" class="form-control" @if ($user->network_type)
-                                disabled
-                            @endif required>
+                            <select id="network_type" name="network_type" class="form-control"
+                                @if ($user->network_type) disabled @endif required>
                                 <option value="">Select Network</option>
                                 <option value="mtn" {{ $user->network_type === 'mtn' ? 'selected' : '' }}>MTN</option>
-                                <option value="telecel" {{ $user->network_type === 'telecel' ? 'selected' : '' }}>Telecel</option>
-                                <option value="airteltigo" {{ $user->network_type === 'airteltigo' ? 'selected' : '' }}>AirtelTigo</option>
+                                <option value="telecel" {{ $user->network_type === 'telecel' ? 'selected' : '' }}>Telecel
+                                </option>
+                                <option value="airteltigo" {{ $user->network_type === 'airteltigo' ? 'selected' : '' }}>
+                                    AirtelTigo</option>
                             </select>
                         </div>
 
