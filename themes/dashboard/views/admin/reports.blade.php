@@ -89,15 +89,14 @@
 
                                         </tr> --}}
                                         <tr>
-                                            <th>
-                                                @if ($report_type == 'course_summary')
-                                                    Course Name
-                                                @else
-                                                    Student Name
-                                                @endif
-                                            </th>
-                                            @if ($report_type == 'student_summary')
+                                            @if ($report_type == 'course_summary')
                                                 <th>Course Name</th>
+                                                <th>Average</th>
+                                                <th>Total</th>
+                                            @else
+                                                <th>Student Name</th>
+                                                <th>Course Name</th>
+                                                <th>Total</th>
                                                 <th>Gender</th>
                                                 <th>Network Type</th>
                                                 <th>Phone Number</th>
@@ -107,10 +106,6 @@
                                                     <th>{{ $date }}</th>
                                                 @endforeach
                                             @endif
-                                            <th>Total</th>
-                                            @if ($report_type == 'course_summary')
-                                                <th>Average</th>
-                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -118,36 +113,41 @@
                                             @foreach ($attendanceData as $course => $record)
                                                 <tr>
                                                     <td>{{ $course }}</td>
+                                                    <td>{{ floor($record->first()->values()[0]->average ?? 0) }}</td>
+                                                    <td>{{ $record->first()->values()[0]->attendance_total }}</td>
                                                     @if ($selectedDailyOption == 'yes')
                                                         @foreach ($dates_array as $date)
                                                             <th>{{ $record->get($date)?->values()[0]->total ?? 0 }}</th>
-                                                            {{-- <th>{{ dump($record) }}</th> --}}
                                                         @endforeach
                                                     @endif
-                                                    <td>{{ $record->first()->values()[0]->attendance_total }}</td>
-                                                    <td>{{ $record->first()->values()[0]->average }}</td>
+
                                                 </tr>
                                             @endforeach
                                         @endif
 
                                         @if ($report_type == 'student_summary')
                                             @foreach ($studentAttendanceData as $student => $record)
-                                                <tr>
+                                                <tr class="text-uppercase">
                                                     <td>{{ $student }}</td>
                                                     <td>{{ $record->first()[0]->course_name }}
                                                         ({{ $record->first()[0]->course_location }})
                                                     </td>
-                                                    <td>{{ $record->first()[0]->user_gender ?? 'N/A' }}</td>
-                                                    <td>{{ $record->first()[0]->user_network_type ?? 'N/A' }}</td>
-                                                    <td>{{ $record->first()[0]->user_contact ?? 'N/A' }}</td>
+                                                    <td>{{ $record->first()->values()[0]->attendance_total ?? 0 }}
+                                                    </td>
+                                                    <td>{{ $record->first()[0]->user_gender ?? 'N/A' }}
+                                                    </td>
+                                                    <td>{{ $record->first()[0]->user_network_type ?? 'N/A' }}
+                                                    </td>
+                                                    <td>{{ $record->first()[0]->user_contact ?? 'N/A' }}
+                                                    </td>
                                                     @if ($selectedDailyOption == 'yes')
                                                         @foreach ($dates_array as $date)
-                                                            <th>{{ $record->get($date)?->values()[0]->total == 1 ? '✅' : '❌' }}
+                                                            <th>{{ $record->get($date)?->values()[0]->attendance_date ? '✅' : '❌' }}
                                                             </th>
                                                             {{-- <th>{{ dump($record) }}</th> --}}
                                                         @endforeach
                                                     @endif
-                                                    <td>{{ $record->first()->values()[0]->attendance_total }}</td>
+
                                                 </tr>
                                             @endforeach
                                         @endif
@@ -179,6 +179,7 @@
                     format: 'MMMM D, YYYY'
                 },
                 ranges: {
+                    'Start to Date': [moment('2024-10-14'), moment()],
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],

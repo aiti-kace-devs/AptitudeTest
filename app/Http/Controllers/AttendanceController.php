@@ -196,9 +196,12 @@ class AttendanceController extends Controller
     public function viewAttendance()
     {
         $userId = Auth::user()->userId;
-        $attendance = Attendance::select('attendances.*', 'courses.created_at as course_created', 'courses.course_name')->where('user_id', $userId)->join('courses', 'courses.id', 'attendances.course_id')->get();
+        $attendance = Attendance::select('attendances.*', 'courses.created_at as course_created', 'courses.course_name')
+            ->where('user_id', $userId)
+            ->join('courses', 'courses.id', 'attendances.course_id')
+            ->orderBy('date', 'desc')
+            ->get();
 
         return view('student.attendance', compact('attendance'));
     }
 }
-

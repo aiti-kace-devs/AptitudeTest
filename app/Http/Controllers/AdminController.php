@@ -691,7 +691,6 @@ class AdminController extends Controller
             'dates' => 'required',
             'course_id' => 'sometimes',
             'daily' => 'sometimes'
-
         ]);
 
         $startDate = Carbon::parse(explode(' - ', $request->dates)[0]);
@@ -702,49 +701,61 @@ class AdminController extends Controller
         $courses = Course::all();
         $selectedCourse = null;
         $studentAttendanceData = collect();
+        $attendanceData = collect();
+
         $courseId = $validated['course_id'];
+        $dailyQuery = isset($validated['daily']) && $validated['daily'] == 'yes';
 
-
-        // find students that have attendance for the selected dates
-        $attendanceData = DB::table('vDailyCourseAttendance', 'v1');
-        if (isset($validated['daily']) && $validated['daily'] == 'yes') {
-            $attendanceData = $attendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate]);
-        }
-
-        $attendanceData = $attendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
-            ->select('v1.*')
-            ->selectRaw('(SELECT AVG(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as average', [$startDate, $endDate])
-            ->selectRaw('(SELECT SUM(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as attendance_total', [$startDate, $endDate])
-            ->orderBy('course_id', 'desc')
-            ->orderBy('attendance_date')
-            ->get()
-            ->groupBy(['course_name', 'attendance_date']);
-
-        // dd($attendanceData);
-        $whereOperator = $courseId == 'all' ? '<>' : '=';
-        $whereCourseId = $courseId == 'all' ? null : $courseId;
-
-        if ($request->get('report_type') == 'student_summary') {
-            $studentAttendanceData = DB::table('vUserCourseAttendance', 'v1')
-                ->where('course_id', $whereOperator, $whereCourseId);
-
-            if (isset($validated['daily']) && $validated['daily'] == 'yes') {
-                $studentAttendanceData = $studentAttendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate]);
+        if ($request->get('report_type') == 'course_summary') {
+            // find students that have attendance for the selected dates
+            $attendanceData = DB::table('vDailyCourseAttendance', 'v1');
+            if ($dailyQuery) {
+                $attendanceData = $attendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate]);
             }
 
-            $studentAttendanceData = $studentAttendanceData->select('v1.*', 'users.name as user_name', 'users.gender as user_gender', 'users.network_type as user_network_type','users.contact as user_contact')
-                ->selectRaw('(SELECT SUM(v2.total) from `vUserCourseAttendance` v2 where v2.user_id = v1.user_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.user_id ) as attendance_total', [$startDate, $endDate])
-                ->orderBy('course_name', 'asc')
-                ->orderBy('user_id', 'desc')
-                ->join('users', 'users.userId', '=', 'v1.user_id')
-                // ->join('courses', 'courses.id', '=', 'v1.user_id')
-                // ->join('users', 'users.userId', '=', 'v1.user_id')
+            $attendanceData = $attendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
+                ->select('v1.*')
+                ->selectRaw('(SELECT AVG(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as average', [$startDate, $endDate])
+                ->selectRaw('(SELECT SUM(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as attendance_total', [$startDate, $endDate])
+                ->orderBy('course_id', 'desc')
                 ->orderBy('attendance_date')
                 ->get()
-                ->groupBy(['user_name', 'attendance_date']);
-            // ->toSql();
+                ->groupBy(['course_name', 'attendance_date']);
+        }
 
-            // dd($studentAttendanceData);
+        if ($request->get('report_type') == 'student_summary') {
+            $whereCourseClause = $courseId == 'all' ? '' : ' WHERE c.id = ? ';
+            // use total attendance when start to date and no daily
+            // if ($s)
+
+            $optimizeQuery = "select _ta.total as attendance_total, _ta.user_id,
+                u.name as user_name, u.gender as user_gender, u.contact as user_contact, u.network_type as user_network_type, c.course_name, c.location as course_location, c.id " . ($dailyQuery ? ', _da.date as attendance_date ' : '') . "from
+                (select count(distinct `a`.`date`) AS `total`,max(`a`.`user_id`) AS `user_id`
+                from `attendances` `a`
+                where DATE(a.date) between ? AND ?
+                group by `a`.`user_id`) as _ta " .
+                ($dailyQuery ? "inner join
+                (select distinct date_format(`a`.`date`,'%Y-%m-%d') AS `date`,
+                `a`.`user_id` from `attendances` `a`
+                where DATE(a.date) between ? AND ? ) as _da
+                ON _ta.user_id  = _da.user_id " : "") . "
+                left join users u on u.userId = _ta.user_id
+                left join user_admission ua on ua.user_id = _ta.user_id
+                inner join courses c on c.id = ua.course_id $whereCourseClause
+                order by c.course_name, u.name";
+            $params = [$startDate, $endDate];
+            $groupBy = ['user_name', 'attendance_date'];
+
+            if ($dailyQuery) {
+                $params =  array_merge($params, $params);
+            }
+
+            if ($courseId !== 'all') {
+                $params[] = $courseId;
+            }
+            $studentAttendanceData = collect(DB::select($optimizeQuery, $params))
+                ->groupBy($groupBy);
+
             $selectedCourse = Course::find($courseId);
         }
 
