@@ -446,7 +446,7 @@ class StudentOperation extends Controller
             'gender' => 'sometimes|in:male,female',
             'contact' => 'sometimes|string|regex:/^[1-9][0-9]{8}$/|max:10',
             'network_type' => 'sometimes|in:mtn,telecel,airteltigo',
-            'card_type' => 'required|in:ghcard,voters_id,drivers_license,passport',
+            'card_type' => 'sometimes|in:ghcard,voters_id,drivers_license,passport',
         ];
 
         if ($request->input('card_type') === 'ghcard') {
@@ -465,6 +465,7 @@ class StudentOperation extends Controller
             $user->network_type = $validatedData['network_type'];
         } else {
             $user->name = $validatedData['name'];
+            $user->card_type = $validatedData['card_type'];
             $user->ghcard =
                 $request->input('card_type') === 'ghcard'
                     ? 'GHA-' . $validatedData['ghcard']

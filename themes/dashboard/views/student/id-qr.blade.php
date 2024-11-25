@@ -54,20 +54,27 @@
 
                         <div class="col-12 mb-2">
                             <label class="form-label col-12">Card Type</label>
-                            <select id="card_type" name="card_type" class="form-control" @if (detailsUpdated($user)) disabled @endif required>
+                            <select id="card_type" name="card_type" class="form-control"
+                                @if (detailsUpdated($user)) disabled @endif required>
                                 <option value="">Select Card Type</option>
-                                <option value="ghcard" {{ $user->card_type === 'ghcard' ? 'selected' : '' }}>Ghana Card</option>
-                                <option value="voters_id" {{ $user->card_type === 'voters_id' ? 'selected' : '' }}>Voter's ID</option>
-                                <option value="drivers_license" {{ $user->card_type === 'drivers_license' ? 'selected' : '' }}>Driver's License</option>
-                                <option value="passport" {{ $user->card_type === 'passport' ? 'selected' : '' }}>Passport</option>
+                                <option value="ghcard" {{ $user->card_type === 'ghcard' ? 'selected' : '' }}>Ghana Card
+                                </option>
+                                <option value="voters_id" {{ $user->card_type === 'voters_id' ? 'selected' : '' }}>Voter's
+                                    ID</option>
+                                <option value="drivers_license"
+                                    {{ $user->card_type === 'drivers_license' ? 'selected' : '' }}>Driver's License</option>
+                                <option value="passport" {{ $user->card_type === 'passport' ? 'selected' : '' }}>Passport
+                                </option>
                             </select>
                         </div>
 
                         <div class="input-group col-12 mb-2">
-                            <label class="form-label col-12">Ghana Card Number</label>
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">GHA-</span>
-                            </div>
+                            <label class="form-label col-12">Card ID</label>
+                            @if ($user->card_type === 'ghcard' || $user->card_type == null)
+                                <div id="ghana-card-prefix" class="input-group-prepend" style="display: none;">
+                                    <span class="input-group-text" id="basic-addon1">GHA-</span>
+                                </div>
+                            @endif
                             <input id="ghcard" type="text" required value="{{ $user->ghcard }}" name="ghcard"
                                 placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
                                 class="form-control @error('ghcard') is-invalid @enderror col-12 mr-2">
@@ -166,15 +173,39 @@
             qrcode.download("StudentID-{{ Auth::user()->userId }}")
         }
 
+        $(document).ready(function() {
+            const cardTypeSelect = $("#card_type");
+            const ghcardInput = $("#ghcard");
 
-        $("#ghcard").inputmask({
-            mask: "555555555-5",
-            definitions: {
-                '5': {
-                    validator: "[0-9]"
-                },
+            function toggleInputMask() {
+                if (cardTypeSelect.val() === "ghcard") {
+                    ghcardInput.inputmask({
+                        mask: "555555555-5",
+                        definitions: {
+                            "5": {
+                                validator: "[0-9]",
+                            },
+                        },
+                    });
+                } else {
+                    ghcardInput.inputmask("remove");
+                }
             }
+
+            cardTypeSelect.on("change", toggleInputMask);
+
+            toggleInputMask();
         });
+
+
+        // $("#ghcard").inputmask({
+        //     mask: "555555555-5",
+        //     definitions: {
+        //         '5': {
+        //             validator: "[0-9]"
+        //         },
+        //     }
+        // });
 
         function confirmUpdateDetails() {
             Swal.fire({
@@ -191,5 +222,22 @@
                 }
             })
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const cardTypeSelect = document.getElementById("card_type");
+            const ghanaCardPrefix = document.getElementById("ghana-card-prefix");
+
+            function togglePrefix() {
+                if (cardTypeSelect.value === "ghcard") {
+                    ghanaCardPrefix.style.display = "flex";
+                } else {
+                    ghanaCardPrefix.style.display = "none";
+                }
+            }
+
+            togglePrefix();
+
+            cardTypeSelect.addEventListener("change", togglePrefix);
+        });
     </script>
 @endpush

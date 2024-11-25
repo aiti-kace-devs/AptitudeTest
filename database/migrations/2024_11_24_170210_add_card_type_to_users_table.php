@@ -14,7 +14,7 @@ class AddCardTypeToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('card_type')->nullable();
+            $table->string('card_type')->nullable()->after('userId');
         });
     }
 
