@@ -75,13 +75,25 @@
                                     <span class="input-group-text" id="basic-addon1">GHA-</span>
                                 </div>
                             @endif
-                            <input id="ghcard" type="text" required value="{{ $user->ghcard }}" name="ghcard"
-                                placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
-                                class="form-control @error('ghcard') is-invalid @enderror col-12 mr-2">
+                            <input id="ghcard" type="text" required value="{{ old('ghcard', $user->ghcard) }}"
+                                name="ghcard" placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
+                                class="form-control  @error('ghcard') is-invalid @enderror
+                                @if (!empty($user->verification_date)) is-valid @else is-invalid @endif
+                                          col-12 mr-2">
+
+                            {{-- Invalid Feedback --}}
+                            @if (empty($user->verification_date))
+                                <div class="invalid-feedback">
+                                    Card not verified
+                                </div>
+                            @endif
+                            {{-- Valid Feedback --}}
+                            @if (!empty($user->verification_date))
+                                <div class="valid-feedback">
+                                    Card Verified Successfully
+                                </div>
+                            @endif
                         </div>
-                        @error('ghcard')
-                            <div role="alert" class="alert alert-danger">{{ $message }}</div>
-                        @enderror
 
                         <div class="col-12 mb-2">
                             <label class="form-label col-12">Gender</label>

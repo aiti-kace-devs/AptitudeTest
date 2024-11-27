@@ -503,7 +503,7 @@ class AdminController extends Controller
 
         // match with ghana card format
         $correctFormat = preg_match('/GHA-[0-9]{9}-[0-9]{1}$/', $student->ghcard);
-        if ($student && $correctFormat) {
+        if ($student && $correctFormat || $student && $student->ghcard && $student->card_type !== 'ghcard' ) {
             $adminId = Auth::id();
             $student->verification_date = now();
             $student->verified_by = $adminId;
@@ -651,15 +651,23 @@ class AdminController extends Controller
     public function reset_verify($userId)
     {
         $u = User::findOrFail($userId);
-        $u->ghcard = null;
-        $u->updated_at = $u->created_at;
-        $u->save();
+        if($u && $u->ghcard && is_null($u->verification_date) && is_null($u->verified_by) && $u->card_type){
+            $u->contact = null;
+            $u->gender = null;
+            $u->network_type = null;
+            $u->save();
+        } else {
+            $u->ghcard = null;
+            $u->updated_at = $u->created_at;
+            $u->save();
+        }
         return redirect()
-            ->back()
-            ->with([
-                'flash' => 'Student reset successfully',
-                'key' => 'success',
-            ]);
+        ->back()
+        ->with([
+            'flash' => 'Student reset successfully',
+            'key' => 'success',
+        ]);
+
     }
 
     public function getReportView()
