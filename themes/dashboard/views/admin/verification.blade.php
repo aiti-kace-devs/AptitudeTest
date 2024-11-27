@@ -49,7 +49,8 @@
                                         <tr>
                                             <th>Name</th>
                                             <th>Email</th>
-                                            <th>Ghana Card Number</th>
+                                            <th>Card Type</th>
+                                            <th>Card Number</th>
                                             <th>Verification By (On)</th>
                                             <th>Action</th>
                                         </tr>
@@ -59,6 +60,7 @@
                                             <tr>
                                                 <td>{{ $student['name'] }}</td>
                                                 <td>{{ $student['email'] }}</td>
+                                                <td class="text-uppercase">{{ $student['card_type'] }}</td>
                                                 <td>{{ $student['ghcard'] }}</td>
                                                 <td>
                                                     @if ($student['verification_date'])
@@ -80,6 +82,8 @@
                                                             class="btn btn-danger btn-sm">Reset</a>
                                                     @else
                                                         <span class="badge badge-success">Verified</span>
+                                                        <a href="{{ route('admin.reset-verify', $student['id']) }}"
+                                                            class="btn btn-danger btn-sm">Reset</a>
                                                     @endif
                                                 </td>
                                             </tr>

@@ -651,16 +651,17 @@ class AdminController extends Controller
     public function reset_verify($userId)
     {
         $u = User::findOrFail($userId);
-        if($u && $u->ghcard && is_null($u->verification_date) && is_null($u->verified_by) && $u->card_type){
+        if($u && !$u->verification_date){
+            $u->ghcard = null;
+            $u->card_type = null;
+            $u->updated_at = $u->created_at;
+        }
+
             $u->contact = null;
             $u->gender = null;
             $u->network_type = null;
             $u->save();
-        } else {
-            $u->ghcard = null;
-            $u->updated_at = $u->created_at;
-            $u->save();
-        }
+
         return redirect()
         ->back()
         ->with([
