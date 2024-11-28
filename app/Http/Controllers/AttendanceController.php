@@ -204,4 +204,23 @@ class AttendanceController extends Controller
 
         return view('student.attendance', compact('attendance'));
     }
+
+    public function removeAttendance($id)
+    {
+
+        $attendance = Attendance::find($id);
+
+        if (!$attendance) {
+            return redirect()->back()->with([
+                'flash' => 'Attendance not found',
+                'key' => 'error'
+            ]);
+        }
+        $attendance->delete();
+        return redirect()->back()->with([
+            'flash' => 'Attendance removed successfully.',
+            'key' => 'success'
+        ]);
+        // return response()->json(['message' => 'Attendance removed successfully.', 'success' => true]);
+    }
 }
