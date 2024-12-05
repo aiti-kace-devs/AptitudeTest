@@ -503,7 +503,7 @@ class AdminController extends Controller
 
         // match with ghana card format
         $correctFormat = preg_match('/GHA-[0-9]{9}-[0-9]{1}$/', $student->ghcard);
-        if ($student && $correctFormat || $student && $student->ghcard && $student->card_type !== 'ghcard' ) {
+        if ($student && $correctFormat || $student && $student->ghcard && $student->card_type !== 'ghcard') {
             $adminId = Auth::id();
             $student->verification_date = now();
             $student->verified_by = $adminId;
@@ -651,24 +651,23 @@ class AdminController extends Controller
     public function reset_verify($userId)
     {
         $u = User::findOrFail($userId);
-        if($u && !$u->verification_date){
+        if ($u && !$u->verification_date) {
             $u->ghcard = null;
             $u->card_type = null;
             $u->updated_at = $u->created_at;
         }
 
-            $u->contact = null;
-            $u->gender = null;
-            $u->network_type = null;
-            $u->save();
+        $u->contact = null;
+        $u->gender = null;
+        $u->network_type = null;
+        $u->save();
 
         return redirect()
-        ->back()
-        ->with([
-            'flash' => 'Student reset successfully',
-            'key' => 'success',
-        ]);
-
+            ->back()
+            ->with([
+                'flash' => 'Student reset successfully',
+                'key' => 'success',
+            ]);
     }
 
     public function getReportView()
@@ -687,7 +686,8 @@ class AdminController extends Controller
             'dates' => '',
             'selectedCourse' => [],
             'selectedDailyOption' => "no",
-
+            'virtualQuery' => false,
+            'virtual_week' => []
         ];
 
         return view('admin.reports', $data);
@@ -698,8 +698,11 @@ class AdminController extends Controller
         $validated = $request->validate([
             'report_type' => 'required|in:student_summary,course_summary',
             'dates' => 'required',
-            'course_id' => 'sometimes',
-            'daily' => 'sometimes'
+            'course_id' => 'sometimes|array',
+            'daily' => 'sometimes|in:yes,no',
+            'course_id.*' => 'numeric|min:0',
+            'virtual_week' => 'sometimes|array',
+            'virtual_week.*' => 'numeric|min:1|max:54',
         ]);
 
         $startDate = Carbon::parse(explode(' - ', $request->dates)[0]);
@@ -712,7 +715,6 @@ class AdminController extends Controller
         $studentAttendanceData = collect();
         $attendanceData = collect();
 
-        $courseId = $validated['course_id'];
         $dailyQuery = isset($validated['daily']) && $validated['daily'] == 'yes';
 
         if ($request->get('report_type') == 'course_summary') {
@@ -733,16 +735,24 @@ class AdminController extends Controller
         }
 
         if ($request->get('report_type') == 'student_summary') {
-            $whereCourseClause = $courseId == 'all' ? '' : ' WHERE c.id = ? ';
+            $courseId = $validated['course_id'] ?? [0];
+            $whereCourseClause = $courseId[0] == 0 ? '' : ' WHERE c.id in ( ' . implode(',', (collect($courseId)->flatten()->all())) . ')';
             // use total attendance when start to date and no daily
             // if ($s)
+            $virtualQuery =  isset($validated['virtual_week']) && count($validated['virtual_week']) > 0;
 
+            $whereVirtualClause = $virtualQuery ? " AND WEEK(a.date, 3) IN (" . implode(',', $validated['virtual_week']) . ") " : '';
             $optimizeQuery = "select _ta.total as attendance_total, _ta.user_id,
-                u.name as user_name, u.gender as user_gender, u.contact as user_contact, u.network_type as user_network_type, c.course_name, c.location as course_location, c.id " . ($dailyQuery ? ', _da.date as attendance_date ' : '') . "from
+                u.name as user_name, u.email as email, u.gender as user_gender, u.contact as user_contact, u.network_type as user_network_type, c.course_name, c.location as course_location, c.id " . ($dailyQuery ? ', _da.date as attendance_date' : '') . ($virtualQuery ? ', _va.t as virtual_attendance, (_ta.total - _va.t) as in_person' : '') . " from
                 (select count(distinct `a`.`date`) AS `total`,max(`a`.`user_id`) AS `user_id`
                 from `attendances` `a`
                 where DATE(a.date) between ? AND ?
                 group by `a`.`user_id`) as _ta " .
+                ($virtualQuery ? "inner join
+                (select COUNT(*) as t, MAX(a.user_id) AS user_id FROM `attendances` `a`
+                where DATE(a.date) between ? AND ? $whereVirtualClause
+                group by `a`.`user_id` ) as _va
+                ON _ta.user_id  = _va.user_id " : '') .
                 ($dailyQuery ? "inner join
                 (select distinct date_format(`a`.`date`,'%Y-%m-%d') AS `date`,
                 `a`.`user_id` from `attendances` `a`
@@ -750,22 +760,33 @@ class AdminController extends Controller
                 ON _ta.user_id  = _da.user_id " : "") . "
                 left join users u on u.userId = _ta.user_id
                 left join user_admission ua on ua.user_id = _ta.user_id
-                inner join courses c on c.id = ua.course_id $whereCourseClause
-                order by c.course_name, u.name";
-            $params = [$startDate, $endDate];
-            $groupBy = ['user_name', 'attendance_date'];
+                inner join courses c on c.id = ua.course_id
+                $whereCourseClause order by c.course_name, u.name";
+            $dateParams = [$startDate, $endDate];
+            $params = $dateParams;
+            $groupBy = ['user_id', 'attendance_date'];
 
             if ($dailyQuery) {
-                $params =  array_merge($params, $params);
+                $params =  array_merge($params, $dateParams);
             }
 
-            if ($courseId !== 'all') {
-                $params[] = $courseId;
+            if ($virtualQuery) {
+                $params =  array_merge($params, $dateParams);
             }
+
+            // if ($courseId[0] !== 'all') {
+            //     // $params[] = "(" . implode(',', (collect($courseId)->flatten()->all())) . ") ";
+            // }
+            // DB::prepareBindings($params);
+            // dd($optimizeQuery);
+            // DB::bindValues($optimizeQuery, $params);
+
+
             $studentAttendanceData = collect(DB::select($optimizeQuery, $params))
                 ->groupBy($groupBy);
+            // dd($studentAttendanceData);
 
-            $selectedCourse = Course::find($courseId);
+            $selectedCourse = $courseId[0] == '0' ||  count($courseId) > 1 ? '0' : Course::find($courseId[0]);
         }
 
         $data = [
@@ -777,10 +798,13 @@ class AdminController extends Controller
             'dates_array' => $dates,
             'report_type' => $request->get('report_type'),
             'dates' => $request->get('dates'),
-            'selectedCourse' => $selectedCourse ?? 'all',
+            'selectedCourse' => $selectedCourse ?? '0',
             'selectedDailyOption' => $request->get('daily'),
-        ];
+            'virtualQuery' => $virtualQuery,
+            'virtual_week' => $validated['virtual_week'] ?? []
 
+        ];
+        // dd($data);
         return view('admin.reports', $data);
     }
 }
