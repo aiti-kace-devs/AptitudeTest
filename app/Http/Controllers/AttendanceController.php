@@ -23,6 +23,12 @@ class AttendanceController extends Controller
             'validity' => 'sometimes',
         ]);
 
+        $date = Carbon::parse($data['date']);
+
+        if ($date->isWeekend()) {
+            return response()->json(["message" => 'Date is a weekend'], 400);
+        }
+
         // $course = Course::findOrFail($courseId);
         $course = Course::findOrFail($data['course_id']);
 
@@ -68,7 +74,16 @@ class AttendanceController extends Controller
                     ]);
                 }
 
-                $date = Carbon::parse($decodedUserIdData['date'])->format('Y-m-d');
+                $date = Carbon::parse($decodedUserIdData['date']);
+
+                if ($date->isWeekend()) {
+                    return redirect(url('/student/attendance'))->with([
+                        'flash' => 'Attendance cannot be taken for weekends',
+                        'key' => 'error',
+                    ]);
+                }
+
+                $date = $date->format('Y-m-d');
 
                 $user_id = Auth::user()->userId;
 
@@ -145,6 +160,10 @@ class AttendanceController extends Controller
 
     private function createAttendance($user_id, $course_id, $date)
     {
+        if (Carbon::parse($date)->isWeekend()) {
+            return false;
+        }
+
         $attendanceRecord = Attendance::where('user_id', $user_id)->whereDate('date', $date)->first();
 
         if ($attendanceRecord) {
@@ -157,7 +176,7 @@ class AttendanceController extends Controller
         $attendance->date = $date;
         $attendance->save();
 
-        UpdateAttendanceOnSheetJob::dispatch($attendance);
+        // UpdateAttendanceOnSheetJob::dispatch($attendance);
         return true;
     }
     public function confirmAttendance(Request $request)
@@ -167,6 +186,11 @@ class AttendanceController extends Controller
             'course_id' => 'required|exists:courses,id',
             'date' => 'required|date|before_or_equal:' . now()->toDateString(),
         ]);
+
+        if (Carbon::parse($data['date'])->isWeekend()) {
+            return response()->json(['message' => 'Cannot confirm attendance for a weekend', 'success' => false]);
+        }
+
 
         $userAdmitted = UserAdmission::where('user_id', $data['user_id'])
             ->whereNotNull('confirmed')
@@ -184,11 +208,11 @@ class AttendanceController extends Controller
 
         $attendance = new Attendance();
         $attendance->user_id = $data['user_id'];
-        $attendance->course_id = $data['course_id'];
+        $attendance->course_id = $userAdmitted->course_id;
         $attendance->date = $data['date'];
         $attendance->save();
 
-        UpdateAttendanceOnSheetJob::dispatch($attendance);
+        // UpdateAttendanceOnSheetJob::dispatch($attendance);
 
         return response()->json(['message' => 'Attendance recorded successfully.', 'success' => true]);
     }
