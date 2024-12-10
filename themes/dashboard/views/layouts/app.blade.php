@@ -41,6 +41,8 @@
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/buttons.bootstrap4.min.css') }}">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -118,7 +120,6 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         @if (Auth::user()->isSuper())
-<<<<<<< HEAD
                         <li class="nav-item">
                             <a href="{{ url('admin/dashboard') }}" class="nav-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -197,58 +198,6 @@
                                 <p>Registered students</p>
                             </a>
                         </li>
-=======
-                            <li class="nav-item">
-                                <a href="{{ url('admin/dashboard') }}" class="nav-link">
-                                    <i class="nav-icon fas fa-tachometer-alt"></i>
-                                    <p>
-                                        Dashboard
-                                    </p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/exam_category') }}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Category</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/manage_exam') }}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Manage Exam</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/manage_students') }}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Students</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/registered_students') }}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Registered students</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/reports') }}" class="nav-link">
-                                    <i class="fa fa-chart-bar nav-icon"></i>
-                                    <p>Reports</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/reports') }}" class="nav-link">
-                                    <i class="fa fa-chart nav-icon"></i>
-                                    <p>Reports</p>
-                                </a>
-                            </li>
->>>>>>> 626886628d282f8c56a6cb014d30e8a4ffb54d0f
                         @endif
                         {{-- <li class="nav-item">
                             <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">
@@ -418,6 +367,12 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('.datatable').DataTable({
+                columnDefs: [
+                    {
+                    width: "15%",
+                    targets: -1
+                },
+            ],
                 "responsive": true,
                 "lengthChange": true,
                 "autoWidth": true,
@@ -426,8 +381,7 @@
                     orientation: 'landscape',
                     pageSize: 'A3'
                 }]
-            }).buttons().container().appendTo('.dataTables_wrapper .col-md-6:eq(0)'
-            });
+            }).buttons().container().appendTo('.dataTables_wrapper .col-md-6:eq(0)');
         });
     </script>
     <script>
