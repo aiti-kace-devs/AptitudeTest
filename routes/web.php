@@ -6,7 +6,12 @@ use App\Http\Controllers\StudentOperation;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AttendanceController;
-
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\CentreController;
+use App\Http\Controllers\ClassScheduleController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\ProgrammeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +41,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
 
     Route::middleware(['auth:admin'])->group(function () {
 
-        Route::get('/dashboard', [AdminController::class, 'index']);
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
         Route::get('/delete_category/{id}', [AdminController::class, 'delete_category'])->middleware('admin.super');
         Route::get('/exam_category', [AdminController::class, 'exam_category'])->middleware('admin.super');
         Route::get('/edit_category/{id}', [AdminController::class, 'edit_category'])->middleware('admin.super');
@@ -82,6 +87,67 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
 
         Route::get('/reset-verify/{id}', [AdminController::class, 'reset_verify'])->name('reset-verify');
         Route::post('/admit', [AdminController::class, 'admit_student'])->name('admit_user_ui')->middleware('admin.super');
+
+        // manage branch routes
+        Route::prefix('manage-branch')->group(function () {
+            Route::get('/', [BranchController::class, 'index'])->name('branch.index');
+            Route::post('/', [BranchController::class, 'store'])->name('branch.store');
+            Route::get('/{id}/edit', [BranchController::class, 'edit'])->name('branch.edit');
+            Route::put('/{branch}/update', [BranchController::class, 'update'])->name('branch.update');
+            Route::get('/{branch}/delete', [BranchController::class, 'destroy'])->name('branch.destroy');
+        });
+        // end of manage branch routes
+
+        // manage centre routes
+        Route::prefix('manage-centre')->group(function () {
+            Route::get('/', [CentreController::class, 'index'])->name('centre.index');
+            Route::post('/', [CentreController::class, 'store'])->name('centre.store');
+            Route::get('/{id}/edit', [CentreController::class, 'edit'])->name('centre.edit');
+            Route::put('/{centre}/update', [CentreController::class, 'update'])->name('centre.update');
+            Route::get('/{centre}/delete', [CentreController::class, 'destroy'])->name('centre.destroy');
+        });
+        // end of manage centre routes
+
+        // manage programme routes
+        Route::prefix('manage-programme')->group(function () {
+            Route::get('/', [ProgrammeController::class, 'index'])->name('programme.index');
+            Route::post('/', [ProgrammeController::class, 'store'])->name('programme.store');
+            Route::get('/{id}/edit', [ProgrammeController::class, 'edit'])->name('programme.edit');
+            Route::put('/{programme}/update', [ProgrammeController::class, 'update'])->name('programme.update');
+            Route::get('/{programme}/delete', [ProgrammeController::class, 'destroy'])->name('programme.destroy');
+        });
+        // end of manage programme routes
+
+        // manage course routes
+        Route::prefix('manage-course')->group(function () {
+            Route::get('/', [CourseController::class, 'index'])->name('course.index');
+            Route::post('/', [CourseController::class, 'store'])->name('course.store');
+            Route::get('/{id}/edit', [CourseController::class, 'edit'])->name('course.edit');
+            Route::get('/fetch/centre', [CourseController::class, 'fetchCentre'])->name('course.fetch.centre');
+            Route::put('/{course}/update', [CourseController::class, 'update'])->name('course.update');
+            Route::get('/{course}/delete', [CourseController::class, 'destroy'])->name('course.destroy');
+        });
+        // end of manage course routes
+
+        // manage period routes
+        Route::prefix('manage-period')->group(function () {
+            Route::get('/', [PeriodController::class, 'index'])->name('period.index');
+            Route::post('/', [PeriodController::class, 'store'])->name('period.store');
+            Route::get('/{id}/edit', [PeriodController::class, 'edit'])->name('period.edit');
+            Route::put('/{period}/update', [PeriodController::class, 'update'])->name('period.update');
+            Route::get('/{period}/delete', [PeriodController::class, 'destroy'])->name('period.destroy');
+        });
+        // end of manage period routes
+
+        // manage class schedule routes
+        Route::prefix('manage-class-schedule')->group(function () {
+            Route::get('/', [ClassScheduleController::class, 'index'])->name('class.schedule.index');
+            Route::post('/', [ClassScheduleController::class, 'store'])->name('class.schedule.store');
+            Route::post('/{id}/edit', [ClassScheduleController::class, 'edit'])->name('class.schedule.edit');
+            Route::put('/{course}/update', [ClassScheduleController::class, 'update'])->name('class.schedule.update');
+            Route::get('/{course}/delete', [ClassScheduleController::class, 'destroy'])->name('class.schedule.destroy');
+        });
+        // end of manage class schedule routes
     });
 });
 
