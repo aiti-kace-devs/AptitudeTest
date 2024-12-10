@@ -64,5 +64,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'theme' => \Qirolab\Theme\Middleware\ThemeMiddleware::class,
+        'apikey.check' => \App\Http\Middleware\CheckAPIKey::class,
+        'admin.super' => \App\Http\Middleware\SuperAdmin::class,
+
     ];
 }

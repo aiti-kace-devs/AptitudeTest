@@ -27,9 +27,9 @@
             <div class="col-12">
               <!-- Default box -->
               <div class="card">
-               
+
                 <div class="card-body container">
-                    <form action="{{ url('/admin/edit_exam_sub')}}" class="database_operation container">  
+                    <form action="{{ url('/admin/edit_exam_sub')}}" class="database_operation container">
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
@@ -51,6 +51,12 @@
                                   <input type="text" required="required"  value="{{ $exam->exam_duration}}" name="exam_duration"  class="form-control">
                               </div>
                           </div>
+                          <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="">Enter Passmark</label>
+                                <input type="text" required="required"  value="{{ $exam->passmark}}" name="passmark" class="form-control">
+                            </div>
+                        </div>
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="">Select category</label>
@@ -84,5 +90,5 @@
 
 
 
- 
+
 @endsection
