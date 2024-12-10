@@ -441,26 +441,68 @@ class StudentOperation extends Controller
     {
         $user = Auth::user();
 
-        if ($user->created_at == $user->updated_at) {
-            $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
-            ], [], ['ghcard' => "Ghana Card number"]);
+        $rules = [
+            'name' => 'sometimes|string|max:255',
+            'gender' => 'sometimes|in:male,female',
+            'contact' => 'sometimes|string|regex:/^[1-9][0-9]{8}$/|max:10',
+            'network_type' => 'sometimes|in:mtn,telecel,airteltigo',
+            'card_type' => 'sometimes|in:ghcard,voters_id,drivers_license,passport',
+        ];
 
-            $user->name = $validatedData['name'];
-            $user->ghcard = "GHA-" . $validatedData['ghcard'];
-            $user->save();
-
-
-            return redirect()->back()->with([
-                'flash' => 'Your details have been updated successfully.',
-                'key' => 'success'
-            ]);
+        if ($request->input('card_type') === 'ghcard') {
+            $rules['ghcard'] = 'sometimes|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16';
         } else {
-            return redirect()->back()->with([
-                'flash' => 'You have already updated your details once.',
-                'key' => 'error'
-            ]);
+            $rules['ghcard'] = 'sometimes|string|max:20';
         }
+
+        $validatedData = $request->validate($rules, [], ['ghcard' => 'Card number']);
+
+        if ($user->name && $user->ghcard && $user->gender && $user->contact) {
+            $user->network_type = $validatedData['network_type'];
+        } elseif ($user->name && $user->ghcard) {
+            $user->gender = $validatedData['gender'];
+            $user->contact = '0' . $validatedData['contact'];
+            $user->network_type = $validatedData['network_type'];
+        } else {
+            $user->name = $validatedData['name'];
+            $user->card_type = $validatedData['card_type'];
+            $user->ghcard =
+                $request->input('card_type') === 'ghcard'
+                    ? 'GHA-' . $validatedData['ghcard']
+                    : $validatedData['ghcard'];
+            $user->gender = $validatedData['gender'];
+            $user->contact = '0' . $validatedData['contact'];
+            $user->network_type = $validatedData['network_type'];
+        }
+        // dd($user);
+        $user->save();
+
+        return redirect()
+            ->back()
+            ->with([
+                'flash' => 'Your details have been updated successfully.',
+                'key' => 'success',
+            ]);
+
+        // if ($user->created_at == $user->updated_at) {
+        //     $validatedData = $request->validate([
+        //         'name' => 'required|string|max:255',
+        //         'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
+        //     ], [], ['ghcard' => "Ghana Card number"]);
+
+        //     $user->name = $validatedData['name'];
+        //     $user->ghcard = "GHA-" . $validatedData['ghcard'];
+        //     $user->save();
+
+        //     return redirect()->back()->with([
+        //         'flash' => 'Your details have been updated successfully.',
+        //         'key' => 'success'
+        //     ]);
+        // } else {
+        //     return redirect()->back()->with([
+        //         'flash' => 'You have already updated your details once.',
+        //         'key' => 'error'
+        //     ]);
+        // }
     }
 }

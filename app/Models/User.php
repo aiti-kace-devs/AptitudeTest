@@ -25,7 +25,9 @@ class User extends Authenticatable
         'mobile_no',
         'password',
         'userId',
-        'ghcard'
+        'ghcard',
+        'gender',
+        'network_type'
     ];
 
     /**

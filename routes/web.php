@@ -82,7 +82,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/reports', [AdminController::class, 'getReportView'])->name('getReportView');
         Route::post('/reports', [AdminController::class, 'generateReport'])->name('generateReport');
 
-
+        Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])->name('remove-attendance');
 
 
         Route::get('/reset-verify/{id}', [AdminController::class, 'reset_verify'])->name('reset-verify');

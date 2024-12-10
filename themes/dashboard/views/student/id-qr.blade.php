@@ -37,7 +37,7 @@
                 @php
                     function detailsUpdated($user)
                     {
-                        return $user->user_updated != $user->user_created && !$user->ghcard;
+                        return $user->user_updated != $user->user_created && $user->ghcard;
                     }
                 @endphp
                 <!-- Small boxes (Stat box) -->
@@ -51,28 +51,98 @@
                             <input id="name" type="text" required value=" {{ $user->student_name }}" name="name"
                                 class="form-control col-12" @if (detailsUpdated($user)) disabled @endif>
                         </div>
-                        <div class="input-group col-12 mb-2">
-                            <label class="form-label col-12">Ghana Card Number</label>
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">GHA-</span>
-                            </div>
-                            <input id="ghcard" type="text" required value=" {{ $user->ghcard }}" name="ghcard"
-                                placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
-                                class="form-control  @error('ghcard') is-invalid @enderror col-12 mr-2">
+
+                        <div class="col-12 mb-2">
+                            <label class="form-label col-12">Card Type</label>
+                            <select id="card_type" name="card_type" class="form-control"
+                                @if (detailsUpdated($user)) disabled @endif required>
+                                <option value="">Select Card Type</option>
+                                <option value="ghcard" {{ $user->card_type === 'ghcard' ? 'selected' : '' }}>Ghana Card
+                                </option>
+                                <option value="voters_id" {{ $user->card_type === 'voters_id' ? 'selected' : '' }}>Voter's
+                                    ID</option>
+                                <option value="drivers_license"
+                                    {{ $user->card_type === 'drivers_license' ? 'selected' : '' }}>Driver's License</option>
+                                <option value="passport" {{ $user->card_type === 'passport' ? 'selected' : '' }}>Passport
+                                </option>
+                            </select>
                         </div>
-                        @error('ghcard')
+
+                        <div class="input-group col-12 mb-2">
+                            <label class="form-label col-12">Card ID</label>
+                            @if ($user->card_type === 'ghcard' || $user->card_type == null)
+                                <div id="ghana-card-prefix" class="input-group-prepend" style="display: none;">
+                                    <span class="input-group-text" id="basic-addon1">GHA-</span>
+                                </div>
+                            @endif
+                            <input id="ghcard" type="text" required value="{{ old('ghcard', $user->ghcard) }}"
+                                name="ghcard" placeholder="123456789-1" @if (detailsUpdated($user)) disabled @endif
+                                class="form-control  @error('ghcard') is-invalid @enderror
+                                @if (!empty($user->verification_date)) is-valid @else is-invalid @endif
+                                          col-12 mr-2">
+
+                            {{-- Invalid Feedback --}}
+                            @if (empty($user->verification_date))
+                                <div class="invalid-feedback">
+                                    Card not verified
+                                </div>
+                            @endif
+                            {{-- Valid Feedback --}}
+                            @if (!empty($user->verification_date))
+                                <div class="valid-feedback">
+                                    Card Verified Successfully
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="col-12 mb-2">
+                            <label class="form-label col-12">Gender</label>
+                            <select id="gender" name="gender" class="form-control"
+                                @if ($user->gender) disabled @endif required>
+                                <option value="">Select Gender</option>
+                                <option value="male" {{ $user->gender === 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ $user->gender === 'female' ? 'selected' : '' }}>Female</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-2">
+                            <label class="form-label col-12">Network Type</label>
+                            <select id="network_type" name="network_type" class="form-control"
+                                @if ($user->network_type) disabled @endif required>
+                                <option value="">Select Network</option>
+                                <option value="mtn" {{ $user->network_type === 'mtn' ? 'selected' : '' }}>MTN</option>
+                                <option value="telecel" {{ $user->network_type === 'telecel' ? 'selected' : '' }}>Telecel
+                                </option>
+                                <option value="airteltigo" {{ $user->network_type === 'airteltigo' ? 'selected' : '' }}>
+                                    AirtelTigo</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group col-12 mb-2">
+                            <label class="form-label col-12">Phone Number</label>
+                            <div class="input-group-prepend">
+                                @if (!$user->contact)
+                                    <span class="input-group-text" id="basic-addon1">+233</span>
+                                @endif
+                            </div>
+                            <input id="contact" type="text" required value="{{ $user->contact }}" name="contact"
+                                placeholder="201234567" @if ($user->contact) disabled @endif
+                                class="form-control  @error('contact') is-invalid @enderror col-12 mr-2">
+                        </div>
+                        @error('contact')
                             <div role="alert" class="alert alert-danger">{{ $message }}</div>
                         @enderror
 
+
                         <div class="col-12">
-                            @if ($user->user_updated != $user->user_created)
+                            @if (detailsUpdated($user) && null !== $user->gender && null !== $user->network_type && null !== $user->contact)
                                 <p class="text-sm text-danger">You have already updated your details</p>
                             @else
                                 <button onclick="confirmUpdateDetails()" type="button"
                                     class="btn btn-primary">Update</button>
                                 <p class="text-sm text-danger">You can only update your details once, make sure you verify
                                     all
-                                    details before submitting</p>
+                                    details before submitting.</p>
                             @endif
                         </div>
                     </div>
@@ -115,15 +185,39 @@
             qrcode.download("StudentID-{{ Auth::user()->userId }}")
         }
 
+        $(document).ready(function() {
+            const cardTypeSelect = $("#card_type");
+            const ghcardInput = $("#ghcard");
 
-        $("#ghcard").inputmask({
-            mask: "555555555-5",
-            definitions: {
-                '5': {
-                    validator: "[0-9]"
-                },
+            function toggleInputMask() {
+                if (cardTypeSelect.val() === "ghcard") {
+                    ghcardInput.inputmask({
+                        mask: "555555555-5",
+                        definitions: {
+                            "5": {
+                                validator: "[0-9]",
+                            },
+                        },
+                    });
+                } else {
+                    ghcardInput.inputmask("remove");
+                }
             }
+
+            cardTypeSelect.on("change", toggleInputMask);
+
+            toggleInputMask();
         });
+
+
+        // $("#ghcard").inputmask({
+        //     mask: "555555555-5",
+        //     definitions: {
+        //         '5': {
+        //             validator: "[0-9]"
+        //         },
+        //     }
+        // });
 
         function confirmUpdateDetails() {
             Swal.fire({
@@ -140,5 +234,22 @@
                 }
             })
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const cardTypeSelect = document.getElementById("card_type");
+            const ghanaCardPrefix = document.getElementById("ghana-card-prefix");
+
+            function togglePrefix() {
+                if (cardTypeSelect.value === "ghcard") {
+                    ghanaCardPrefix.style.display = "flex";
+                } else {
+                    ghanaCardPrefix.style.display = "none";
+                }
+            }
+
+            togglePrefix();
+
+            cardTypeSelect.addEventListener("change", togglePrefix);
+        });
     </script>
 @endpush

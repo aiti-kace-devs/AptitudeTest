@@ -54,6 +54,9 @@
                                             <th>#</th>
                                             <th>Student Name</th>
                                             <th>Email</th>
+                                            @if (Auth::user()->isSuper())
+                                                <td>Action</td>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -62,6 +65,16 @@
                                                 <td>{{ $key + 1 }}</td>
                                                 <td>{{ $record->name }}</td>
                                                 <td>{{ $record->email }}</td>
+                                                @if (Auth::user()->isSuper())
+                                                    <form action="{{ route('admin.remove-attendance', $record->id) }}"
+                                                        name="remove-attendance-{{ $record->id }}">
+                                                        <td>
+                                                            <button onclick="removeAttendance()"
+                                                                data-id="{{ $record->id }}"
+                                                                class="btn btn-sm btn-danger">Remove</button>
+                                                        </td>
+                                                    </form>
+                                                @endif
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -99,6 +112,23 @@
             $('#selected_date').on('change', function() {
                 reloadPage();
             });
+
+            function removeAttendance(id) {
+                Swal.fire({
+                    title: 'Remove Attendance',
+                    text: `Are you sure you want to remove attendance?`,
+                    icon: 'info',
+                    backdrop: `rgba(0,0,0,0.95)`,
+                    confirmButtonText: 'Yes, Submit',
+                    cancelButtonText: 'No, Cancel',
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                    preConfirm: async () => {
+                        const form = $(`[name="remove-attendance-${id}"]`);
+                        form.submit();
+                    }
+                })
+            }
         });
     </script>
 @endpush
