@@ -78,7 +78,7 @@ export default {
     },
     submit() {
       // Submit the form with schema as JSON
-      this.form.post(route("setup.admission_form.store"), {
+      this.form.post(route("admin.setup.admission_form.store"), {
         onSuccess: () => {
           toastr.success("Form successfully saved");
           this.resetForm(); // Optional: reset form after submission

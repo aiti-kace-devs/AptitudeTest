@@ -12,6 +12,7 @@ use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
 
 /*
@@ -38,15 +39,15 @@ Route::get('/home', function () {
 })->middleware(['auth'])->name('home');
 
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
-   // setup route
-Route::prefix('setup')->name('setup.')->group(function () {
-    // admission form route
-    Route::prefix('/admission-form')->name('admission_form.')->group(function () {
-        Route::get('/', [FormController::class, 'index'])->name('index');
-        Route::get('/create', [FormController::class, 'create'])->name('create');
-        Route::post('/', [FormController::class, 'store'])->name('store');
+    // setup route
+    Route::prefix('setup')->name('setup.')->group(function () {
+        // admission form route
+        Route::prefix('/admission-form')->name('admission_form.')->group(function () {
+            Route::get('/', [FormController::class, 'index'])->name('index');
+            Route::get('/create', [FormController::class, 'create'])->name('create');
+            Route::post('/', [FormController::class, 'store'])->name('store');
+        });
     });
-}); 
 });
 
 Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(function () {
@@ -201,7 +202,11 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
     });
 });
 
-
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
 
 require __DIR__ . '/auth.php';

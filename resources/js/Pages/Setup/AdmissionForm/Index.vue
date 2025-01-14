@@ -23,7 +23,7 @@ import LinkButton from "@/Components/LinkButton.vue";
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
           <div class="p-6">
             <div class="flex justify-end">
-              <LinkButton :href="route('setup.admission_form.create')">
+              <LinkButton :href="route('admin.setup.admission_form.create')">
                 <span class="material-symbols-outlined mr-2"> add </span>
                 create form
               </LinkButton>

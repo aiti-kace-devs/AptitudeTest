@@ -186,6 +186,13 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="{{ route('admin.setup.admission_form.index') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Admission</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="{{ url('admin/manage_students') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Students</p>
