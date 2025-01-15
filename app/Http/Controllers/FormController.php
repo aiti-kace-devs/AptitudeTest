@@ -34,28 +34,25 @@ class FormController extends Controller
         $validated = $request->validate(
             [
                 'title' => ['required', 'string', 'max:100'],
+                'schema' => ['required', 'array'],
                 'schema.*.title' => ['required'],
+                'schema.*.type' => ['required', 'string', 'in:select,radio,checkbox,text,number'],
                 'schema.*.options' => [
                     'nullable',
-                    Rule::requiredIf(function ($attribute, $value) use ($request) {
-                       
-                        // Extract index from the attribute name, e.g., schema.0.options to 0
-                        $index = explode('.', $attribute)[1];
-            
-                        // Get the 'type' value from the schema at the specific index
-                        $type = data_get($request->input('schema'), "$index.type");
-            
-                        // Check if the 'type' is 'select', 'radio', or 'checkbox'
-                        return in_array($type, ['select', 'radio', 'checkbox']);
-                    }),
+                    'required_if:schema.*.type,select,radio,checkbox',
+                    'string',
                     'min:1'
                 ],
             ],
             [
                 'schema.*.title.required'  => 'The question field is required.',
-                'schema.*.options.required'  => 'The options field is required.',
+                'schema.*.options.required_if'  => 'The options field is required.',
             ]
         );
+
+        Form::create($validated);
+
+        return redirect()->route('admin.setup.admission_form.index');
     }
 
     /**

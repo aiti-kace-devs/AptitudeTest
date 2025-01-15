@@ -57,7 +57,7 @@ export default {
         label: `Field ${this.selections.length + 1}`, // Default label
         title: null,
         type: "text", // Default type
-        placeholder: "Enter your question here", // Placeholder
+        placeholder: "Question", // Placeholder
         options: null, // Options for dropdown/select fields
         is_required: false, // Default required status
       };
@@ -71,7 +71,6 @@ export default {
     changeSelectionType(index) {
       // Reset specific field properties when type changes
       const selection = this.selections[index];
-      selection.title = null; // Reset title
       if (selection.type !== "dropdown") {
         selection.options = null; // Remove options for non-dropdown fields
       }
@@ -81,7 +80,7 @@ export default {
       this.form.post(route("admin.setup.admission_form.store"), {
         onSuccess: () => {
           toastr.success("Form successfully saved");
-          this.resetForm(); // Optional: reset form after submission
+          this.resetForm();
         },
         onError: (errors) => {
           toastr.error("Something went wrong");
@@ -136,7 +135,7 @@ export default {
                     />
                     <InputError :message="form.errors.title" />
                   </div>
-
+                  
                   <!-- Questions -->
                   <div
                     class="border border-gray-400 p-6 rounded-lg shadow-sm space-y-4"
