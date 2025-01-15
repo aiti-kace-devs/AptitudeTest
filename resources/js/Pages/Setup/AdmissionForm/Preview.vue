@@ -137,13 +137,73 @@ export default {
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-          <div class="p-6 space-4">
+          <div class="p-6">
             <div>
               <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
             </div>
 
-            <div>
+            <div class="mt-4">
+              <form>
+                <div class="space-y-5">
+                  <div v-for="(question, row) in admissionForm.schema" :key="row">
+                    <div>
+                      <InputLabel
+                        :for="question.title"
+                        :value="question.title"
+                        :required="question.is_required"
+                      />
+                      <TextInput
+                        v-if="
+                          ['text', 'number', 'email', 'password'].includes(question.type)
+                        "
+                        :id="question.title"
+                        :type="question.type"
+                        class="w-full"
+                        v-model="form.title"
+                        :placeholder="question.title"
+                        autocomplete="off"
+                        :class="{ 'border-red-600': form.errors.title }"
+                      />
 
+                      <div
+                        class="flex items-center space-x-4"
+                        v-else-if="question.type == 'checkbox'"
+                      >
+                        <div
+                          class="flex items-center space-x-2"
+                          v-for="option in question.options.split(',')"
+                        >
+                          <Checkbox v-model:checked="form.is_admin" :value="true" />
+                          <InputLabel :for="option" :value="option" />
+                        </div>
+                      </div>
+
+                      <div
+                        class="flex items-center space-x-4"
+                        v-else-if="question.type == 'select'"
+                      >
+                        <SelectInput
+                          :id="question.title"
+                          v-model="form.type"
+                          class="w-full"
+                        >
+                          <option value="" disabled selected>
+                            -- Select an option --
+                          </option>
+                          <option
+                            v-for="option in question.options.split(',')"
+                            :value="option"
+                          >
+                            {{ option }}
+                          </option>
+                        </SelectInput>
+                      </div>
+
+                      <InputError :message="form.errors.title" />
+                    </div>
+                  </div>
+                </div>
+              </form>
             </div>
 
             <div>
