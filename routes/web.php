@@ -44,8 +44,12 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         // admission form route
         Route::prefix('/admission-form')->name('admission_form.')->group(function () {
             Route::get('/', [FormController::class, 'index'])->name('index');
+            Route::get('/fetch', [FormController::class, 'fetch'])->name('fetch');
             Route::get('/create', [FormController::class, 'create'])->name('create');
             Route::post('/', [FormController::class, 'store'])->name('store');
+            Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit');
+            Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
+            Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
         });
     });
 });

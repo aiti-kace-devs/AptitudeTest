@@ -1,16 +1,47 @@
 <script>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import LinkButton from "@/Components/LinkButton.vue";
+import MenuDropdown from "@/Components/MenuDropdown.vue";
+import DangerButton from "@/Components/DangerButton.vue";
 
 export default {
   components: {
     AuthenticatedLayout,
     Head,
     LinkButton,
+    MenuDropdown,
+    DangerButton,
   },
   mounted() {
     this.fetch();
+
+    $(document).on("click", ".dropdown-toggle", (evt) => {
+      const data = $(evt.target).attr("dropdown-log");
+
+      if (this.$refs.menuDropdown && evt.target.classList.contains("dropdown-span")) {
+        this.$refs.menuDropdown.toggleDropdown(data);
+      }
+    });
+
+    $(document).on("click", "body", (evt) => {
+      if (this.$refs.menuDropdown && !evt.target.classList.contains("dropdown-span")) {
+        // Close all dropdowns when clicking outside
+        this.$refs.menuDropdown.closeAllDropdowns();
+      }
+    });
+
+    $(document).on("click", ".edit", (evt) => {
+      const data = $(evt.currentTarget).data("id");
+
+      router.get(route("admin.setup.admission_form.edit", data));
+    });
+
+    $(document).on("click", ".preview", (evt) => {
+      const data = $(evt.currentTarget).data("id");
+
+      router.get(route("admin.setup.admission_form.preview", data));
+    });
   },
   methods: {
     fetch() {
@@ -24,7 +55,7 @@ export default {
         },
         columns: [
           { data: "title", name: "title" },
-          { data: "created_at", name: "created_at" },
+          { data: "date", name: "created at" },
           {
             data: "action",
             name: "action",
@@ -37,8 +68,6 @@ export default {
           ["10", "25", "50", "100", "All"],
         ],
         columnDefs: [
-          { width: "45%", targets: 0 },
-          { width: "10%", targets: 3 },
           { width: "5%", targets: -1 },
         ],
         createdRow: function (row, data, dataIndex) {
@@ -57,6 +86,7 @@ export default {
   <Head title="Setup | Admission Form" />
 
   <AuthenticatedLayout>
+    <MenuDropdown ref="menuDropdown" />
     <template #header>
       <div class="flex items-center">
         Setup
@@ -82,24 +112,24 @@ export default {
               <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 inline-w-full sm:px-6 lg:px-8">
                   <div class="overflow-x-auto">
-                    <table id="data_table" class="w-full table-striped">
+                    <table id="data_table" class="w-full text-sm table-striped">
                       <thead class="capitalize border-b bg-gray-100 font-medium">
                         <tr>
                           <th
                             scope="col"
-                            class="text-sm text-gray-900 px-6 py-4 text-left"
+                            class="text-gray-900 px-6 py-4 text-left"
                           >
                             Title
                           </th>
                           <th
                             scope="col"
-                            class="text-sm text-gray-900 px-6 py-4 text-left"
+                            class="text-gray-900 px-6 py-4 text-left"
                           >
                             created at
                           </th>
                           <th
                             scope="col"
-                            class="text-sm text-gray-900 px-6 py-4 text-left"
+                            class="text-gray-900 px-6 py-4 text-left"
                           >
                             action
                           </th>

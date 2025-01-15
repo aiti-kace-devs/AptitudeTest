@@ -26,19 +26,35 @@ export default {
   },
   props: {
     errors: Object,
+    admissionForm: Object,
   },
   data() {
     const selections = ref([]);
 
     const form = useForm({
-      title: null,
-      schema: [],
+      title: this.admissionForm.title,
+      schema: this.admissionForm.schema,
     });
 
     return {
       form,
       selections,
     };
+  },
+  mounted() {
+    this.admissionForm.schema.forEach((schema) => {
+      const newField = {
+        id: `field_${this.selections.length + 1}`, // Unique ID
+        label: `Field ${this.selections.length + 1}`, // Default label
+        title: schema.title,
+        type: schema.type, // Default type
+        placeholder: "Question", // Placeholder
+        options: schema.options, // Options for dropdown/select fields
+        is_required: schema.is_required, // Default required status
+      };
+
+      this.selections.push(newField);
+    });
   },
   watch: {
     selections: {
@@ -53,7 +69,7 @@ export default {
     addSelection() {
       // Add a new field with default values
       const newField = {
-        id: `field_${this.selections.length + 1}`, // Unique ID
+        id: `field_${Date.now()}`, // Unique ID
         label: `Field ${this.selections.length + 1}`, // Default label
         title: null,
         type: "text", // Default type
@@ -77,15 +93,18 @@ export default {
     },
     submit() {
       // Submit the form with schema as JSON
-      this.form.post(route("admin.setup.admission_form.store"), {
-        onSuccess: () => {
-          toastr.success("Form successfully saved");
-          this.resetForm();
-        },
-        onError: (errors) => {
-          toastr.error("Something went wrong");
-        },
-      });
+      this.form.put(
+        route("admin.setup.admission_form.update", { form: this.admissionForm.uuid }),
+        {
+          onSuccess: () => {
+            toastr.success("Form successfully updated");
+            this.resetForm();
+          },
+          onError: (errors) => {
+            toastr.error("Something went wrong");
+          },
+        }
+      );
     },
     resetForm() {
       // Clear form and selections after successful submission
@@ -98,7 +117,7 @@ export default {
 </script>
 
 <template>
-  <Head title="Setup | Admission Form | Create Form" />
+  <Head title="Setup | Admission Form | Preview Form" />
 
   <AuthenticatedLayout>
     <template #header>
@@ -111,14 +130,22 @@ export default {
         <span class="material-symbols-outlined text-gray-400">
           keyboard_arrow_right
         </span>
-        Create Form
+        Preview Form
       </div>
     </template>
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-          <div class="p-6">
+          <div class="p-6 space-4">
+            <div>
+              <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
+            </div>
+
+            <div>
+
+            </div>
+
             <div>
               <form @submit.prevent="submit">
                 <div class="grid gap-5">
@@ -135,7 +162,7 @@ export default {
                     />
                     <InputError :message="form.errors.title" />
                   </div>
-                  
+
                   <!-- Questions -->
                   <div
                     class="border border-gray-400 p-6 rounded-lg shadow-sm space-y-4"
@@ -150,7 +177,9 @@ export default {
                           class="w-full"
                           v-model="selection.title"
                           :placeholder="selection.placeholder"
-                          :class="{ 'border-red-600': form.errors[`schema.${row}.title`] }"
+                          :class="{
+                            'border-red-600': form.errors[`schema.${row}.title`],
+                          }"
                         />
                         <InputError :message="form.errors[`schema.${row}.title`]" />
                       </div>
@@ -181,7 +210,9 @@ export default {
                           class="w-full"
                           v-model="selection.options"
                           :placeholder="'Options (comma-separated)'"
-                          :class="{ 'border-red-600': form.errors[`schema.${row}.options`] }"
+                          :class="{
+                            'border-red-600': form.errors[`schema.${row}.options`],
+                          }"
                         />
                         <InputError :message="form.errors[`schema.${row}.options`]" />
                       </div>
@@ -225,7 +256,7 @@ export default {
                       type="submit"
                       :disabled="form.processing"
                       :class="{ 'opacity-25': form.processing }"
-                      >save
+                      >update
                     </PrimaryButton>
                   </div>
                 </div>

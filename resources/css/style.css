@@ -1,0 +1,92 @@
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #1F2937;
+    color: #fff !important;
+    border-color: #1F2937;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: rgb(55 65 81);
+    color: #fff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgb(55 65 81);
+    color: #fff !important;
+    border-color: rgb(55 65 81);
+}
+
+.dataTables_filter label,
+.dataTables_length label,
+.dataTables_info {
+    color: var(--color-dark) !important;
+    font-size: 14px;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    font-size: 14px;
+}
+
+.dataTables_filter input,
+.dataTables_length select {
+    margin-bottom: 0.5em !important;
+    color: var(--color-dark) !important;
+    border: 1px solid rgb(209 213 219) !important;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
+.dataTables_length select option {
+    color: var(--color-black) !important;
+    font-size: 13px !important;
+}
+
+.dataTables_filter input {
+    height: 2.1em;
+}
+
+.dataTables_length select {
+    height: 2.1em;
+    width: calc(2.1em * 2) !important;
+}
+
+.dataTables_length select:focus,
+.dataTables_filter input:focus {
+    border-color: rgb(55 65 81) !important;
+    outline: none !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 1.5px rgb(55 65 81) !important;
+}
+
+/* Custom CSS to create table-striped effect */
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #fff;
+    /* Background color for odd rows */
+}
+
+.table-striped tbody tr:nth-child(even) {
+    background-color: rgb(243 244 246);
+    /* Background color for even rows */
+}
+
+/* Additional styles for table */
+.table-striped {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-striped td {
+    padding: 1em 1.6em;
+}
+
+/*
+.table-striped tbody tr:nth-last-child(2) .dropdown-menu,
+.table-striped tbody tr:last-child .dropdown-menu {
+    bottom: 100%;
+    /* Position above the button 
+    transform: translateY(-10px);
+}
+*/
+
+.max-w-48 {
+    max-width: 12rem;
+    color: #35455b
+}
