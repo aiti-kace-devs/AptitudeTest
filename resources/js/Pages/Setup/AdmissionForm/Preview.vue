@@ -23,6 +23,7 @@ export default {
     SelectInput,
     Checkbox,
     DangerButton,
+    
   },
   props: {
     errors: Object,
