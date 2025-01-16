@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class FormResponse extends Model
 {
     use HasFactory;
+
+
+    public function form()
+    {
+        return $this->belongsTo(Form::class);
+    }
 }

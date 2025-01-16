@@ -23,10 +23,22 @@ class Form extends Model
     {
         parent::boot();
 
-        static::creating(function ($model) {
+        static::saving(function ($model) {
             if (empty($model->uuid)) {
                 $model->uuid = (string) Str::uuid();
             }
+
+            if ($model->isDirty('schema')) {
+                $model->schema = array_map(function ($schema) {
+                    $schema['field_name'] = Str::slug(strtolower($schema['title']));
+                    return $schema;
+                }, $model->schema);
+            }
         });
+    }
+
+    public function responses()
+    {
+        return $this->hasMany(FormResponse::class);
     }
 }

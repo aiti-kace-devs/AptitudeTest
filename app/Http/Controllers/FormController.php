@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Str;
 
 class FormController extends Controller
 {

@@ -11,6 +11,7 @@ use App\Http\Controllers\CentreController;
 use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\FormResponseController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
@@ -52,6 +53,17 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
             Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
         });
     });
+});
+
+Route::prefix('admission')->name('admission.')->group(function () {
+    // admission route
+    Route::get('/', [FormController::class, 'index'])->name('index');
+    Route::get('/fetch', [FormController::class, 'fetch'])->name('fetch');
+    Route::get('/create', [FormController::class, 'create'])->name('create');
+    Route::post('/', [FormResponseController::class, 'store'])->name('store');
+    Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit');
+    Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
+    Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
 });
 
 Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(function () {

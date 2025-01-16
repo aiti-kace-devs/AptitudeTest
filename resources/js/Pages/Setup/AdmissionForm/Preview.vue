@@ -10,6 +10,7 @@ import { ref } from "vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import RadioInput from "@/Components/RadioInput.vue";
 
 export default {
   components: {
@@ -23,89 +24,48 @@ export default {
     SelectInput,
     Checkbox,
     DangerButton,
-    
+    RadioInput,
   },
   props: {
     errors: Object,
     admissionForm: Object,
   },
   data() {
-    const selections = ref([]);
+    const formFields = {
+      form_uuid: this.admissionForm.uuid,
+    };
 
-    const form = useForm({
-      title: this.admissionForm.title,
-      schema: this.admissionForm.schema,
+    this.admissionForm.schema.forEach((schema) => {
+      const fieldName = schema.field_name;
+
+      if (
+        ["text", "number", "email", "file", "password", "radio"].includes(schema.type)
+      ) {
+        formFields[fieldName] = null;
+      } else if (schema.type === "checkbox") {
+        formFields[fieldName] = [];
+      } else if (schema.type === "select") {
+        formFields[fieldName] = "";
+      }
     });
+
+    const form = useForm(formFields);
 
     return {
       form,
-      selections,
     };
   },
-  mounted() {
-    this.admissionForm.schema.forEach((schema) => {
-      const newField = {
-        id: `field_${this.selections.length + 1}`, // Unique ID
-        label: `Field ${this.selections.length + 1}`, // Default label
-        title: schema.title,
-        type: schema.type, // Default type
-        placeholder: "Question", // Placeholder
-        options: schema.options, // Options for dropdown/select fields
-        is_required: schema.is_required, // Default required status
-      };
-
-      this.selections.push(newField);
-    });
-  },
-  watch: {
-    selections: {
-      handler(newSelections) {
-        // Sync selections with form.schema
-        this.form.schema = newSelections;
-      },
-      deep: true,
-    },
-  },
   methods: {
-    addSelection() {
-      // Add a new field with default values
-      const newField = {
-        id: `field_${Date.now()}`, // Unique ID
-        label: `Field ${this.selections.length + 1}`, // Default label
-        title: null,
-        type: "text", // Default type
-        placeholder: "Question", // Placeholder
-        options: null, // Options for dropdown/select fields
-        is_required: false, // Default required status
-      };
-
-      this.selections.push(newField);
-    },
-    removeSelection(index) {
-      // Remove the field at the specified index
-      this.selections.splice(index, 1);
-    },
-    changeSelectionType(index) {
-      // Reset specific field properties when type changes
-      const selection = this.selections[index];
-      if (selection.type !== "dropdown") {
-        selection.options = null; // Remove options for non-dropdown fields
-      }
-    },
     submit() {
-      // Submit the form with schema as JSON
-      this.form.put(
-        route("admin.setup.admission_form.update", { form: this.admissionForm.uuid }),
-        {
-          onSuccess: () => {
-            toastr.success("Form successfully updated");
-            this.resetForm();
-          },
-          onError: (errors) => {
-            toastr.error("Something went wrong");
-          },
-        }
-      );
+      this.form.post(route("admission.store"), {
+        onSuccess: () => {
+          toastr.success("Entry successfully submitted");
+          this.resetForm();
+        },
+        onError: (errors) => {
+          toastr.error("Something went wrong");
+        },
+      });
     },
     resetForm() {
       // Clear form and selections after successful submission
@@ -144,26 +104,34 @@ export default {
             </div>
 
             <div class="mt-4">
-              <form>
+              <form @submit.prevent="submit">
                 <div class="space-y-5">
                   <div v-for="(question, row) in admissionForm.schema" :key="row">
                     <div>
                       <InputLabel
-                        :for="question.title"
+                        :for="`field-${row}`"
                         :value="question.title"
                         :required="question.is_required"
                       />
                       <TextInput
                         v-if="
-                          ['text', 'number', 'email', 'password'].includes(question.type)
+                          ['text', 'number', 'email', 'file', 'password'].includes(
+                            question.type
+                          )
                         "
-                        :id="question.title"
+                        :id="`field-${row}`"
                         :type="question.type"
                         class="w-full"
-                        v-model="form.title"
+                        v-model="form[question.field_name]"
                         :placeholder="question.title"
                         autocomplete="off"
-                        :class="{ 'border-red-600': form.errors.title }"
+                        :class="{
+                          'block w-full mt-2 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100':
+                            question.type == 'file',
+                          'file:bg-red-600 hover:file:bg-red-500 file:text-white':
+                            question.type == 'file',
+                          'border-red-600': form.errors.title,
+                        }"
                       />
 
                       <div
@@ -171,21 +139,47 @@ export default {
                         v-else-if="question.type == 'checkbox'"
                       >
                         <div
-                          class="flex items-center space-x-2"
-                          v-for="option in question.options.split(',')"
+                          class="mt-1 flex items-center space-x-2"
+                          v-for="(option, idx) in question.options.split(',')"
+                          :key="idx"
                         >
-                          <Checkbox v-model:checked="form.is_admin" :value="true" />
-                          <InputLabel :for="option" :value="option" />
+                          <Checkbox
+                            :id="`field-${row}-option-${idx}`"
+                            v-model:checked="form[question.field_name]"
+                            :value="option.trim()"
+                          />
+                          <InputLabel
+                            :for="`field-${row}-option-${idx}`"
+                            :value="option.trim()"
+                          />
                         </div>
                       </div>
 
                       <div
-                        class="flex items-center space-x-4"
-                        v-else-if="question.type == 'select'"
+                        class="flex items-center gap-4"
+                        v-else-if="question.type == 'radio'"
                       >
+                        <div
+                          class="flex items-center space-x-2"
+                          v-for="(option, idx) in question.options.split(',')"
+                          :key="idx"
+                        >
+                          <RadioInput
+                            :id="`field-${row}-option-${idx}`"
+                            v-model:checked="form[question.field_name]"
+                            :value="option.trim()"
+                          />
+                          <InputLabel
+                            :for="`field-${row}-option-${idx}`"
+                            :value="option.trim()"
+                          />
+                        </div>
+                      </div>
+
+                      <div v-else-if="question.type == 'select'">
                         <SelectInput
                           :id="question.title"
-                          v-model="form.type"
+                          v-model="form[question.field_name]"
                           class="w-full"
                         >
                           <option value="" disabled selected>
@@ -193,123 +187,14 @@ export default {
                           </option>
                           <option
                             v-for="option in question.options.split(',')"
-                            :value="option"
+                            :value="option.trim()"
                           >
-                            {{ option }}
+                            {{ option.trim() }}
                           </option>
                         </SelectInput>
                       </div>
-
                       <InputError :message="form.errors.title" />
                     </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            <div>
-              <form @submit.prevent="submit">
-                <div class="grid gap-5">
-                  <div>
-                    <InputLabel for="title" value="Title" :required="true" />
-                    <TextInput
-                      id="title"
-                      type="text"
-                      class="w-full"
-                      v-model="form.title"
-                      :placeholder="'Title'"
-                      autocomplete="title"
-                      :class="{ 'border-red-600': form.errors.title }"
-                    />
-                    <InputError :message="form.errors.title" />
-                  </div>
-
-                  <!-- Questions -->
-                  <div
-                    class="border border-gray-400 p-6 rounded-lg shadow-sm space-y-4"
-                    v-for="(selection, row) in selections"
-                    :key="row"
-                  >
-                    <div class="grid grid-cols-3 gap-x-4">
-                      <div class="col-span-2">
-                        <TextInput
-                          :id="selection.id"
-                          type="text"
-                          class="w-full"
-                          v-model="selection.title"
-                          :placeholder="selection.placeholder"
-                          :class="{
-                            'border-red-600': form.errors[`schema.${row}.title`],
-                          }"
-                        />
-                        <InputError :message="form.errors[`schema.${row}.title`]" />
-                      </div>
-
-                      <div>
-                        <SelectInput
-                          @change="changeSelectionType(row)"
-                          :id="'input_type_' + row"
-                          v-model="selection.type"
-                          class="w-full"
-                        >
-                          <option value="text" selected>Text</option>
-                          <option value="textarea">Textarea</option>
-                          <option value="select">Select</option>
-                          <option value="checkbox">Checkbox</option>
-                          <option value="radio">Radio</option>
-                          <option value="number">Number</option>
-                        </SelectInput>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div>
-                        <TextInput
-                          v-if="['select', 'radio', 'checkbox'].includes(selection.type)"
-                          :id="selection.id"
-                          type="text"
-                          class="w-full"
-                          v-model="selection.options"
-                          :placeholder="'Options (comma-separated)'"
-                          :class="{
-                            'border-red-600': form.errors[`schema.${row}.options`],
-                          }"
-                        />
-                        <InputError :message="form.errors[`schema.${row}.options`]" />
-                      </div>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                      <div>
-                        <label class="inline-flex items-center cursor-pointer space-x-3">
-                          Required
-                          <Checkbox
-                            v-model:checked="selection.is_required"
-                            class="sr-only peer"
-                          />
-                          <div
-                            class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
-                          ></div>
-                        </label>
-                      </div>
-
-                      <div>
-                        <DangerButton
-                          type="button"
-                          @click="removeSelection(row)"
-                          class="h-8 w-9 flex items-center justify-center"
-                        >
-                          <span class="material-symbols-outlined"> delete </span>
-                        </DangerButton>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <PrimaryButton @click="addSelection" type="button">
-                      <span class="material-symbols-outlined mr-2"> add </span>
-                      add question
-                    </PrimaryButton>
                   </div>
 
                   <div>
@@ -317,7 +202,7 @@ export default {
                       type="submit"
                       :disabled="form.processing"
                       :class="{ 'opacity-25': form.processing }"
-                      >update
+                      >submit
                     </PrimaryButton>
                   </div>
                 </div>
