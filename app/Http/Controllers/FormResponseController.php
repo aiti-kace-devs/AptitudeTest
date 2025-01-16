@@ -36,42 +36,68 @@ class FormResponseController extends Controller
             'response_data' => 'required|array',
         ];
 
+        $customMessages = [
+            'response_data.required' => 'The form responses are required.',
+        ];
+
         foreach ($schema as $field) {
             $fieldKey = "response_data.{$field['field_name']}";
+
             $rules = [];
+
+            $field['title'] = strtolower($field['title']);
 
             if (!empty($field['is_required'])) {
                 $rules[] = 'required';
+                $customMessages["{$fieldKey}.required"] = "The {$field['title']} field is required.";
             }
 
             switch ($field['type']) {
                 case 'text':
                 case 'textarea':
+                    $rules[] = 'string';
+                    $customMessages["{$fieldKey}.string"] = "The {$field['title']} must be a valid string.";
+                    break;
+
                 case 'radio':
                 case 'select':
                     $rules[] = 'string';
+                    $customMessages["{$fieldKey}.string"] = "The {$field['title']} must be a valid option.";
                     break;
+
                 case 'number':
                     $rules[] = 'numeric';
+                    $customMessages["{$fieldKey}.numeric"] = "The {$field['title']} must be a valid number.";
                     break;
+
                 case 'email':
                     $rules[] = 'email';
+                    $customMessages["{$fieldKey}.email"] = "The {$field['title']} must be a valid email address.";
                     break;
+
                 case 'checkbox':
-                    $rules[] = 'array';
+                    $rules[] = 'array'; 
+                    $customMessages["{$fieldKey}.array"] = "The {$field['title']} must be a valid array.";
                     break;
+
                 case 'file':
                     $rules[] = 'file';
+                    $customMessages["{$fieldKey}.file"] = "The {$field['title']} must be a valid file.";
                     break;
+
                 default:
-                    $rules[] = 'nullable';
+                    $rules[] = 'nullable'; 
                     break;
             }
 
             $validationRules[$fieldKey] = implode('|', $rules);
         }
 
-        $validated = $request->validate($validationRules);
+        $validated = $request->validate($validationRules, $customMessages);
+
+        $response = new FormResponse($validated);
+
+        $form->responses()->save($response);
     }
 
 
