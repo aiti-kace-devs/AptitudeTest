@@ -54,9 +54,7 @@ const { component } = usePage().props;
 
           <!-- Setup -->
           <div>
-            <p
-              class="text-gray-200 uppercase font-semibold text-xs tracking-wide pb-2"
-            >
+            <p class="text-gray-200 uppercase font-semibold text-xs tracking-wide pb-2">
               Setup
             </p>
 
@@ -70,21 +68,14 @@ const { component } = usePage().props;
             </SidebarNavLink>
           </div>
 
-          <!-- Inventory -->
           <div>
-            <p
-              class="text-gray-600 uppercase font-semibold text-xs tracking-wide pb-2 sm:pb-3"
-            >
-              Inventory
-            </p>
-
             <SidebarNavLink
               :href="route('admin.dashboard')"
               :active="route().current('admin.dashboard')"
               class="flex items-center space-x-3 py-2 text-sm sm:text-base"
             >
-              <span class="material-symbols-outlined">medication</span>
-              <span>Products</span>
+              <span class="material-symbols-outlined">school</span>
+              <span>applicants</span>
             </SidebarNavLink>
           </div>
         </nav>
