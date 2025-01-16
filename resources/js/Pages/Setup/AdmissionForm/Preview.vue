@@ -33,6 +33,7 @@ export default {
   data() {
     const formFields = {
       form_uuid: this.admissionForm.uuid,
+      response_data: {},
     };
 
     this.admissionForm.schema.forEach((schema) => {
@@ -41,11 +42,11 @@ export default {
       if (
         ["text", "number", "email", "file", "password", "radio"].includes(schema.type)
       ) {
-        formFields[fieldName] = null;
+        formFields.response_data[fieldName] = null;
       } else if (schema.type === "checkbox") {
-        formFields[fieldName] = [];
+        formFields.response_data[fieldName] = [];
       } else if (schema.type === "select") {
-        formFields[fieldName] = "";
+        formFields.response_data[fieldName] = "";
       }
     });
 
@@ -122,7 +123,7 @@ export default {
                         :id="`field-${row}`"
                         :type="question.type"
                         class="w-full"
-                        v-model="form[question.field_name]"
+                        v-model="form.response_data[question.field_name]"
                         :placeholder="question.title"
                         autocomplete="off"
                         :class="{
@@ -130,7 +131,8 @@ export default {
                             question.type == 'file',
                           'file:bg-red-600 hover:file:bg-red-500 file:text-white':
                             question.type == 'file',
-                          'border-red-600': form.errors.title,
+                          'border-red-600':
+                            form.errors[`response_data.${question.field_name}`],
                         }"
                       />
 
@@ -145,7 +147,7 @@ export default {
                         >
                           <Checkbox
                             :id="`field-${row}-option-${idx}`"
-                            v-model:checked="form[question.field_name]"
+                            v-model:checked="form.response_data[question.field_name]"
                             :value="option.trim()"
                           />
                           <InputLabel
@@ -166,7 +168,7 @@ export default {
                         >
                           <RadioInput
                             :id="`field-${row}-option-${idx}`"
-                            v-model:checked="form[question.field_name]"
+                            v-model:checked="form.response_data[question.field_name]"
                             :value="option.trim()"
                           />
                           <InputLabel
@@ -179,7 +181,7 @@ export default {
                       <div v-else-if="question.type == 'select'">
                         <SelectInput
                           :id="question.title"
-                          v-model="form[question.field_name]"
+                          v-model="form.response_data[question.field_name]"
                           class="w-full"
                         >
                           <option value="" disabled selected>
@@ -193,7 +195,9 @@ export default {
                           </option>
                         </SelectInput>
                       </div>
-                      <InputError :message="form.errors.title" />
+                      <InputError
+                        :message="form.errors[`response_data.${question.field_name}`]"
+                      />
                     </div>
                   </div>
 

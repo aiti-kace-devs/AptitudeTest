@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Form;
 use App\Models\FormResponse;
 use Illuminate\Http\Request;
 
@@ -28,8 +29,51 @@ class FormResponseController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        $form = Form::where('uuid', $request->form_uuid)->first();
+        $schema = $form->schema;
+
+        $validationRules = [
+            'response_data' => 'required|array',
+        ];
+
+        foreach ($schema as $field) {
+            $fieldKey = "response_data.{$field['field_name']}";
+            $rules = [];
+
+            if (!empty($field['is_required'])) {
+                $rules[] = 'required';
+            }
+
+            switch ($field['type']) {
+                case 'text':
+                case 'textarea':
+                case 'radio':
+                case 'select':
+                    $rules[] = 'string';
+                    break;
+                case 'number':
+                    $rules[] = 'numeric';
+                    break;
+                case 'email':
+                    $rules[] = 'email';
+                    break;
+                case 'checkbox':
+                    $rules[] = 'array';
+                    break;
+                case 'file':
+                    $rules[] = 'file';
+                    break;
+                default:
+                    $rules[] = 'nullable';
+                    break;
+            }
+
+            $validationRules[$fieldKey] = implode('|', $rules);
+        }
+
+        $validated = $request->validate($validationRules);
     }
+
 
     /**
      * Display the specified resource.
