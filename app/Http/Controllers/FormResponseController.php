@@ -50,6 +50,8 @@ class FormResponseController extends Controller
             if (!empty($field['is_required'])) {
                 $rules[] = 'required';
                 $customMessages["{$fieldKey}.required"] = "The {$field['title']} field is required.";
+            } else {
+                $rules[] = 'nullable'; 
             }
 
             switch ($field['type']) {

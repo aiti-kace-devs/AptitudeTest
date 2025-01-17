@@ -27,7 +27,7 @@ class FormController extends Controller
     public function fetch()
     {
 
-        $data = Form::get(['uuid', 'title']);
+        $data = Form::get(['uuid', 'title', 'updated_at']);
         return DataTables::of($data)
             ->addIndexColumn()
             ->editColumn('date', function ($row) {
@@ -46,12 +46,15 @@ class FormController extends Controller
                           </button>
                         </div>
 
-                        <div id="dropdown-menu-' . $row->uuid . '" class="hidden dropdown-menu absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                        <div id="dropdown-menu-' . $row->uuid . '" class="hidden dropdown-menu absolute right-0 z-50 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                             <button type="button" data-id="' . $row->uuid . '" class="edit ' . $linkClass . '">
                                 Edit
                             </button>
                             <button type="button" data-id="' . $row->uuid . '" class="preview ' . $linkClass . '">
                                 Preview
+                            </button>
+                            <button type="button" data-id="' . $row->uuid . '" class="responses ' . $linkClass . '">
+                                Responses
                             </button>
                             <button type="button" data-id="' . $row->uuid . '" class="delete ' . $linkClass . '">
                                  Delete
@@ -91,6 +94,7 @@ class FormController extends Controller
                 'schema.*.is_required' => ['nullable', 'boolean']
             ],
             [
+                'schema.required'   => 'A question is required.',
                 'schema.*.title.required'  => 'The question field is required.',
                 'schema.*.options.required_if'  => 'The options field is required.',
             ]
@@ -98,7 +102,7 @@ class FormController extends Controller
 
         Form::create($validated);
 
-        return redirect()->route('admin.setup.admission_form.index');
+        return redirect()->route('admin.form.index');
     }
 
     /**
@@ -146,6 +150,7 @@ class FormController extends Controller
                 'schema.*.is_required' => ['nullable', 'boolean']
             ],
             [
+                'schema.required'   => 'A question is required.',
                 'schema.*.title.required'  => 'The question field is required.',
                 'schema.*.options.required_if'  => 'The options field is required.',
             ]
@@ -154,14 +159,16 @@ class FormController extends Controller
         $form = Form::where('uuid', $uuid)->first();
         $form->fill($validated)->save();
 
-        return redirect()->route('admin.setup.admission_form.index');
+        return redirect()->route('admin.form.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Form $form)
+    public function destroy($uuid)
     {
-        //
+        $form = Form::where('uuid', $uuid)->first();
+
+        $form->delete();
     }
 }

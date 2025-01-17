@@ -40,23 +40,23 @@ Route::get('/home', function () {
 })->middleware(['auth'])->name('home');
 
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
-    // setup route
-    Route::prefix('setup')->name('setup.')->group(function () {
-        // admission form route
-        Route::prefix('/admission-form')->name('admission_form.')->group(function () {
-            Route::get('/', [FormController::class, 'index'])->name('index');
-            Route::get('/fetch', [FormController::class, 'fetch'])->name('fetch');
-            Route::get('/create', [FormController::class, 'create'])->name('create');
-            Route::post('/', [FormController::class, 'store'])->name('store');
-            Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit');
-            Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
-            Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
-        });
+
+    // forms route
+    Route::prefix('/forms')->name('form.')->group(function () {
+        Route::get('/', [FormController::class, 'index'])->name('index');
+        Route::get('/fetch', [FormController::class, 'fetch'])->name('fetch');
+        Route::get('/create', [FormController::class, 'create'])->name('create');
+        Route::post('/', [FormController::class, 'store'])->name('store');
+        Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit');
+        Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
+        Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
+        Route::get('/{form}/responses', [FormController::class, 'responses'])->name('responses');
+        Route::post('/{form}/destroy', [FormController::class, 'destroy'])->name('destroy');
     });
 });
 
-Route::prefix('admission')->name('admission.')->group(function () {
-    // admission route
+Route::prefix('form-responses')->name('form_responses.')->group(function () {
+    // form responses route
     Route::get('/', [FormController::class, 'index'])->name('index');
     Route::get('/fetch', [FormController::class, 'fetch'])->name('fetch');
     Route::get('/create', [FormController::class, 'create'])->name('create');

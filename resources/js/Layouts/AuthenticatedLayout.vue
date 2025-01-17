@@ -52,30 +52,14 @@ const { component } = usePage().props;
             </div>
           </div>
 
-          <!-- Setup -->
           <div>
-            <p class="text-gray-200 uppercase font-semibold text-xs tracking-wide pb-2">
-              Setup
-            </p>
-
             <SidebarNavLink
-              :href="route('admin.setup.admission_form.index')"
-              :active="route().current('admin.setup.*')"
+              :href="route('admin.form.index')"
+              :active="route().current('admin.form.*')"
               class="flex items-center space-x-3 py-2 text-sm sm:text-base"
             >
               <span class="material-symbols-outlined">ballot</span>
-              <span>Admission Form</span>
-            </SidebarNavLink>
-          </div>
-
-          <div>
-            <SidebarNavLink
-              :href="route('admin.dashboard')"
-              :active="route().current('admin.dashboard')"
-              class="flex items-center space-x-3 py-2 text-sm sm:text-base"
-            >
-              <span class="material-symbols-outlined">school</span>
-              <span>applicants</span>
+              <span>Forms</span>
             </SidebarNavLink>
           </div>
         </nav>

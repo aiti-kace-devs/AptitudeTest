@@ -6,7 +6,6 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import { ref } from "vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
@@ -58,9 +57,9 @@ export default {
   },
   methods: {
     submit() {
-      this.form.post(route("admission.store"), {
+      this.form.post(route("form_responses.store"), {
         onSuccess: () => {
-          toastr.success("Entry successfully submitted");
+          toastr.success("Response successfully submitted");
           this.resetForm();
         },
         onError: (errors) => {
@@ -72,27 +71,22 @@ export default {
       // Clear form and selections after successful submission
       this.form.reset();
       this.form.clearErrors();
-      this.selections = [];
     },
   },
 };
 </script>
 
 <template>
-  <Head title="Setup | Admission Form | Preview Form" />
+  <Head title="Forms | Preview" />
 
   <AuthenticatedLayout>
     <template #header>
       <div class="flex items-center">
-        Setup
+        Forms
         <span class="material-symbols-outlined text-gray-400">
           keyboard_arrow_right
         </span>
-        Admission Form
-        <span class="material-symbols-outlined text-gray-400">
-          keyboard_arrow_right
-        </span>
-        Preview Form
+        Preview
       </div>
     </template>
 
@@ -106,14 +100,13 @@ export default {
 
             <div class="mt-4">
               <form @submit.prevent="submit">
-                <div class="space-y-5">
+                <div class="space-y-7">
                   <div v-for="(question, row) in admissionForm.schema" :key="row">
                     <div>
-                      <InputLabel
-                        :for="`field-${row}`"
-                        :value="question.title"
-                        :required="question.is_required"
-                      />
+                      <p class="mb-2">
+                        {{ question.title
+                        }}<span class="text-red-600" v-if="question.is_required">*</span>
+                      </p>
                       <TextInput
                         v-if="
                           ['text', 'number', 'email', 'file', 'password'].includes(
@@ -141,7 +134,7 @@ export default {
                         v-else-if="question.type == 'checkbox'"
                       >
                         <div
-                          class="mt-1 flex items-center space-x-2"
+                          class="flex items-center space-x-2"
                           v-for="(option, idx) in question.options.split(',')"
                           :key="idx"
                         >

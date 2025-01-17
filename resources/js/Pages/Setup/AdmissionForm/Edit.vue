@@ -79,6 +79,8 @@ export default {
       };
 
       this.selections.push(newField);
+
+      this.form.clearErrors("schema");
     },
     removeSelection(index) {
       // Remove the field at the specified index
@@ -87,24 +89,30 @@ export default {
     changeSelectionType(index) {
       // Reset specific field properties when type changes
       const selection = this.selections[index];
-      if (selection.type !== "dropdown") {
+      if (selection.type !== "select") {
         selection.options = null; // Remove options for non-dropdown fields
       }
     },
+    moveField(index, direction) {
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+
+      if (swapIndex < 0 || swapIndex >= this.selections.length) return;
+
+      const temp = this.selections[index];
+      this.selections[index] = this.selections[swapIndex];
+      this.selections[swapIndex] = temp;
+    },
     submit() {
       // Submit the form with schema as JSON
-      this.form.put(
-        route("admin.setup.admission_form.update", { form: this.admissionForm.uuid }),
-        {
-          onSuccess: () => {
-            toastr.success("Form successfully updated");
-            this.resetForm();
-          },
-          onError: (errors) => {
-            toastr.error("Something went wrong");
-          },
-        }
-      );
+      this.form.put(route("admin.form.update", { form: this.admissionForm.uuid }), {
+        onSuccess: () => {
+          toastr.success("Form successfully updated");
+          this.resetForm();
+        },
+        onError: (errors) => {
+          toastr.error("Something went wrong");
+        },
+      });
     },
     resetForm() {
       // Clear form and selections after successful submission
@@ -117,16 +125,12 @@ export default {
 </script>
 
 <template>
-  <Head title="Setup | Admission Form | Edit Form" />
+  <Head title="Forms | Edit Form" />
 
   <AuthenticatedLayout>
     <template #header>
       <div class="flex items-center">
-        Setup
-        <span class="material-symbols-outlined text-gray-400">
-          keyboard_arrow_right
-        </span>
-        Admission Form
+        Forms
         <span class="material-symbols-outlined text-gray-400">
           keyboard_arrow_right
         </span>
@@ -212,7 +216,9 @@ export default {
 
                     <div class="flex justify-between items-center">
                       <div>
-                        <label class="inline-flex items-center cursor-pointer space-x-3">
+                        <label
+                          class="inline-flex items-center cursor-pointer space-x-3 text-sm"
+                        >
                           Required
                           <Checkbox
                             v-model:checked="selection.is_required"
@@ -222,6 +228,43 @@ export default {
                             class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
                           ></div>
                         </label>
+                      </div>
+
+                      <div
+                        class="flex flex-col items-center"
+                        :class="{
+                          'gap-y-2.5': row !== 0 && row !== selections.length - 1,
+                        }"
+                      >
+                        <div>
+                          <button
+                            @click="moveField(row, 'up')"
+                            v-if="row !== 0"
+                            type="button"
+                            class="w-11 h-8 flex items-center justify-center border border-transparent bg-gray-100 rounded-sm shadow-sm p-1 disabled:opacity-25 disabled:cursor-not-allowed"
+                          >
+                            <span
+                              class="material-symbols-outlined text-2xl font-bold text-gray-800"
+                            >
+                              keyboard_arrow_up
+                            </span>
+                          </button>
+                        </div>
+
+                        <div>
+                          <button
+                            @click="moveField(row, 'down')"
+                            v-if="row !== selections.length - 1"
+                            type="button"
+                            class="w-11 h-8 flex items-center justify-center border border-transparent bg-gray-100 rounded-sm shadow-sm p-1 disabled:opacity-25 disabled:cursor-not-allowed"
+                          >
+                            <span
+                              class="material-symbols-outlined text-2xl font-bold text-gray-800"
+                            >
+                              keyboard_arrow_down
+                            </span>
+                          </button>
+                        </div>
                       </div>
 
                       <div>
@@ -234,6 +277,13 @@ export default {
                         </DangerButton>
                       </div>
                     </div>
+                  </div>
+
+                  <div
+                    v-if="form.errors.schema"
+                    class="bg-red-100 rounded-md p-4 border border-red-200 text-red-700 text-md"
+                  >
+                    <span class="font-bold">Oops!</span> {{ form.errors.schema }}
                   </div>
 
                   <div>
