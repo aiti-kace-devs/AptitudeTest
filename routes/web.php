@@ -50,7 +50,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit');
         Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
         Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
-        Route::get('/{form}/responses', [FormController::class, 'responses'])->name('responses');
+        Route::get('/{form}/responses', [FormController::class, 'show'])->name('show');
         Route::post('/{form}/destroy', [FormController::class, 'destroy'])->name('destroy');
     });
 });

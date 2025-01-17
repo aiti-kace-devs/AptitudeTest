@@ -17,7 +17,7 @@ class FormController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Setup/AdmissionForm/Index');
+        return Inertia::render('Form/Index');
     }
 
     /**
@@ -71,7 +71,7 @@ class FormController extends Controller
 
     public function create()
     {
-        return Inertia::render('Setup/AdmissionForm/Create');
+        return Inertia::render('Form/Create');
     }
 
     /**
@@ -108,9 +108,11 @@ class FormController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Form $form)
+    public function show($uuid)
     {
-        //
+        $admissionForm = Form::where('uuid', $uuid)->first();
+
+        return Inertia::render('Form/Show', compact('admissionForm'));
     }
 
     /**
@@ -120,14 +122,14 @@ class FormController extends Controller
     {
         $admissionForm = Form::where('uuid', $uuid)->first();
 
-        return Inertia::render('Setup/AdmissionForm/Edit', compact('admissionForm'));
+        return Inertia::render('Form/Edit', compact('admissionForm'));
     }
 
     public function preview($uuid)
     {
         $admissionForm = Form::where('uuid', $uuid)->first();
 
-        return Inertia::render('Setup/AdmissionForm/Preview', compact('admissionForm'));
+        return Inertia::render('Form/Preview', compact('admissionForm'));
     }
 
     /**

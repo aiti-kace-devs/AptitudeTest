@@ -54,7 +54,7 @@ export default {
     $(document).on("click", ".responses", (evt) => {
       const data = $(evt.currentTarget).data("id");
 
-      router.get(route("admin.form.responses", data));
+      router.get(route("admin.form.show", data));
     });
 
     $(document).on("click", ".delete", (evt) => {
