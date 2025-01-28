@@ -55,7 +55,7 @@ const { component } = usePage().props;
           <div>
             <SidebarNavLink
               :href="route('admin.form.index')"
-              :active="route().current('admin.form.*')"
+              :active="route().current('admin.form.*') || route().current('admin.form_responses.*')"
               class="flex items-center space-x-3 py-2 text-sm sm:text-base"
             >
               <span class="material-symbols-outlined">ballot</span>

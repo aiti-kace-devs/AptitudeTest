@@ -53,18 +53,21 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         Route::get('/{form}/responses', [FormController::class, 'show'])->name('show');
         Route::post('/{form}/destroy', [FormController::class, 'destroy'])->name('destroy');
     });
+
+    Route::prefix('form-responses')->name('form_responses.')->group(function () {
+        // form responses route
+        Route::get('/', [FormController::class, 'index'])->name('index');
+        Route::get('/fetch', [FormResponseController::class, 'fetch'])->name('fetch');
+        Route::get('/create', [FormController::class, 'create'])->name('create');
+        Route::post('/', [FormResponseController::class, 'store'])->name('store');
+        Route::get('/{response}/edit', [FormResponseController::class, 'edit'])->name('edit');
+        Route::put('/{response}/update', [FormResponseController::class, 'update'])->name('update');
+        Route::get('/{response}/view', [FormResponseController::class, 'show'])->name('show');
+        Route::post('/{response}/destroy', [FormResponseController::class, 'destroy'])->name('destroy');
+    });
 });
 
-Route::prefix('form-responses')->name('form_responses.')->group(function () {
-    // form responses route
-    Route::get('/', [FormController::class, 'index'])->name('index');
-    Route::get('/fetch', [FormController::class, 'fetch'])->name('fetch');
-    Route::get('/create', [FormController::class, 'create'])->name('create');
-    Route::post('/', [FormResponseController::class, 'store'])->name('store');
-    Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit');
-    Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
-    Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
-});
+
 
 Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(function () {
 

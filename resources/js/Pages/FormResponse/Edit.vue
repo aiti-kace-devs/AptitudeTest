@@ -28,10 +28,10 @@ export default {
   props: {
     errors: Object,
     admissionForm: Object,
+    formResponse: Object,
   },
   data() {
     const formFields = {
-      form_uuid: this.admissionForm.uuid,
       response_data: {},
     };
 
@@ -53,17 +53,25 @@ export default {
       form,
     };
   },
+  mounted() {
+    if (this.formResponse.response_data) {
+      Object.assign(this.form.response_data, this.formResponse.response_data);
+    }
+  },
   methods: {
     submit() {
-      this.form.post(route("form_responses.store"), {
-        onSuccess: () => {
-          toastr.success("Entry successfully submitted");
-          this.resetForm();
-        },
-        onError: () => {
-          toastr.error("Something went wrong");
-        },
-      });
+      this.form.put(
+        route("admin.form_responses.update", { response: this.formResponse.uuid }),
+        {
+          onSuccess: () => {
+            toastr.success("Entry successfully updated");
+            this.resetForm();
+          },
+          onError: () => {
+            toastr.error("Something went wrong");
+          },
+        }
+      );
     },
     resetForm() {
       this.form.reset();
@@ -74,16 +82,16 @@ export default {
 </script>
 
 <template>
-  <Head title="Forms | Preview Form" />
+  <Head title="Form Response | Edit Response" />
 
   <AuthenticatedLayout>
     <template #header>
       <div class="flex items-center">
-        Forms
+        Form Response
         <span class="material-symbols-outlined text-gray-400">
           keyboard_arrow_right
         </span>
-        Preview Form
+        Edit Response
       </div>
     </template>
 
@@ -94,7 +102,6 @@ export default {
             <div>
               <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
             </div>
-
             <div class="mt-4">
               <form @submit.prevent="submit">
                 <div class="space-y-5">
