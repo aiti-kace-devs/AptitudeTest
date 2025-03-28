@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     submit() {
-      this.form.post(route("form_responses.store"), {
+      this.form.post(route("admin.form_responses.store"), {
         onSuccess: () => {
           toastr.success("Entry successfully submitted");
           this.resetForm();

@@ -15,6 +15,9 @@ export default {
     DangerButton,
     Modal,
   },
+  props: {
+    form: Object,
+  },
   data() {
     return {
       destroyModal: false,
@@ -72,6 +75,9 @@ export default {
         serverSide: true,
         ajax: {
           url: route("admin.form_responses.fetch"),
+          data: {
+            uuid: this.form.uuid,
+          },
         },
         columns: [
           { data: "title", name: "title" },
@@ -120,7 +126,7 @@ export default {
 };
 </script>
 <template>
-  <Head title="Forms | Form Responses" />
+  <Head title="Forms | Responses" />
 
   <AuthenticatedLayout>
     <MenuDropdown ref="menuDropdown" />

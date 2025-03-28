@@ -17,7 +17,7 @@ class FormController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Form/Index');
+        return Inertia::render('Form/List');
     }
 
     /**
@@ -110,9 +110,9 @@ class FormController extends Controller
      */
     public function show($uuid)
     {
-        $admissionForm = Form::where('uuid', $uuid)->first();
+        $form = Form::where('uuid', $uuid)->first();
 
-        return Inertia::render('Form/Show', compact('admissionForm'));
+        return Inertia::render('Form/Show', compact('form'));
     }
 
     /**

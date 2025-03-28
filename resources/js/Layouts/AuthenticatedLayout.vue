@@ -5,18 +5,18 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import SidebarNavLink from "@/Components/SidebarNavLink.vue";
 import { Link, usePage } from "@inertiajs/vue3";
+import SidebarSectionHeader from "@/Components/SidebarSectionHeader.vue";
 
 const showingNavigationDropdown = ref(false);
-const isSidebarOpen = ref(false);
+const isSidebarCollapsed = ref(true);
 const sidebarNavIcon = computed(() =>
-  isSidebarOpen.value
+  isSidebarCollapsed.value
     ? "block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 bg-gray-100 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out"
     : "block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out"
 );
 
-// Toggle sidebar for mobile view
 const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
 };
 
 // Get the current route name for active link highlighting
@@ -24,65 +24,21 @@ const { component } = usePage().props;
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100 flex">
-    <!-- Sidebar -->
+  <div class="min-h-screen">
+    <!-- header -->
     <div
-      class="fixed inset-y-0 left-0 bg-gray-800 w-96 md:w-72 lg:w-72 shadow-md transform transition-transform duration-300 ease-in-out z-50 lg:translate-x-0 overflow-y-auto"
-      :class="[isSidebarOpen ? 'translate-x-0' : '-translate-x-full', 'lg:translate-x-0']"
+      class="sticky top-0 z-[10001] flex justify-between items-center border-b border-gray-200 bg-white px-4 py-2.5 transition-all"
     >
-      <div class="flex flex-col">
-        <!-- Logo -->
-        <div class="shrink-0 flex justify-center items-center py-5">
-          <Link :href="route('admin.dashboard')">
-            <ApplicationLogo class="block h-10 w-auto fill-current text-gray-800" />
-          </Link>
-        </div>
-        <!-- Navigation Links -->
-        <nav class="flex flex-col p-5 space-y-5 sm:space-y-6 lg:space-y-8">
-          <div>
-            <div>
-              <SidebarNavLink
-                :href="route('admin.dashboard')"
-                :active="route().current('admin.dashboard')"
-                class="flex items-center space-x-3 py-2 text-sm sm:text-base"
-              >
-                <span class="material-symbols-outlined">dashboard</span>
-                <span>Overview</span>
-              </SidebarNavLink>
-            </div>
-          </div>
-
-          <div>
-            <SidebarNavLink
-              :href="route('admin.form.index')"
-              :active="route().current('admin.form.*') || route().current('admin.form_responses.*')"
-              class="flex items-center space-x-3 py-2 text-sm sm:text-base"
-            >
-              <span class="material-symbols-outlined">ballot</span>
-              <span>Forms</span>
-            </SidebarNavLink>
-          </div>
-        </nav>
-      </div>
-    </div>
-
-    <div
-      v-if="isSidebarOpen"
-      class="fixed inset-0 bg-black opacity-50 z-100 lg:hidden"
-      @click="toggleSidebar"
-    ></div>
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col lg:ml-72">
-      <!-- Header -->
-      <header class="flex items-center justify-between bg-white border-b p-4">
-        <div class="flex items-center space-x-4">
+      <div class="flex items-center gap-x-6">
+        <div class="flex items-center lg:gap-2">
           <button
-            class="text-gray-500 focus:outline-none lg:hidden"
+            class="block cursor-pointer rounded-md p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-950 focus:outline-none"
             @click="toggleSidebar"
             aria-label="Toggle Sidebar"
-            aria-expanded="isSidebarOpen"
+            aria-expanded="isSidebarCollapsed"
           >
             <svg
+              v-if="isSidebarCollapsed"
               class="h-6 w-6"
               fill="none"
               stroke="currentColor"
@@ -96,77 +52,151 @@ const { component } = usePage().props;
                 d="M4 6h16M4 12h16M4 18h16"
               ></path>
             </svg>
+
+            <svg
+              v-else
+              class="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </button>
+          <Link :href="route('admin.dashboard')">
+            <ApplicationLogo class="hidden lg:block h-10 w-auto fill-current" />
+          </Link>
+        </div>
 
-          <div v-if="$slots.header">
-            <p class="font-semibold text-lg text-gray-800 leading-tight">
+        <div class="flex items-center space-x-3">
+          <!-- page heading  -->
+          <div class="max-w-full" v-if="$slots.header">
+            <div
+              class="overflow-hidden whitespace-nowrap text-ellipsis font-semibold text-lg text-gray-800 leading-tight"
+            >
               <slot name="header" />
-            </p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="flex space-x-3 items-center">
-          <!-- <div>
-            <span class="text-gray-500 text-sm cpaitalize">
-            switch to
-            <Link :href="route('dispensary.dashboard.index')" class="text-gray-800 font-bold text-md">Dispensary</Link>
-            </span>
-          </div> -->
-          <!-- Settings Dropdown -->
-          <div class="relative">
-            <Dropdown align="right" width="48">
-              <template #trigger>
-                <span class="inline-flex rounded-md">
-                  <button
-                    type="button"
-                    class="inline-flex items-center p-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-transparent hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
-                    aria-haspopup="true"
-                    aria-expanded="false"
+      <div class="flex space-x-3 items-center">
+        <!-- Settings Dropdown -->
+        <div class="relative">
+          <Dropdown align="right" width="48">
+            <template #trigger>
+              <span class="inline-flex rounded-md">
+                <button
+                  type="button"
+                  class="inline-flex items-center p-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-transparent hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <span class="material-symbols-outlined"> account_circle </span>
+
+                  <svg
+                    class="-me-0.5 h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    <span class="material-symbols-outlined"> account_circle </span>
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </template>
 
-                    <svg
-                      class="-me-0.5 h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </span>
-              </template>
-
-              <template #content>
-                <DropdownLink
-                  :href="route('profile.edit')"
-                  class="inline-flex items-center"
-                >
-                  <span class="material-symbols-outlined me-1"> person </span> Profile
-                </DropdownLink>
-                <DropdownLink
-                  :href="route('logout')"
-                  method="post"
-                  as="button"
-                  class="inline-flex items-center"
-                >
-                  <span class="material-symbols-outlined me-1"> logout </span>
-                  Log Out
-                </DropdownLink>
-              </template>
-            </Dropdown>
-          </div>
+            <template #content>
+              <DropdownLink
+                :href="route('profile.edit')"
+                class="inline-flex items-center"
+              >
+                <span class="material-symbols-outlined me-1"> person </span> Profile
+              </DropdownLink>
+              <DropdownLink
+                :href="route('logout')"
+                method="post"
+                as="button"
+                class="inline-flex items-center"
+              >
+                <span class="material-symbols-outlined me-1"> logout </span>
+                Log Out
+              </DropdownLink>
+            </template>
+          </Dropdown>
         </div>
-      </header>
+      </div>
+    </div>
 
-      <!-- Page Content -->
-      <main>
-        <slot />
-      </main>
+    <div
+      class="group/container flex gap-4"
+      :class="[isSidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-not-collapsed']"
+    >
+      <!-- sidebar -->
+      <div
+        class="bg-white duration-300 ease-in-out fixed left-0 top-[60px] z-[10002] h-full w-full md:w-2/3 lg:w-64 border-gray-200 pt-4 transition-all group-[.sidebar-collapsed]/container:w-[70px] hidden group-[.sidebar-not-collapsed]/container:block lg:block ltr:border-r rtl:border-l"
+      >
+        <div
+          @mouseenter="isSidebarCollapsed = false"
+          @mouseleave="isSidebarCollapsed = true"
+          class="h-[calc(100vh-100px)] overflow-y-auto group-[.sidebar-collapsed]/container:overflow-visible"
+        >
+          <!-- navigation links -->
+          <nav
+            class="flex flex-col justify-center mx-3 space-y-3 md:space-y-5 lg:group-[.sidebar-not-collapsed]/container:mx-4 lg:group-[.sidebar-collapsed]/container:space-y-2"
+          >
+            <div>
+              <SidebarNavLink
+                :href="route('admin.dashboard')"
+                :active="route().current('admin.dashboard')"
+                :label="'overview'"
+              >
+                <span class="material-symbols-outlined">dashboard</span>
+              </SidebarNavLink>
+
+              <SidebarNavLink
+                :href="route('admin.form.index')"
+                :active="
+                  route().current('admin.form.*') ||
+                  route().current('admin.form_responses.*')
+                "
+                :label="'forms'"
+              >
+                <span class="material-symbols-outlined">ballot</span>
+              </SidebarNavLink>
+            </div>
+
+            <div>
+              <SidebarNavLink
+                :href="route('admin.dashboard')"
+                :active="route().current('admin.dashboard')"
+                :label="'home'"
+              >
+                <span class="material-symbols-outlined"> home </span>
+              </SidebarNavLink>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      <!-- main content -->
+      <div class="flex-1 lg:ml-[70px] min-h-screen bg-gray-100">
+        <!-- Page Content -->
+        <main class="py-6">
+          <slot />
+        </main>
+      </div>
     </div>
   </div>
 </template>

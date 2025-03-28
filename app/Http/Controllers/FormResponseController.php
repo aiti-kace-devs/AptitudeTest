@@ -19,10 +19,13 @@ class FormResponseController extends Controller
         //
     }
 
-    public function fetch()
+    public function fetch(Request $request)
     {
+        $uuid = $request->uuid;
 
-        $data = FormResponse::get(['uuid', 'created_at', 'updated_at']);
+        $form = Form::where('uuid', $uuid)->with('responses')->first();
+        $data = $form->responses;
+
         return DataTables::of($data)
             ->addIndexColumn()
             ->editColumn('date', function ($row) {
