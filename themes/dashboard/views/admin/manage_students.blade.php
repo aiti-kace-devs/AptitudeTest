@@ -128,6 +128,13 @@
                                             class="form-control">
                                     </div>
                                 </div>
+
+
+
+                                <!-- <input type="hidden" name="userId" value="{{ auth()->id() }}"> -->
+                                {{ csrf_field() }}
+                                <input type="hidden" name="userId" value="">
+
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label for="">Enter E-mail</label>

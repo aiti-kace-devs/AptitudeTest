@@ -22,10 +22,15 @@ class CreateUsersTable extends Migration
             $table->string('mobile_no')->nullable();
             $table->string('exam')->nullable();
             $table->string('status')->nullable();
+            $table->string('userId')->unique()->nullable();  // Added userId
+            $table->string('ghcard')->nullable();  // Added ghcard
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();  // Added gender with an enum type
+            $table->string('network_type')->nullable();  // Added network_type
             $table->rememberToken();
             $table->timestamps();
         });
     }
+    
 
     /**
      * Reverse the migrations.

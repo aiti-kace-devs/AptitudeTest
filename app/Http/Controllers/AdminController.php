@@ -232,8 +232,23 @@ class AdminController extends Controller
 
         AddNewStudentsJob::dispatch($data);
 
-        echo json_encode(['status' => 'true', 'message' => 'Successfully updated', 'reload' => url('admin/manage_students')]);
+        echo json_encode(['status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students')]);
     }
+
+
+    // public function add_new_students(Request $request)
+    // {
+    //     $data = $request->input('students') !== null ? $request->input('students') : [$request->all()];
+    
+    //     AddNewStudentsJob::dispatch($data);
+    
+    //     return response()->json([
+    //         'status' => 'true',
+    //         'message' => 'Student added successfully',
+    //         'reload' => url('admin/manage_students')
+    //     ]);
+    // }
+    
 
     //Add new students
     // public function add_new_students_arr(Request $request)

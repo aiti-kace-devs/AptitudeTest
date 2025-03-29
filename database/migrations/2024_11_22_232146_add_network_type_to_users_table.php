@@ -13,9 +13,9 @@ class AddNetworkTypeToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->enum('network_type', ['mtn', 'telecel', 'airteltigo'])->nullable();
-        });
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->enum('network_type', ['mtn', 'telecel', 'airteltigo'])->nullable();
+        // });
     }
 
     /**

@@ -48,7 +48,7 @@ class AddNewStudentsJob implements ShouldQueue
                 'email' => 'required|email',
                 'mobile_no' => 'required',
                 'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
-                'userId' => 'required',
+                'userId' => 'sometimes',
                 'password' => 'sometimes',
                 'exam_name' => 'sometimes',
             ]);
