@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DynamicFormRequest;
 use App\Models\Form;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -77,29 +78,25 @@ class FormController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(DynamicFormRequest $request)
     {
-        $validated = $request->validate(
-            [
-                'title' => ['required', 'string', 'max:100'],
-                'schema' => ['required', 'array'],
-                'schema.*.title' => ['required'],
-                'schema.*.type' => ['required', 'string', 'in:select,radio,checkbox,text,number'],
-                'schema.*.options' => [
-                    'nullable',
-                    'required_if:schema.*.type,select,radio,checkbox',
-                    'string',
-                    'min:1'
-                ],
-                'schema.*.is_required' => ['nullable', 'boolean']
-            ],
-            [
-                'schema.required'   => 'A question is required.',
-                'schema.*.title.required'  => 'The question field is required.',
-                'schema.*.options.required_if'  => 'The options field is required.',
-            ]
-        );
+        $validated = $request->validated();
 
+        if ($request->hasFile('image')) {
+            $destinationPath = 'form/banner/';
+            $image = $request->file('image');
+            $fileName = time() . '.' . $image->getClientOriginalExtension();
+
+            // Delete old image if it exists
+            if (\Storage::disk('public')->exists($destinationPath . $fileName)) {
+                \Storage::disk('public')->delete($destinationPath . $fileName);
+            }
+
+            // Save new image
+            \Storage::disk('public')->putFileAs($destinationPath, $image, $fileName);
+            $validated['image'] = $fileName;
+        }
+        
         Form::create($validated);
 
         return redirect()->route('admin.form.index');
@@ -121,6 +118,7 @@ class FormController extends Controller
     public function edit($uuid)
     {
         $admissionForm = Form::where('uuid', $uuid)->first();
+        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
         return Inertia::render('Form/Edit', compact('admissionForm'));
     }
@@ -128,6 +126,7 @@ class FormController extends Controller
     public function preview($uuid)
     {
         $admissionForm = Form::where('uuid', $uuid)->first();
+        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
         return Inertia::render('Form/Preview', compact('admissionForm'));
     }
@@ -135,30 +134,30 @@ class FormController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $uuid)
+    public function update(DynamicFormRequest $request, $uuid)
     {
-        $validated = $request->validate(
-            [
-                'title' => ['required', 'string', 'max:100'],
-                'schema' => ['required', 'array'],
-                'schema.*.title' => ['required'],
-                'schema.*.type' => ['required', 'string', 'in:select,radio,checkbox,text,number'],
-                'schema.*.options' => [
-                    'nullable',
-                    'required_if:schema.*.type,select,radio,checkbox',
-                    'string',
-                    'min:1'
-                ],
-                'schema.*.is_required' => ['nullable', 'boolean']
-            ],
-            [
-                'schema.required'   => 'A question is required.',
-                'schema.*.title.required'  => 'The question field is required.',
-                'schema.*.options.required_if'  => 'The options field is required.',
-            ]
-        );
-
+        $validated = $request->validated();
         $form = Form::where('uuid', $uuid)->first();
+
+         // Handle image upload if necessary
+         if ($request->isDirty && $request->hasFile('image')) {
+            $destinationPath = 'form/banner/';
+            $image = $request->file('image');
+            $fileName = time() . '.' . $image->getClientOriginalExtension();
+
+            // Delete old image if it exists
+            if ($form->image && \Storage::disk('public')->exists($destinationPath . $form->image)) {
+                \Storage::disk('public')->delete($destinationPath . $form->image);
+            }
+
+            // Save new image
+            \Storage::disk('public')->putFileAs($destinationPath, $image, $fileName);
+            $validated['image'] = $fileName;
+        } else {
+            // Retain existing image
+            $validated['image'] = $form->image;
+        }
+
         $form->fill($validated)->save();
 
         return redirect()->route('admin.form.index');

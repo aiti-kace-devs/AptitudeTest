@@ -10,6 +10,8 @@ import { ref } from "vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import TextAreaInput from "@/Components/TextAreaInput.vue";
+import PreviewImage from "@/Components/PreviewImage.vue";
 
 export default {
   components: {
@@ -23,6 +25,8 @@ export default {
     SelectInput,
     Checkbox,
     DangerButton,
+    TextAreaInput,
+    PreviewImage,
   },
   props: {
     errors: Object,
@@ -30,14 +34,24 @@ export default {
   data() {
     const selections = ref([]);
 
+    const imageConfig = {
+      image: null,
+      isDirty: true,
+      preview: null,
+    };
+
     const form = useForm({
       title: null,
+      description: null,
+      image: imageConfig.image,
       schema: [],
     });
 
     return {
       form,
+      imageConfig,
       selections,
+      editContent: false,
     };
   },
   watch: {
@@ -56,10 +70,12 @@ export default {
         id: `field_${this.selections.length + 1}`, // Unique ID
         label: `Field ${this.selections.length + 1}`, // Default label
         title: null,
-        type: "text", // Default type
+        description: null,
+        type: "text",
         placeholder: "Question", // Placeholder
-        options: null, // Options for dropdown/select fields
-        is_required: false, // Default required status
+        options: null,
+        file_type: null,
+        is_required: false,
       };
 
       this.selections.push(newField);
@@ -86,6 +102,9 @@ export default {
     },
     submit() {
       this.form.post(route("admin.form.store"), {
+        data: {
+          isDirty: this.imageConfig.isDirty,
+        },
         onSuccess: () => {
           toastr.success("Form successfully saved");
           this.resetForm();
@@ -96,10 +115,60 @@ export default {
       });
     },
     resetForm() {
-      // Clear form and selections after successful submission
       this.form.reset();
       this.form.clearErrors();
       this.selections = [];
+    },
+
+    handleImageOnChange(event) {
+      const file = event.target.files[0];
+
+      if (file) {
+        this.previewImage(file);
+        this.imageConfig.image = file;
+        this.imageConfig.isDirty = true;
+      }
+    },
+    previewImage(file) {
+      // Use FileReader to read the file and generate a data URL
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        this.imageConfig.preview = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    },
+    toggleImageChange() {
+      this.imageConfig.isDirty = !this.imageConfig.isDirty;
+
+      if (this.imageConfig.isDirty) {
+        this.form.image = null;
+      } else {
+        this.restoreImage();
+      }
+    },
+    cancelImage() {
+      this.imageConfig.preview = null;
+      this.imageConfig.isDirty = false;
+      this.form.reset("image");
+
+      const fileInput = document.getElementById("image");
+      if (fileInput) {
+        fileInput.value = ""; // This clears the file input
+      }
+    },
+    restoreImage() {
+      this.imageConfig.preview = this.original_img;
+    },
+    clearImage() {
+      this.imageConfig.preview = null;
+      this.form.reset("image");
+
+      const fileInput = document.getElementById("image");
+      if (fileInput) {
+        fileInput.value = ""; // This clears the file input
+      }
     },
   },
 };
@@ -121,164 +190,286 @@ export default {
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="bg-transparent overflow-hidden shadow-none sm:rounded-lg">
           <div class="p-6">
             <div>
-              <form @submit.prevent="submit">
-                <div class="grid gap-5">
-                  <div>
-                    <InputLabel for="title" value="Title" :required="true" />
-                    <TextInput
-                      id="title"
-                      type="text"
-                      class="w-full"
-                      v-model="form.title"
-                      :placeholder="'Title'"
-                      autocomplete="title"
-                      :class="{ 'border-red-600': form.errors.title }"
-                    />
-                    <InputError :message="form.errors.title" />
-                  </div>
-
-                  <!-- Questions -->
-                  <div
-                    class="border border-gray-400 p-6 rounded-lg shadow-sm space-y-4"
-                    v-for="(selection, row) in selections"
-                    :key="row"
-                  >
-                    <div class="grid grid-cols-3 gap-x-4">
-                      <div class="col-span-2">
+              <form @submit.prevent="submit" class="space-y-5">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                  <div class="p-6">
+                    <div class="grid gap-5">
+                      <div>
+                        <InputLabel for="title" value="Title" :required="true" />
                         <TextInput
-                          :id="selection.id"
+                          id="title"
                           type="text"
                           class="w-full"
-                          v-model="selection.title"
-                          :placeholder="selection.placeholder"
-                          :class="{
-                            'border-red-600': form.errors[`schema.${row}.title`],
-                          }"
+                          v-model="form.title"
+                          :placeholder="'Title'"
+                          autocomplete="title"
+                          :class="{ 'border-red-600': form.errors.title }"
                         />
-                        <InputError :message="form.errors[`schema.${row}.title`]" />
+                        <InputError :message="form.errors.title" />
                       </div>
 
                       <div>
-                        <SelectInput
-                          @change="changeSelectionType(row)"
-                          :id="'input_type_' + row"
-                          v-model="selection.type"
+                        <InputLabel
+                          for="description"
+                          value="Description"
+                          :required="false"
+                        />
+                        <TextAreaInput
+                          v-model="form.description"
                           class="w-full"
+                          :class="{ 'border-red-600': form.errors.description }"
+                        />
+
+                        <InputError :message="form.errors.description" />
+                      </div>
+
+                      <div>
+                        <InputLabel for="image" value="image" :required="false" />
+                        <div
+                          v-if="imageConfig.preview != null"
+                          class="mt-1 mb-4 flex items-start gap-3 shrink-0"
                         >
-                          <option value="text" selected>Text</option>
-                          <option value="textarea">Textarea</option>
-                          <option value="select">Select</option>
-                          <option value="checkbox">Checkbox</option>
-                          <option value="radio">Radio</option>
-                          <option value="number">Number</option>
-                        </SelectInput>
-                      </div>
-                    </div>
+                          <div class="flex items-center gap-5">
+                            <PreviewImage
+                              :src="imageConfig.preview"
+                              :alt="imageConfig.preview ? 'image' : 'No image'"
+                            />
 
-                    <div>
-                      <div>
-                        <TextInput
-                          v-if="['select', 'radio', 'checkbox'].includes(selection.type)"
-                          :id="selection.id"
-                          type="text"
-                          class="w-full"
-                          v-model="selection.options"
-                          :placeholder="'Options (comma-separated)'"
-                          :class="{
-                            'border-red-600': form.errors[`schema.${row}.options`],
-                          }"
-                        />
-                        <InputError :message="form.errors[`schema.${row}.options`]" />
-                      </div>
-                    </div>
+                            <div>
+                              <DangerButton
+                                type="button"
+                                @click="clearImage"
+                                class="h-9 w-9 flex items-center justify-center"
+                              >
+                                <span class="material-symbols-outlined"> delete </span>
+                              </DangerButton>
+                            </div>
+                          </div>
+                          <div v-if="editContent">
+                            <div class="grid gap-2">
+                              <button
+                                type="button"
+                                @click="toggleImageChange"
+                                class="py-2 px-4 text-sm capitalize text-slate-600 font-semibold bg-gray-100 rounded-full hover:text-gray-700 hover:bg-gray-200"
+                              >
+                                <span v-if="!imageConfig.isDirty">Change image</span>
+                                <span v-else>Cancel</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
 
-                    <div class="flex justify-between items-center">
-                      <div>
-                        <label class="inline-flex items-center cursor-pointer space-x-3 text-sm">
-                          Required
-                          <Checkbox
-                            v-model:checked="selection.is_required"
-                            class="sr-only peer"
+                        <div v-if="imageConfig.isDirty" class="mt-1">
+                          <span class="sr-only">Choose image</span>
+                          <input
+                            type="file"
+                            id="image"
+                            accept="image/*"
+                            class="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                            :class="{
+                              'file:bg-red-600 hover:file:bg-red-500 file:text-white':
+                                form.errors.image,
+                            }"
+                            @change="handleImageOnChange"
                           />
+                        </div>
+
+                        <InputError :message="form.errors.image" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Questions -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                  <div class="p-6">
+                    <div class="grid gap-5">
+                      <div
+                        class="border border-gray-400 p-6 rounded-lg shadow-sm space-y-4"
+                        v-for="(selection, row) in selections"
+                        :key="row"
+                      >
+                        <div class="grid grid-cols-3 gap-4">
+                          <div class="col-span-2">
+                            <TextInput
+                              :id="selection.id"
+                              type="text"
+                              class="w-full"
+                              v-model="selection.title"
+                              :placeholder="selection.placeholder"
+                              :class="{
+                                'border-red-600': form.errors[`schema.${row}.title`],
+                              }"
+                            />
+                            <InputError :message="form.errors[`schema.${row}.title`]" />
+                          </div>
+
+                          <div>
+                            <SelectInput
+                              @change="changeSelectionType(row)"
+                              :id="'input_type_' + row"
+                              v-model="selection.type"
+                              class="w-full"
+                            >
+                              <option value="text" selected>Text</option>
+                              <option value="textarea">Textarea</option>
+                              <option value="select">Select</option>
+                              <option value="checkbox">Checkbox</option>
+                              <option value="radio">Radio</option>
+                              <option value="number">Number</option>
+                              <option value="file">File</option>
+                            </SelectInput>
+                          </div>
+
+                          <div class="col-span-full">
+                            <InputLabel
+                              for="description"
+                              value="Description"
+                              :required="false"
+                            />
+                            <TextAreaInput
+                              v-model="selection.description"
+                              class="w-full"
+                              :class="{
+                                'border-red-600':
+                                  form.errors[`schema.${row}.description`],
+                              }"
+                            />
+
+                            <InputError
+                              :message="form.errors[`schema.${row}.description`]"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
                           <div
-                            class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
-                          ></div>
-                        </label>
+                            v-if="
+                              ['select', 'radio', 'checkbox'].includes(selection.type)
+                            "
+                          >
+                            <TextInput
+                              :id="selection.id"
+                              type="text"
+                              class="w-full"
+                              v-model="selection.options"
+                              :placeholder="'Options (comma-separated)'"
+                              :class="{
+                                'border-red-600': form.errors[`schema.${row}.options`],
+                              }"
+                            />
+                            <InputError :message="form.errors[`schema.${row}.options`]" />
+                          </div>
+
+                          <div v-if="['file'].includes(selection.type)">
+                            <TextInput
+                              :id="selection.id"
+                              type="text"
+                              class="w-full"
+                              v-model="selection.file_type"
+                              :placeholder="'File type (comma-separated)'"
+                              :class="{
+                                'border-red-600': form.errors[`schema.${row}.file_type`],
+                              }"
+                            />
+                            <p>Files</p>
+                            <InputError
+                              :message="form.errors[`schema.${row}.file_type`]"
+                            />
+                          </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                          <div>
+                            <label
+                              class="inline-flex items-center cursor-pointer space-x-3 text-sm"
+                            >
+                              Required
+                              <Checkbox
+                                v-model:checked="selection.is_required"
+                                class="sr-only peer"
+                              />
+                              <div
+                                class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
+                              ></div>
+                            </label>
+                          </div>
+
+                          <div
+                            class="flex flex-col items-center"
+                            :class="{
+                              'gap-y-2.5': row !== 0 && row !== selections.length - 1,
+                            }"
+                          >
+                            <div>
+                              <button
+                                @click="moveField(row, 'up')"
+                                v-if="row !== 0"
+                                type="button"
+                                class="w-11 h-8 flex items-center justify-center border border-transparent bg-gray-100 rounded-sm shadow-sm p-1 disabled:opacity-25 disabled:cursor-not-allowed"
+                              >
+                                <span
+                                  class="material-symbols-outlined text-2xl font-bold text-gray-800"
+                                >
+                                  keyboard_arrow_up
+                                </span>
+                              </button>
+                            </div>
+
+                            <div>
+                              <button
+                                @click="moveField(row, 'down')"
+                                v-if="row !== selections.length - 1"
+                                type="button"
+                                class="w-11 h-8 flex items-center justify-center border border-transparent bg-gray-100 rounded-sm shadow-sm p-1 disabled:opacity-25 disabled:cursor-not-allowed"
+                              >
+                                <span
+                                  class="material-symbols-outlined text-2xl font-bold text-gray-800"
+                                >
+                                  keyboard_arrow_down
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div>
+                            <DangerButton
+                              type="button"
+                              @click="removeSelection(row)"
+                              class="h-8 w-9 flex items-center justify-center"
+                            >
+                              <span class="material-symbols-outlined"> delete </span>
+                            </DangerButton>
+                          </div>
+                        </div>
                       </div>
 
                       <div
-                        class="flex flex-col items-center"
-                        :class="{
-                          'gap-y-2.5': row !== 0 && row !== selections.length - 1,
-                        }"
+                        v-if="form.errors.schema"
+                        class="bg-red-100 rounded-md p-4 border border-red-200 text-red-700 text-md"
                       >
-                        <div>
-                          <button
-                            @click="moveField(row, 'up')"
-                            v-if="row !== 0"
-                            type="button"
-                            class="w-11 h-8 flex items-center justify-center border border-transparent bg-gray-100 rounded-sm shadow-sm p-1 disabled:opacity-25 disabled:cursor-not-allowed"
-                          >
-                            <span
-                              class="material-symbols-outlined text-2xl font-bold text-gray-800"
-                            >
-                              keyboard_arrow_up
-                            </span>
-                          </button>
-                        </div>
-
-                        <div>
-                          <button
-                            @click="moveField(row, 'down')"
-                            v-if="row !== selections.length - 1"
-                            type="button"
-                            class="w-11 h-8 flex items-center justify-center border border-transparent bg-gray-100 rounded-sm shadow-sm p-1 disabled:opacity-25 disabled:cursor-not-allowed"
-                          >
-                            <span
-                              class="material-symbols-outlined text-2xl font-bold text-gray-800"
-                            >
-                              keyboard_arrow_down
-                            </span>
-                          </button>
-                        </div>
+                        <span class="font-bold">Oops!</span> {{ form.errors.schema }}
                       </div>
 
                       <div>
-                        <DangerButton
-                          type="button"
-                          @click="removeSelection(row)"
-                          class="h-8 w-9 flex items-center justify-center"
-                        >
-                          <span class="material-symbols-outlined"> delete </span>
-                        </DangerButton>
+                        <PrimaryButton @click="addSelection" type="button">
+                          <span class="material-symbols-outlined mr-2"> add </span>
+                          add question
+                        </PrimaryButton>
+                      </div>
+
+                      <div>
+                        <PrimaryButton
+                          type="submit"
+                          :disabled="form.processing"
+                          :class="{ 'opacity-25': form.processing }"
+                          >save
+                        </PrimaryButton>
                       </div>
                     </div>
-                  </div>
-
-                  <div
-                    v-if="form.errors.schema"
-                    class="bg-red-100 rounded-md p-4 border border-red-200 text-red-700 text-md"
-                  >
-                    <span class="font-bold">Oops!</span> {{ form.errors.schema }}
-                  </div>
-
-                  <div>
-                    <PrimaryButton @click="addSelection" type="button">
-                      <span class="material-symbols-outlined mr-2"> add </span>
-                      add question
-                    </PrimaryButton>
-                  </div>
-
-                  <div>
-                    <PrimaryButton
-                      type="submit"
-                      :disabled="form.processing"
-                      :class="{ 'opacity-25': form.processing }"
-                      >save
-                    </PrimaryButton>
                   </div>
                 </div>
               </form>
