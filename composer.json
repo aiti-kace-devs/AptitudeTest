@@ -9,7 +9,7 @@
         "barryvdh/laravel-debugbar": "^3.7",
         "fruitcake/laravel-cors": "dev-develop",
         "guzzlehttp/guzzle": "^7.2",
-        "inertiajs/inertia-laravel": "^0.6.8",
+        "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",

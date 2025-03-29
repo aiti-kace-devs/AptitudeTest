@@ -10,6 +10,7 @@ import SelectInput from "@/Components/SelectInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import RadioInput from "@/Components/RadioInput.vue";
+import CourseSelect from "@/Components/CourseSelect.vue";
 
 export default {
   components: {
@@ -24,6 +25,7 @@ export default {
     Checkbox,
     DangerButton,
     RadioInput,
+    CourseSelect
   },
   props: {
     errors: Object,
@@ -192,6 +194,20 @@ export default {
                   </div>
 
                   <div>
+                    <CourseSelect
+                      :locations="admissionForm.locations"
+                      :courses="admissionForm.courses"
+                      v-model="form.response_data.course_id"
+                      v-model:location="form.response_data.location_id"
+                      :error="form.errors.response_data?.course_id"
+                      :error-location="form.errors.response_data?.location_id"
+                      :error-message="form.errors.response_data?.course_id"
+                      :error-message-location="form.errors.response_data?.location_id"
+                      :required="true"
+                      :required-location="true"
+                      :placeholder="admissionForm.title"
+                      :placeholder-location="admissionForm.title"
+                      :label="admissionForm.title" ></CourseSelect>
                     <PrimaryButton
                       type="submit"
                       :disabled="form.processing"
