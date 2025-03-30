@@ -75,6 +75,7 @@ export default {
         },
         columns: [
           { data: "title", name: "title" },
+          { data: "active", name: "active" },
           { data: "date", name: "date" },
           {
             data: "action",
@@ -91,11 +92,20 @@ export default {
         columnDefs: [{ width: "5%", targets: -1 }],
         createdRow: function (row, data, dataIndex) {
           // Find the dropdown element in the row and set its width
+          $(row).attr("data-id", data.uuid);
           var dropdownMenu = $(row).find(".dropdown-menu");
           if (dropdownMenu.length > 0) {
             dropdownMenu.width(160); // Set your desired width here
           }
         },
+      });
+
+      $('#data_table').on('click', 'tbody tr > td:not(:last-child)', function (evt) {
+        const data = $(evt.currentTarget).parent().data("id");
+        console.log(data);
+
+
+        router.get(route("admin.form.edit", data));
       });
     },
     showDestroyModal(data) {
@@ -149,11 +159,14 @@ export default {
                           <th scope="col" class="text-gray-900 px-6 py-4 text-left">
                             Title
                           </th>
-                          <th scope="col" class="text-gray-900 px-6 py-4 text-left">
-                            created at
+                            <th scope="col" class="text-gray-900 px-6 py-4 text-left">
+                            Status
                           </th>
                           <th scope="col" class="text-gray-900 px-6 py-4 text-left">
-                            action
+                            Created At
+                          </th>
+                          <th scope="col" class="text-gray-900 px-6 py-4 text-left">
+                            Action
                           </th>
                         </tr>
                       </thead>
@@ -193,3 +206,9 @@ export default {
     </Modal>
   </AuthenticatedLayout>
 </template>
+
+<style>
+#data_table tbody tr > td:not(:last-child) {
+    cursor: pointer;
+}
+</style>

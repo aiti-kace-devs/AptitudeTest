@@ -32,6 +32,10 @@ export default {
 
     const form = useForm({
       title: null,
+      code: null,
+      message_when_inactive: null,
+      message_after_registration: null,
+      active: 1,
       schema: [],
     });
 
@@ -140,6 +144,63 @@ export default {
                     <InputError :message="form.errors.title" />
                   </div>
 
+                   <div>
+                    <InputLabel for="code" value="Unique Code" :required="true" />
+                    <TextInput
+                      id="code"
+                      type="text"
+                      class="w-full"
+                      v-model="form.code"
+                      :placeholder="'Code'"
+                      autocomplete="code"
+                      :class="{ 'border-red-600': form.errors.title }"
+                    />
+                    <InputError :message="form.errors.code" />
+                  </div>
+                  <!-- message after registration -->
+                    <div>
+                    <InputLabel for="message_after_registration" value="Message After Registration" :required="true" />
+                    <TextInput
+                      id="message_after_registration"
+                      type="text"
+                      class="w-full h-15"
+                      v-model="form.message_after_registration"
+                      :placeholder="'Message After Registration'"
+                      :class="{ 'border-red-600': form.errors.message_after_registration }"
+                    />
+                    <InputError :message="form.errors.code" />
+                  </div>
+
+                  <!-- message when inactive -->
+                    <div>
+                    <InputLabel for="message_when_inactive" value="Message When Inactive" :required="true" />
+                    <TextInput
+                      id="code"
+                      type="text"
+                      class="w-full"
+                      v-model="form.message_when_inactive"
+                      :placeholder="'Message When Inactive'"
+                      :class="{ 'border-red-600': form.errors.message_when_inactive }"
+                    />
+                    <InputError :message="form.errors.code" />
+                  </div>
+
+                  <!-- status -->
+                    <div>
+                    <InputLabel for="active" value="Form Accepting Responses" :required="true" />
+
+                        <SelectInput
+                          :id="'active'"
+                          v-model="form.active"
+                          class="w-full"
+                        >
+                          <option value="1" selected>Yes</option>
+                          <option value="0">No</option>
+                        </SelectInput>
+                    <InputError :message="form.errors.active" />
+
+                      </div>
+
                   <!-- Questions -->
                   <div
                     class="border border-gray-400 p-6 rounded-lg shadow-sm space-y-4"
@@ -174,6 +235,7 @@ export default {
                           <option value="checkbox">Checkbox</option>
                           <option value="radio">Radio</option>
                           <option value="number">Number</option>
+                          <option value="select_course">Course Selection</option>
                         </SelectInput>
                       </div>
                     </div>

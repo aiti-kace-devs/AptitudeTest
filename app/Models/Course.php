@@ -11,7 +11,9 @@ class Course extends Model
 
     protected $fillable = [
         'centre_id',
-        'programme_id'
+        'programme_id',
+        'course_name',
+        'location'
     ];
 
     public function centre()

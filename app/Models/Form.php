@@ -12,11 +12,16 @@ class Form extends Model
 
     protected $fillable = [
         'title',
-        'schema'
+        'schema',
+        'code',
+        'message_after_registration',
+        'message_when_inactive',
+        'active'
     ];
 
     protected $casts = [
         'schema' => 'array',
+        'active' => 'boolean'
     ];
 
     protected static function boot()

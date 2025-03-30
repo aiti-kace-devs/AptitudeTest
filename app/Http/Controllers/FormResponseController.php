@@ -43,7 +43,7 @@ class FormResponseController extends Controller
                           <button type="button" class="dropdown-toggle py-2 rounded-md">
                           <span class="material-symbols-outlined dropdown-span" dropdown-log="' . $row->uuid . '">
                             more_vert
-                          </span> 
+                          </span>
                           </button>
                         </div>
 
@@ -92,7 +92,7 @@ class FormResponseController extends Controller
         ];
 
         foreach ($schema as $field) {
-            $fieldKey = "response_data.{$field['field_name']}";
+            $fieldKey = $field['type'] == 'select_course' ? 'response_data.course_id' : "response_data.{$field['field_name']}";
 
             $rules = [];
 
@@ -136,6 +136,11 @@ class FormResponseController extends Controller
                 case 'file':
                     $rules[] = 'file';
                     $customMessages["{$fieldKey}.file"] = "The {$field['title']} must be a valid file.";
+                    break;
+
+                case 'select_course':
+                    $rules[] = 'exists:courses,id';
+                    $customMessages["{$fieldKey}.exists"] = "The selected course is invalid";
                     break;
 
                 default:
