@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
+use App\Models\Course;
 use App\Http\Requests\DynamicFormRequest;
 use App\Models\Form;
 use Carbon\Carbon;
@@ -9,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Str;
 
 class FormController extends Controller
 {
@@ -28,11 +29,14 @@ class FormController extends Controller
     public function fetch()
     {
 
-        $data = Form::get(['uuid', 'title', 'updated_at']);
+        $data = Form::get(['uuid', 'title', 'active', 'updated_at']);
         return DataTables::of($data)
             ->addIndexColumn()
             ->editColumn('date', function ($row) {
                 return '<span class="hidden">' . strtotime($row->updated_at) . '</span>' . Carbon::parse($row->updated_at)->toDayDateTimeString();
+            })
+            ->editColumn('active', function ($row) {
+                return '<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">' . $row->active ? 'Active' : 'Inactive' . '</span>';
             })
             ->addColumn('action', function ($row) {
                 $linkClass = 'inline-flex items-center w-full px-4 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-25 hover:text-gray-50 hover:bg-gray-100';
@@ -43,7 +47,7 @@ class FormController extends Controller
                           <button type="button" class="dropdown-toggle py-2 rounded-md">
                           <span class="material-symbols-outlined dropdown-span" dropdown-log="' . $row->uuid . '">
                             more_vert
-                          </span> 
+                          </span>
                           </button>
                         </div>
 
@@ -96,7 +100,7 @@ class FormController extends Controller
             \Storage::disk('public')->putFileAs($destinationPath, $image, $fileName);
             $validated['image'] = $fileName;
         }
-        
+
         Form::create($validated);
 
         return redirect()->route('admin.form.index');
@@ -126,9 +130,33 @@ class FormController extends Controller
     public function preview($uuid)
     {
         $admissionForm = Form::where('uuid', $uuid)->first();
-        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
+        //        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
-        return Inertia::render('Form/Preview', compact('admissionForm'));
+        $courses = [];
+        $branches = [];
+        $withLayout = true;
+
+        if (isset($admissionForm->schema)) {
+            $courses = Course::get();
+            $branches = Branch::orderBy('title')->get();
+        }
+        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'withLayout'));
+    }
+
+
+    public function submitForm($formCode)
+    {
+        // 679c89bf-91ec-488e-9878-0d010468ca3e
+        $admissionForm = Form::where('code', $formCode)->first();
+        if (!$admissionForm) {
+            return redirect('home');
+        }
+        $withLayout = false;
+
+        $courses = Course::get();
+        $branches = Branch::orderBy('title')->get();
+
+        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'withLayout'));
     }
 
     /**
@@ -139,8 +167,8 @@ class FormController extends Controller
         $validated = $request->validated();
         $form = Form::where('uuid', $uuid)->first();
 
-         // Handle image upload if necessary
-         if ($request->isDirty && $request->hasFile('image')) {
+        // Handle image upload if necessary
+        if ($request->isDirty && $request->hasFile('image')) {
             $destinationPath = 'form/banner/';
             $image = $request->file('image');
             $fileName = time() . '.' . $image->getClientOriginalExtension();

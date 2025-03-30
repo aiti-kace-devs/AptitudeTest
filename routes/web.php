@@ -39,6 +39,9 @@ Route::get('/home', function () {
     return view('home');
 })->middleware(['auth'])->name('home');
 
+Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
+
+
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
 
     // forms route
