@@ -28,6 +28,8 @@ class SendSmsJob implements ShouldQueue
     
     public function handle()
     {
+        \Log::info('Send SMS job has started.');
+
         try {
             $apiKey = env('ARKESEL_SMS_API_KEY');
     
