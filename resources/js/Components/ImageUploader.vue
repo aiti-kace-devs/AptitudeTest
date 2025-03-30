@@ -3,7 +3,7 @@ import { ref, watch } from "vue";
 
 const props = defineProps({
   modelValue: File, // Bound file
-  preview: String, // Initial preview URL
+  preview: [String, File], // Initial preview URL
   maxSize: { type: Number, default: 2 * 1024 * 1024 }, // Default 2MB
   allowedTypes: {
     type: Array,
