@@ -98,9 +98,12 @@ class FormResponseController extends Controller
 
             $field['title'] = strtolower($field['title']);
 
-            if (!empty($field['is_required'])) {
+            if (isset($field['validators']['required']) && $field['validators']['required']) {
                 $rules[] = 'required';
-                $customMessages["{$fieldKey}.required"] = "The {$field['title']} field is required.";
+                $customMessages["{$fieldKey}.required"] = "This field is required.";
+            } elseif (isset($field['validators']['unique']) && $field['validators']['unique']) {
+                $rules[] = "unique:form_responses,{$field['title']}";
+                $customMessages["{$fieldKey}.unique"] = "This field has already been taken.";
             } else {
                 $rules[] = 'nullable';
             }
@@ -109,33 +112,41 @@ class FormResponseController extends Controller
                 case 'text':
                 case 'textarea':
                     $rules[] = 'string';
-                    $customMessages["{$fieldKey}.string"] = "The {$field['title']} must be a valid string.";
+                    $customMessages["{$fieldKey}.string"] = "This field must be a string.";
                     break;
 
                 case 'radio':
                 case 'select':
                     $rules[] = 'string';
-                    $customMessages["{$fieldKey}.string"] = "The {$field['title']} must be a valid option.";
+                    $customMessages["{$fieldKey}.string"] = "This field must be a valid option.";
                     break;
 
                 case 'number':
                     $rules[] = 'numeric';
-                    $customMessages["{$fieldKey}.numeric"] = "The {$field['title']} must be a valid number.";
+                    $customMessages["{$fieldKey}.numeric"] = "This field must be a number.";
                     break;
 
                 case 'email':
                     $rules[] = 'email';
-                    $customMessages["{$fieldKey}.email"] = "The {$field['title']} must be a valid email address.";
+                    $customMessages["{$fieldKey}.email"] = "This field must be a valid email address.";
                     break;
 
                 case 'checkbox':
                     $rules[] = 'array';
-                    $customMessages["{$fieldKey}.array"] = "The {$field['title']} must be a valid array.";
+                    $customMessages["{$fieldKey}.array"] = "This field must be an array.";
                     break;
 
                 case 'file':
                     $rules[] = 'file';
-                    $customMessages["{$fieldKey}.file"] = "The {$field['title']} must be a valid file.";
+
+                    if (!empty($field['options'])) {
+                        $allowedMimes = array_map('trim', explode(',', strtolower($field['options'])));
+                        $rules[] = 'mimes:' . implode(',', $allowedMimes);
+                        $customMessages["{$fieldKey}.mimes"] = "Must be a file of type: " . implode(', ', $allowedMimes) . ".";
+                    }
+
+                    $customMessages["{$fieldKey}.file"] = "This field must be a file.";
+
                     break;
 
                 case 'select_course':
@@ -166,6 +177,7 @@ class FormResponseController extends Controller
     {
         $formResponse = FormResponse::where('uuid', $uuid)->with('form')->first();
         $admissionForm = $formResponse->form;
+        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
         return Inertia::render('FormResponse/Show', compact('formResponse', 'admissionForm'));
     }
@@ -177,6 +189,7 @@ class FormResponseController extends Controller
     {
         $formResponse = FormResponse::where('uuid', $uuid)->with('form')->first();
         $admissionForm = $formResponse->form;
+        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
         return Inertia::render('FormResponse/Edit', compact('formResponse', 'admissionForm'));
     }

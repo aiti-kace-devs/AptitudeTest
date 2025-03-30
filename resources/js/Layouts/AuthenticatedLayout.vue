@@ -27,12 +27,12 @@ const { component } = usePage().props;
   <div class="min-h-screen">
     <!-- header -->
     <div
-      class="sticky top-0 z-[10001] flex justify-between items-center border-b border-gray-200 bg-white px-4 py-2.5 transition-all"
+      class="sticky top-0 z-[1001] flex justify-between items-center border-b border-gray-200 bg-white px-4 py-2.5 transition-all"
     >
       <div class="flex items-center gap-x-6">
         <div class="flex items-center lg:gap-2">
           <button
-            class="block cursor-pointer rounded-md p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-950 focus:outline-none"
+            class="block cursor-pointer rounded-md p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-100 focus:outline-none"
             @click="toggleSidebar"
             aria-label="Toggle Sidebar"
             aria-expanded="isSidebarCollapsed"
@@ -145,7 +145,7 @@ const { component } = usePage().props;
     >
       <!-- sidebar -->
       <div
-        class="bg-white duration-300 ease-in-out fixed left-0 top-[60px] z-[10002] h-full w-full md:w-2/3 lg:w-64 border-gray-200 pt-4 transition-all group-[.sidebar-collapsed]/container:w-[70px] hidden group-[.sidebar-not-collapsed]/container:block lg:block ltr:border-r rtl:border-l"
+        class="bg-white duration-300 ease-in-out fixed left-0 top-[60px] z-[1002] h-full w-full md:w-2/3 lg:w-64 border-gray-200 pt-4 transition-all group-[.sidebar-collapsed]/container:w-[70px] hidden group-[.sidebar-not-collapsed]/container:block lg:block ltr:border-r rtl:border-l"
       >
         <div
           @mouseenter="isSidebarCollapsed = false"

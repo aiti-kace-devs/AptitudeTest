@@ -10,6 +10,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import RadioInput from "@/Components/RadioInput.vue";
 import CourseSelect from "@/Components/CourseSelect.vue";
+import FileInput from "@/Components/FileInput.vue";
 
 export default {
   components: {
@@ -23,7 +24,8 @@ export default {
     Checkbox,
     DangerButton,
     RadioInput,
-    CourseSelect
+    CourseSelect,
+    FileInput
   },
   props: {
     errors: Object,
@@ -99,9 +101,19 @@ export default {
       <div class="py-12"  v-if="showForm && formIsActive">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+             <div v-if="admissionForm.image" class="shadow-sm w-full h-44 lg:h-72">
+            <img
+              :src="admissionForm.image"
+              alt=""
+              class="inset-0 w-full h-full object-cover"
+            />
+          </div>
           <div class="p-6">
             <div>
               <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
+               <p v-if="admissionForm.description" class="text-sm text-gray-600">
+                {{ admissionForm.description }}
+              </p>
             </div>
 
             <div class="mt-4">
@@ -135,6 +147,24 @@ export default {
                             form.errors[`response_data.${question.field_name}`],
                         }"
                       />
+
+                      <!-- File Input -->
+                       <div v-else-if="question.type === 'file'">
+                        <FileInput
+                          class="mt-1"
+                          :accept="
+                            question.options
+                              ? question.options
+                                  .split(',')
+                                  .map((type) => '.' + type.trim())
+                              : []
+                          "
+                          :class="{
+                            'file:bg-red-600 hover:file:bg-red-500 file:text-white':
+                              form.errors[`response_data.${question.field_name}`],
+                          }"
+                        />
+                      </div>
 
                       <!-- Select Input -->
                       <div v-else-if="question.type === 'select'">

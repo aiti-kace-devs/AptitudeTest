@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->unique();
             $table->string('title');
+            $table->text('description')->nullable();
+            $table->string('image')->nullable();    
             $table->JSON('schema');
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
