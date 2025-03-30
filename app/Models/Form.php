@@ -38,6 +38,14 @@ class Form extends Model
             if ($model->isDirty('schema')) {
                 $model->schema = array_map(function ($schema) {
                     $schema['field_name'] = Str::slug(strtolower($schema['title']));
+                    
+                    if (isset($schema['validators']) && is_array($schema['validators'])) {
+                        $schema['validators'] = array_map(
+                            fn($value) => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+                            $schema['validators']
+                        );
+                    }
+                    
                     return $schema;
                 }, $model->schema);
             }

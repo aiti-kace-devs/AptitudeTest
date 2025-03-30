@@ -31,7 +31,10 @@ class DynamicFormRequest extends FormRequest
                     $this->boolean('isDirty') ? ['required', 'image'] : [],
                     'max:2048',
                 ],
-                'code' => ['required'],
+                'code' => [
+                    'required',
+                    Rule::unique('forms', 'code')->ignore($this->route('form'), 'uuid')
+                ],
                 'message_when_inactive' => ['required'],
                 'message_after_registration' => ['required'],
                 'active' => ['required'],
