@@ -127,7 +127,7 @@ export default {
                         "
                         :for="`field-${index}`"
                         :value="question.title"
-                        :required="question.is_required"
+                        :required="question.validators.required"
                       />
                       <TextInput
                         v-if="
