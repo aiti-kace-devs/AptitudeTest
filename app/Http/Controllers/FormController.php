@@ -130,17 +130,19 @@ class FormController extends Controller
     public function preview($uuid)
     {
         $admissionForm = Form::where('uuid', $uuid)->first();
-        //        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
+        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
-        $courses = [];
-        $branches = [];
-        $withLayout = true;
+        // $courses = [];
+        // $branches = [];
+        // $withLayout = true;
 
-        if (isset($admissionForm->schema)) {
-            $courses = Course::get();
-            $branches = Branch::orderBy('title')->get();
-        }
-        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'withLayout'));
+        // if (isset($admissionForm->schema)) {
+        //     $courses = Course::get();
+        //     $branches = Branch::orderBy('title')->get();
+        // }
+        return Inertia::render('Form/Preview', compact('admissionForm',
+        //  'courses', 'branches', 'withLayout'
+        ));
     }
 
 

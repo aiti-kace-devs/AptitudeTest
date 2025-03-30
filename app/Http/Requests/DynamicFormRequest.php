@@ -27,10 +27,14 @@ class DynamicFormRequest extends FormRequest
                 'title' => ['required', 'string', 'max:100'],
                 'description' => ['nullable'],
                 'image' => [
-                    'required',
+                    'nullable',
                     $this->boolean('isDirty') ? ['required', 'image'] : [],
-                    'max:512',
+                    'max:2048',
                 ],
+                'code' => ['required'],
+                'message_when_inactive' => ['required'],
+                'message_after_registration' => ['required'],
+                'active' => ['required'],
                 'schema' => ['required', 'array'],
                 'schema.*.title' => ['required'],
                 'schema.*.description' => ['nullable'],
@@ -78,6 +82,7 @@ class DynamicFormRequest extends FormRequest
         return [
             // 'schema.required'   => 'A question is required.',
             // 'schema.*.title.required'  => 'The question field is required.',
+            'image.max' => 'The :attribute must not be greater than 2MB.',
             'schema.*.options.required_if' => 'The :attribute field is required.',
         ];
     }

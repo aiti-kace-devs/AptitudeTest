@@ -13,6 +13,7 @@ import DangerButton from "@/Components/DangerButton.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PreviewImage from "@/Components/PreviewImage.vue";
 import FileInput from "@/Components/FileInput.vue";
+import ImageUploader from "@/Components/ImageUploader.vue";
 
 export default {
   components: {
@@ -28,19 +29,22 @@ export default {
     DangerButton,
     TextAreaInput,
     PreviewImage,
-    FileInput
+    FileInput,
+    ImageUploader,
   },
   props: {
     errors: Object,
   },
   data() {
     const selections = ref([]);
+    const fileInput = ref(null);
 
-    const imageConfig = {
+    const imageConfig = ref({
       image: null,
       isDirty: true,
       preview: null,
-    };
+      original: null,
+    });
 
     const form = useForm({
       title: null,
@@ -56,6 +60,7 @@ export default {
     return {
       form,
       imageConfig,
+      fileInput,
       selections,
       editContent: false,
     };
@@ -133,12 +138,12 @@ export default {
 
     handleImageOnChange(event) {
       const file = event.target.files[0];
+      if (!file) return;
 
-      if (file) {
-        this.previewImage(file);
-        this.imageConfig.image = file;
-        this.imageConfig.isDirty = true;
-      }
+      this.previewImage(file);
+      this.imageConfig.image = file;
+      this.imageConfig.isDirty = true;
+      this.form.image = file
     },
     previewImage(file) {
       // Use FileReader to read the file and generate a data URL
@@ -150,35 +155,20 @@ export default {
 
       reader.readAsDataURL(file);
     },
-    toggleImageChange() {
-      this.imageConfig.isDirty = !this.imageConfig.isDirty;
-
-      if (this.imageConfig.isDirty) {
-        this.form.image = null;
-      } else {
-        this.restoreImage();
-      }
-    },
-    cancelImage() {
+    removeImage() {
       this.imageConfig.preview = null;
+      this.imageConfig.image = null;
       this.imageConfig.isDirty = false;
-      this.form.reset("image");
-
-      const fileInput = document.getElementById("image");
-      if (fileInput) {
-        fileInput.value = ""; // This clears the file input
-      }
+      this.resetInput();
     },
     restoreImage() {
-      this.imageConfig.preview = this.original_img;
+      this.imageConfig.preview = this.imageConfig.original;
+      this.imageConfig.image = null;
+      this.imageConfig.isDirty = false;
     },
-    clearImage() {
-      this.imageConfig.preview = null;
-      this.form.reset("image");
-
-      const fileInput = document.getElementById("image");
-      if (fileInput) {
-        fileInput.value = ""; // This clears the file input
+    resetInput() {
+      if (this.fileInput) {
+        this.fileInput = ""; // Clear file input
       }
     },
   },
@@ -219,7 +209,7 @@ export default {
                           autocomplete="title"
                           :class="{ 'border-red-600': form.errors.title }"
                         />
-                        <InputError :message="form.errors.title" />
+                        <InputError :message="form.errors.title" /> 
                       </div>
 
                       <div>
@@ -239,116 +229,131 @@ export default {
 
                       <div>
                         <InputLabel for="image" value="image" :required="false" />
-                        <div
-                          v-if="imageConfig.preview != null"
-                          class="mt-1 mb-4 flex items-start gap-3 shrink-0"
-                        >
-                          <div class="flex items-center gap-5">
-                            <PreviewImage
+                        
+                        <div class="flex flex-col gap-6 mt-3">
+                          <!-- preview section -->
+                          <div
+                            v-if="imageConfig.preview"
+                            class="relative h-28 w-28 md:w-56 md:h-36"
+                          >
+                            <img
                               :src="imageConfig.preview"
-                              :alt="imageConfig.preview ? 'image' : 'No image'"
+                              alt="Preview"
+                              class="w-full h-full object-cover rounded-lg shadow-md"
                             />
 
-                            <div>
-                              <DangerButton
-                                type="button"
-                                @click="clearImage"
-                                class="h-9 w-9 flex items-center justify-center"
-                              >
-                                <span class="material-symbols-outlined"> delete </span>
-                              </DangerButton>
-                            </div>
+                            <button
+                              @click="removeImage"
+                              class="inline-flex absolute top-0 right-0 bg-red-600 text-white p-1 rounded-full shadow-lg hover:bg-red-700"
+                            >
+                              <span class="material-symbols-outlined"> close </span>
+                            </button>
                           </div>
-                          <div v-if="editContent">
-                            <div class="grid gap-2">
-                              <button
-                                type="button"
-                                @click="toggleImageChange"
-                                class="py-2 px-4 text-sm capitalize text-slate-600 font-semibold bg-gray-100 rounded-full hover:text-gray-700 hover:bg-gray-200"
-                              >
-                                <span v-if="!imageConfig.isDirty">Change image</span>
-                                <span v-else>Cancel</span>
-                              </button>
-                            </div>
+
+                          <!-- Upload Button -->
+                          <div>
+                            <FileInput
+                              ref="fileInput"
+                              id="image-upload"
+                              class="hidden"
+                              @change="handleImageOnChange"
+                              accept="image/*"
+                            />
+                            <label
+                              for="image-upload"
+                              class="cursor-pointer text-sm py-2 px-4 bg-gray-100 text-gray-700 rounded-md shadow hover:bg-gray-200"
+                            >
+                              Choose Image
+                            </label>
+                          </div>
+
+                          <!-- Restore Button -->
+                          <div v-if="this.editContent && imageConfig.isDirty">
+                            <button                              
+                              @click="restoreImage"
+                              class="py-2 px-4 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                              Restore Original
+                            </button>
                           </div>
                         </div>
 
-                        <div v-if="imageConfig.isDirty" class="mt-1">
-                          <span class="sr-only">Choose image</span>
-
-                          <FileInput
-                            id="image"
-                            accept="image/*"
-                            :class="{
-                              'file:bg-red-600 hover:file:bg-red-500 file:text-white':
-                                form.errors.image,
-                            }"
-                            @change="handleImageOnChange"
-                          />
-                        </div>
-
-                        <InputError :message="form.errors.image" />
+                        <InputError class="mt-2" :message="form.errors.image" />
                       </div>
-                    </div>
-                  </div>
-                  </div>
 
-                   <div>
-                    <InputLabel for="code" value="Unique Code" :required="true" />
-                    <TextInput
-                      id="code"
-                      type="text"
-                      class="w-full"
-                      v-model="form.code"
-                      :placeholder="'Code'"
-                      autocomplete="code"
-                      :class="{ 'border-red-600': form.errors.title }"
-                    />
-                    <InputError :message="form.errors.code" />
-                  </div>
-                  <!-- message after registration -->
-                    <div>
-                    <InputLabel for="message_after_registration" value="Message After Registration" :required="true" />
-                    <TextInput
-                      id="message_after_registration"
-                      type="text"
-                      class="w-full h-15"
-                      v-model="form.message_after_registration"
-                      :placeholder="'Message After Registration'"
-                      :class="{ 'border-red-600': form.errors.message_after_registration }"
-                    />
-                    <InputError :message="form.errors.code" />
-                  </div>
+                      <div>
+                        <InputLabel for="code" value="Unique Code" :required="true" />
+                        <TextInput
+                          id="code"
+                          type="text"
+                          class="w-full"
+                          v-model="form.code"
+                          :placeholder="'Code'"
+                          autocomplete="code"
+                          :class="{ 'border-red-600': form.errors.code }"
+                        />
+                        <InputError :message="form.errors.code" />
+                      </div>
+                      <!-- message after registration -->
+                      <div>
+                        <InputLabel
+                          for="message_after_registration"
+                          value="Message After Registration"
+                          :required="true"
+                        />
+                        <TextInput
+                          id="message_after_registration"
+                          type="text"
+                          class="w-full"
+                          v-model="form.message_after_registration"
+                          :placeholder="'Message After Registration'"
+                          :class="{
+                            'border-red-600': form.errors.message_after_registration,
+                          }"
+                        />
+                        <InputError :message="form.errors.message_after_registration" />
+                      </div>
 
-                  <!-- message when inactive -->
-                    <div>
-                    <InputLabel for="message_when_inactive" value="Message When Inactive" :required="true" />
-                    <TextInput
-                      id="code"
-                      type="text"
-                      class="w-full"
-                      v-model="form.message_when_inactive"
-                      :placeholder="'Message When Inactive'"
-                      :class="{ 'border-red-600': form.errors.message_when_inactive }"
-                    />
-                    <InputError :message="form.errors.code" />
-                  </div>
+                      <!-- message when inactive -->
+                      <div>
+                        <InputLabel
+                          for="message_when_inactive"
+                          value="Message When Inactive"
+                          :required="true"
+                        />
+                        <TextInput
+                          id="code"
+                          type="text"
+                          class="w-full"
+                          v-model="form.message_when_inactive"
+                          :placeholder="'Message When Inactive'"
+                          :class="{ 'border-red-600': form.errors.message_when_inactive }"
+                        />
+                        <InputError :message="form.errors.message_when_inactive" />
+                      </div>
 
-                  <!-- status -->
-                    <div>
-                    <InputLabel for="active" value="Form Accepting Responses" :required="true" />
+                      <!-- status -->
+                      <div>
+                        <InputLabel
+                          for="active"
+                          value="Form Accepting Responses"
+                          :required="true"
+                        />
 
                         <SelectInput
                           :id="'active'"
                           v-model="form.active"
                           class="w-full"
+                          :class="{ 'border-red-600': form.errors.active }"
                         >
                           <option value="1" selected>Yes</option>
                           <option value="0">No</option>
                         </SelectInput>
-                    <InputError :message="form.errors.active" />
-
+                        <InputError :message="form.errors.active" />
+                      </div>
                     </div>
+                  </div>
+                </div>
 
                 <!-- Questions -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -389,7 +394,7 @@ export default {
                               <option value="number">Number</option>
                               <option value="file">File</option>
                               <option value="select_course">Course Selection</option>
-                        </SelectInput>
+                            </SelectInput>
                           </div>
 
                           <div class="col-span-full">
