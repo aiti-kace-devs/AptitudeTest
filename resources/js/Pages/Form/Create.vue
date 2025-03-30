@@ -12,6 +12,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PreviewImage from "@/Components/PreviewImage.vue";
+import FileInput from "@/Components/FileInput.vue";
 
 export default {
   components: {
@@ -27,6 +28,7 @@ export default {
     DangerButton,
     TextAreaInput,
     PreviewImage,
+    FileInput
   },
   props: {
     errors: Object,
@@ -74,8 +76,10 @@ export default {
         type: "text",
         placeholder: "Question", // Placeholder
         options: null,
-        file_type: null,
-        is_required: false,
+        validators: {
+          required: false,
+          unique: false,
+        },
       };
 
       this.selections.push(newField);
@@ -86,8 +90,11 @@ export default {
       this.selections.splice(index, 1);
     },
     changeSelectionType(index) {
+      this.form.clearErrors(`schema.${index}.options`);
+
       const selection = this.selections[index];
-      if (selection.type !== "select") {
+
+      if (!["select", "radio", "checkbox", "file"].includes(selection.type)) {
         selection.options = null;
       }
     },
@@ -264,11 +271,10 @@ export default {
 
                         <div v-if="imageConfig.isDirty" class="mt-1">
                           <span class="sr-only">Choose image</span>
-                          <input
-                            type="file"
+
+                          <FileInput
                             id="image"
                             accept="image/*"
-                            class="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
                             :class="{
                               'file:bg-red-600 hover:file:bg-red-500 file:text-white':
                                 form.errors.image,
@@ -348,7 +354,9 @@ export default {
                         <div>
                           <div
                             v-if="
-                              ['select', 'radio', 'checkbox'].includes(selection.type)
+                              ['select', 'radio', 'checkbox', 'file'].includes(
+                                selection.type
+                              )
                             "
                           >
                             <TextInput
@@ -356,46 +364,57 @@ export default {
                               type="text"
                               class="w-full"
                               v-model="selection.options"
-                              :placeholder="'Options (comma-separated)'"
+                              :placeholder="
+                                (selection.type == 'file' ? 'File type' : 'Options') +
+                                ' (comma-separated)'
+                              "
                               :class="{
                                 'border-red-600': form.errors[`schema.${row}.options`],
                               }"
                             />
-                            <InputError :message="form.errors[`schema.${row}.options`]" />
-                          </div>
 
-                          <div v-if="['file'].includes(selection.type)">
-                            <TextInput
-                              :id="selection.id"
-                              type="text"
-                              class="w-full"
-                              v-model="selection.file_type"
-                              :placeholder="'File type (comma-separated)'"
-                              :class="{
-                                'border-red-600': form.errors[`schema.${row}.file_type`],
-                              }"
-                            />
-                            <p>Files</p>
-                            <InputError
-                              :message="form.errors[`schema.${row}.file_type`]"
-                            />
+                            <div class="mt-1" v-if="selection.type == 'file'">
+                              <p class="text-sm text-gray-600">
+                                Supported formats: jpg, jpeg, png, gif, docx, txt, pdf,
+                                csv, xlsx and zip.
+                              </p>
+                            </div>
+
+                            <InputError :message="form.errors[`schema.${row}.options`]" />
                           </div>
                         </div>
 
                         <div class="flex justify-between items-center">
-                          <div>
-                            <label
-                              class="inline-flex items-center cursor-pointer space-x-3 text-sm"
-                            >
-                              Required
-                              <Checkbox
-                                v-model:checked="selection.is_required"
-                                class="sr-only peer"
-                              />
-                              <div
-                                class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
-                              ></div>
-                            </label>
+                          <div class="flex items-center gap-4">
+                            <div>
+                              <label
+                                class="inline-flex items-center cursor-pointer space-x-3 text-sm"
+                              >
+                                Required
+                                <Checkbox
+                                  v-model:checked="selection.validators.required"
+                                  class="sr-only peer"
+                                />
+                                <div
+                                  class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
+                                ></div>
+                              </label>
+                            </div>
+
+                            <div>
+                              <label
+                                class="inline-flex items-center cursor-pointer space-x-3 text-sm"
+                              >
+                                Unique
+                                <Checkbox
+                                  v-model:checked="selection.validators.unique"
+                                  class="sr-only peer"
+                                />
+                                <div
+                                  class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
+                                ></div>
+                              </label>
+                            </div>
                           </div>
 
                           <div

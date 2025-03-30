@@ -27,21 +27,39 @@ class DynamicFormRequest extends FormRequest
                 'title' => ['required', 'string', 'max:100'],
                 'description' => ['nullable'],
                 'image' => [
-                    'nullable',
+                    'required',
                     $this->boolean('isDirty') ? ['required', 'image'] : [],
                     'max:512',
                 ],
                 'schema' => ['required', 'array'],
                 'schema.*.title' => ['required'],
                 'schema.*.description' => ['nullable'],
-                'schema.*.type' => ['required', 'string', 'in:select,radio,checkbox,text,number'],
+                'schema.*.type' => ['required', 'string', 'in:select,radio,checkbox,text,number,file'],
                 'schema.*.options' => [
                     'nullable',
-                    'required_if:schema.*.type,select,radio,checkbox',
+                    'required_if:schema.*.type,select,radio,checkbox,file',
                     'string',
-                    'min:1'
+                    'min:1',
+                    function ($attribute, $value, $fail) {
+                        $index = explode('.', $attribute)[1]; // Extract index from "schema.X.options"
+                        $type = request("schema.$index.type"); // Get the type for the same index
+
+                        if ($type === 'file') {
+                            $allowedFileTypes = ['jpg', 'jpeg', 'png', 'gif', 'docx', 'txt', 'pdf', 'csv', 'xlsx', 'zip'];
+
+                            // Convert input to an array, normalize case, and trim spaces
+                            $values = array_map('trim', explode(',', strtolower($value)));
+
+                            $invalidValues = array_diff($values, $allowedFileTypes);
+
+                            if (!empty($invalidValues)) {
+                                $fail('The file type' . (count($invalidValues) > 1 ? 's' : '') . ' "' . implode(', ', $invalidValues) . '" ' . (count($invalidValues) > 1 ? 'are' : 'is') . ' invalid.');
+                            }
+                        }
+                    }
                 ],
-                'schema.*.is_required' => ['nullable', 'boolean']
+                'schema.*.validators.required' => ['nullable', 'boolean'],
+                'schema.*.validators.unique' => ['nullable', 'boolean'],
             ];
     }
 
@@ -60,7 +78,7 @@ class DynamicFormRequest extends FormRequest
         return [
             // 'schema.required'   => 'A question is required.',
             // 'schema.*.title.required'  => 'The question field is required.',
-            'schema.*.options.required_if'  => 'The options field is required.',
+            'schema.*.options.required_if' => 'The :attribute field is required.',
         ];
     }
 }
