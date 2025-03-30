@@ -50,7 +50,7 @@ export default {
     const form = useForm({
       title: this.admissionForm.title,
       description: this.admissionForm.description,
-      image: imageConfig.image,
+      image: this.admissionForm.image ?? null,
       schema: this.admissionForm.schema,
     });
 
@@ -154,6 +154,8 @@ export default {
       this.form.clearErrors();
       this.selections = [];
     },
+
+    // Handle image on change
     handleFileChange(file) {
       this.form.image = file;
       console.log("Selected file:", file);
@@ -216,59 +218,9 @@ export default {
 
                       <div>
                         <InputLabel for="image" value="image" :required="false" />
-                        <!-- <div
-                          v-if="imageConfig.preview != null"
-                          class="mt-1 mb-4 flex items-start gap-3 shrink-0"
-                        >
-                          <div class="flex items-center gap-5">
-                            <PreviewImage
-                              :src="imageConfig.preview"
-                              :alt="imageConfig.preview ? 'image' : 'No image'"
-                            />
-
-                            <div v-if="!editContent">
-                              <DangerButton
-                                type="button"
-                                @click="clearImage"
-                                class="h-9 w-9 flex items-center justify-center"
-                              >
-                                <span class="material-symbols-outlined"> delete </span>
-                              </DangerButton>
-                            </div>
-                          </div>
-                          <div v-if="editContent">
-                            <div class="grid gap-2">
-                              <button
-                                type="button"
-                                @click="toggleImageChange"
-                                class="py-2 px-4 text-sm capitalize text-slate-600 font-semibold bg-gray-100 rounded-full hover:text-gray-700 hover:bg-gray-200"
-                              >
-                                <span v-if="!imageConfig.isDirty">Change image</span>
-                                <span v-else>Cancel</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div v-if="imageConfig.isDirty" class="mt-1">
-                          <span class="sr-only">Choose image</span>
-
-                          <FileInput
-                            id="image"
-                            accept="image/*"
-                            :class="{
-                              'file:bg-red-600 hover:file:bg-red-500 file:text-white':
-                                form.errors.image,
-                            }"
-                            @change="handleImageOnChange"
-                          />
-                        </div> -->
-
-                        <!-- <ImageUploader v-model="form.image" :preview="form.image" /> -->
 
                         {{ form }}
                         <ImageUploader
-                          v-model="form.image"
                           @handleImageOnChange="handleFileChange"
                           :preview="form.image"
                           :maxSize="5 * 1024 * 1024"
