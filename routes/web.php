@@ -10,7 +10,10 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CentreController;
 use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\FormController;
+use App\Http\Controllers\FormResponseController;
 use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
 
 /*
@@ -35,6 +38,38 @@ Route::redirect('/', '/login');
 Route::get('/home', function () {
     return view('home');
 })->middleware(['auth'])->name('home');
+
+Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
+Route::post('form-responses/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
+
+
+Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
+
+    // forms route
+    Route::prefix('/forms')->name('form.')->group(function () {
+        Route::get('/', [FormController::class, 'index'])->name('index');
+        Route::get('/fetch', [FormController::class, 'fetch'])->name('fetch');
+        Route::get('/create', [FormController::class, 'create'])->name('create');
+        Route::post('/', [FormController::class, 'store'])->name('store');
+        Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit');
+        Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
+        Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
+        Route::get('/{form}/responses', [FormController::class, 'show'])->name('show');
+        Route::post('/{form}/destroy', [FormController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('form-responses')->name('form_responses.')->group(function () {
+        // form responses route
+        Route::get('/', [FormController::class, 'index'])->name('index');
+        Route::get('/fetch', [FormResponseController::class, 'fetch'])->name('fetch');
+        Route::get('/create', [FormController::class, 'create'])->name('create');
+        Route::get('/{response}/edit', [FormResponseController::class, 'edit'])->name('edit');
+        Route::put('/{response}/update', [FormResponseController::class, 'update'])->name('update');
+        Route::get('/{response}/view', [FormResponseController::class, 'show'])->name('show');
+        Route::post('/{response}/destroy', [FormResponseController::class, 'destroy'])->name('destroy');
+    });
+});
+
 
 
 Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(function () {
@@ -189,7 +224,11 @@ Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group
     });
 });
 
-
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
 
 require __DIR__ . '/auth.php';

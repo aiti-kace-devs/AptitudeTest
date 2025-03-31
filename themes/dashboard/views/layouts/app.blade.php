@@ -227,6 +227,13 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="{{ route('admin.form.index') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Go To Admission Portal</p>
+                            </a>
+                        </li>
+
 
                         <li class="nav-item">
                             <a href="{{ url('admin/logout') }}" class="nav-link">

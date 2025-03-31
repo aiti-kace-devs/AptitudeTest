@@ -203,7 +203,7 @@ class StudentOperation extends Controller
         $storedResult = Oex_result::where('user_id', $user->id)
             ->where('exam_id', $request->exam_id)
             ->first();
-        GoogleSheets::updateGoogleSheets($userId, ['result' => $storedResult->yes_ans]);
+        // GoogleSheets::updateGoogleSheets($userId, ['result' => $storedResult->yes_ans]);
 
         return redirect(url('student/exam'))->with([
             'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
@@ -468,8 +468,8 @@ class StudentOperation extends Controller
             $user->card_type = $validatedData['card_type'];
             $user->ghcard =
                 $request->input('card_type') === 'ghcard'
-                    ? 'GHA-' . $validatedData['ghcard']
-                    : $validatedData['ghcard'];
+                ? 'GHA-' . $validatedData['ghcard']
+                : $validatedData['ghcard'];
             $user->gender = $validatedData['gender'];
             $user->contact = '0' . $validatedData['contact'];
             $user->network_type = $validatedData['network_type'];

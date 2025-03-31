@@ -76,6 +76,11 @@ class CourseController extends Controller
             }
 
             $input = $request->all();
+            $branch_name = Branch::find($input['branch_id'])->title;
+            $programme_name = Programme::find($input['programme_id'])->title;
+
+            $input['course_name'] = "$programme_name - ($branch_name)";
+            $input['location'] = $branch_name;
             Course::create($input);
 
             return response()->json([
