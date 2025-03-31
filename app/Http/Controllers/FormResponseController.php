@@ -234,7 +234,7 @@ class FormResponseController extends Controller
         ];
 
         foreach ($schema as $field) {
-            $fieldKey = "response_data.{$field['field_name']}";
+            $fieldKey = $field['type'] == 'select_course' ? 'response_data.course_id' : "response_data.{$field['field_name']}";
 
             $rules = [];
 
