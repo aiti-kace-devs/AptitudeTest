@@ -137,6 +137,7 @@ export default {
                         :type="question.type"
                         class="mt-1 w-full"
                         v-model="form.response_data[question.field_name]"
+                        :required="question.validators.required"
                         :placeholder="question.title"
                         :class="{
                           'block w-full mt-2 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100':
@@ -148,10 +149,13 @@ export default {
                         }"
                       />
 
+
                       <!-- File Input -->
                        <div v-else-if="question.type === 'file'">
                         <FileInput
                           class="mt-1"
+                        :required="question.validators.required"
+
                           :accept="
                             question.options
                               ? question.options
@@ -172,6 +176,8 @@ export default {
                           :id="question.field_name"
                           v-model="form.response_data[question.field_name]"
                           class="mt-1 w-full"
+                        :required="question.validators.required"
+
                         >
                           <option value="" disabled selected>
                             -- Select an option --
@@ -207,6 +213,7 @@ export default {
                         >
                           <Checkbox
                             :id="`field-${index}-option-${idx}`"
+                            :required="question.validators.required"
                             v-model:checked="form.response_data[question.field_name]"
                             :value="option.trim()"
                           />
@@ -229,6 +236,7 @@ export default {
                           <RadioInput
                             :id="`field-${index}-option-${idx}`"
                             v-model:checked="form.response_data[question.field_name]"
+                            :required="question.validators.required"
                             :value="option.trim()"
                           />
                           <InputLabel
@@ -236,6 +244,9 @@ export default {
                             :value="option.trim()"
                           />
                         </div>
+                      </div>
+                       <div v-if="question.description" class="mt-1">
+                        <p class="text-xs text-blue-400">{{ question.description }}</p>
                       </div>
                       <InputError
                         :message="form.errors[`response_data.${question.field_name}`]"

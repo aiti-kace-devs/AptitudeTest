@@ -411,6 +411,8 @@ export default {
                               class="w-full"
                             >
                               <option value="text" selected>Text</option>
+                              <option value="email">Email</option>
+                              <option value="phonenumber">Phonenumber</option>
                               <option value="textarea">Textarea</option>
                               <option value="select">Select</option>
                               <option value="checkbox">Checkbox</option>

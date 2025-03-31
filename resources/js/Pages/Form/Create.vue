@@ -205,7 +205,7 @@ export default {
                           autocomplete="title"
                           :class="{ 'border-red-600': form.errors.title }"
                         />
-                        <InputError :message="form.errors.title" /> 
+                        <InputError :message="form.errors.title" />
                       </div>
 
                       <div>
@@ -225,7 +225,7 @@ export default {
 
                       <div>
                         <InputLabel for="image" value="image" :required="false" />
-                        
+
                         <div class="flex flex-col gap-6 mt-3">
                           <!-- preview section -->
                           <div
@@ -265,7 +265,7 @@ export default {
 
                           <!-- Restore Button -->
                           <div v-if="this.editContent && imageConfig.isDirty">
-                            <button                              
+                            <button
                               @click="restoreImage"
                               class="py-2 px-4 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
                             >
@@ -387,6 +387,8 @@ export default {
                               class="w-full"
                             >
                               <option value="text" selected>Text</option>
+                               <option value="email">Email</option>
+                              <option value="phonenumber">Phonenumber</option>
                               <option value="textarea">Textarea</option>
                               <option value="select">Select</option>
                               <option value="checkbox">Checkbox</option>

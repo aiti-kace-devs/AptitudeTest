@@ -41,7 +41,7 @@ class DynamicFormRequest extends FormRequest
                 'schema' => ['required', 'array'],
                 'schema.*.title' => ['required'],
                 'schema.*.description' => ['nullable'],
-                'schema.*.type' => ['required', 'string', 'in:select,radio,checkbox,text,number,file,select_course'],
+                'schema.*.type' => ['required', 'string', 'in:select,radio,checkbox,text,number,file,select_course,email,phonenumber,textarea'],
                 'schema.*.options' => [
                     'nullable',
                     'required_if:schema.*.type,select,radio,checkbox,file',

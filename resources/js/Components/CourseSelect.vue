@@ -16,6 +16,7 @@ array when the `selectedLocation` changes. */
       class="mt-1 mb-1 w-full"
       v-model="selectedLocation"
       @change="updateCourses"
+      :required="true"
     >
       <option value="" disabled selected>-- Select an option --</option>
       <option v-for="branch in branches" :key="branch.id" :value="branch.title">
@@ -28,6 +29,8 @@ array when the `selectedLocation` changes. */
       @change="updateCourses"
       v-model="form.response_data.course_id"
       name="course_id"
+      :required="true"
+
     >
       <option value="" disabled selected>-- Select an option --</option>
       <option v-for="course in filteredCourses" :key="course.id" :value="course.id">

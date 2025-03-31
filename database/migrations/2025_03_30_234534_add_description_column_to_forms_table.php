@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('forms', function (Blueprint $table) {
-            $table->id();
-            $table->string('uuid')->unique();
-            $table->string('title');
-            $table->JSON('schema');
-            $table->timestamps();
-            $table->timestamp('deleted_at')->nullable();
+        Schema::table('forms', function (Blueprint $table) {
+            $table->text('description')->nullable();
+            $table->string('image')->nullable();
         });
     }
 
@@ -26,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('forms');
+        Schema::table('forms', function (Blueprint $table) {
+            $table->dropColumn('description');
+            $table->dropColumn('image');
+        });
     }
 };

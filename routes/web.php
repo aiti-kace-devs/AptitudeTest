@@ -40,6 +40,7 @@ Route::get('/home', function () {
 })->middleware(['auth'])->name('home');
 
 Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
+Route::post('/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
 
 
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
@@ -62,7 +63,6 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         Route::get('/', [FormController::class, 'index'])->name('index');
         Route::get('/fetch', [FormResponseController::class, 'fetch'])->name('fetch');
         Route::get('/create', [FormController::class, 'create'])->name('create');
-        Route::post('/', [FormResponseController::class, 'store'])->name('store');
         Route::get('/{response}/edit', [FormResponseController::class, 'edit'])->name('edit');
         Route::put('/{response}/update', [FormResponseController::class, 'update'])->name('update');
         Route::get('/{response}/view', [FormResponseController::class, 'show'])->name('show');

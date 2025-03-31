@@ -121,7 +121,7 @@ class FormController extends Controller
      */
     public function edit($uuid)
     {
-        $admissionForm = Form::where('uuid', $uuid)->first();
+        $admissionForm = Form::where('uuid', $uuid)->firstOrFail();
         $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
         return Inertia::render('Form/Edit', compact('admissionForm'));
