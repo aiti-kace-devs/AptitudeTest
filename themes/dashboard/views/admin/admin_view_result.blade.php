@@ -30,9 +30,10 @@
                 <!-- Default box -->
                 <!-- /.card -->
                 <div class="card mt-4">
-                    
+
                     <div class="card-body">
                         <h2>Student information</h2>
+
                         <table class="table">
                             <tr>
                                 <td>Name : </td>
@@ -55,19 +56,24 @@
                                 <td>{{ $exam_info->exam_date}}</td>
                             </tr>
                         </table>
-                        <h2>Result info</h2>
+                        <br>
+                        <h2>Exam Result</h2>
                         <table class="table">
                             <tr>
-                                <td>Correst ans : </td>
+                                <td>Number of correct answers : </td>
                                 <td>{{ $result_info->yes_ans}}</td>
                             </tr>
                             <tr>
-                                <td>Wrong ans : </td>
+                                <td>Number of wrong answers : </td>
                                 <td>{{ $result_info->no_ans}}</td>
                             </tr>
                             <tr>
-                                <td>Total : </td>
-                                <td>{{ $result_info->yes_ans+$result_info->no_ans}}</td>
+                                <td>Total marks: </td>
+                                <td>{{ $result_info->yes_ans}}/30</td>
+                            </tr>
+                            <tr>
+                                <td>Percentage score :</td>
+                                <td>{{ round(($result_info->yes_ans / 30) * 100) }}%</td>
                             </tr>
                         </table>
                     </div>
@@ -83,5 +89,5 @@
     <!-- Modal -->
 
 
- 
+
 @endsection

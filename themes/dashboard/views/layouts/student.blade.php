@@ -6,6 +6,7 @@
         BASE_URL = "<?php echo url(''); ?>"
     </script>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title> @yield('title')</title>
 
@@ -33,6 +34,7 @@
     <!-- summernote -->
     <link rel="stylesheet" href="{{ url('assets/plugins/summernote/summernote-bs4.min.css') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+    <link href="{{ asset('themes/student/css/app.css') }}" rel="stylesheet">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -52,18 +54,12 @@
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
                             class="fas fa-bars"></i></a>
                 </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="index3.html" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link">Contact</a>
-                </li>
             </ul>
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Navbar Search -->
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link" data-widget="navbar-search" href="#" role="button">
                         <i class="fas fa-search"></i>
                     </a>
@@ -83,7 +79,7 @@
                             </div>
                         </form>
                     </div>
-                </li>
+                </li> --}}
 
 
                 <!-- Notifications Dropdown Menu -->
@@ -93,28 +89,24 @@
                         <i class="fas fa-expand-arrows-alt"></i>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-                        <i class="fas fa-th-large"></i>
-                    </a>
-                </li>
             </ul>
         </nav>
         <!-- /.navbar -->
 
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
-            <a href="index3.html" class="brand-link">
-                <span class="brand-text font-weight-light">Online Examination</span>
-            </a>
+        @unless (isset($noSide) == true && !Auth::user())
+            <!-- Main Sidebar Container -->
+            <aside class="main-sidebar sidebar-dark-primary elevation-4">
+                <!-- Brand Logo -->
+                <a href="/" class="brand-link">
+                    <span class="brand-text font-weight-light">{{ config('app.name') }}</span>
+                </a>
 
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Sidebar user panel (optional) -->
 
-                <!-- SidebarSearch Form -->
-                {{-- <div class="form-inline">
+                    <!-- SidebarSearch Form -->
+                    {{-- <div class="form-inline">
         <div class="input-group" data-widget="sidebar-search">
           <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
           <div class="input-group-append">
@@ -125,48 +117,86 @@
         </div>
       </div> --}}
 
-                <!-- Sidebar Menu -->
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
+                    <!-- Sidebar Menu -->
+                    <nav class="mt-2">
+                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                            data-accordion="false">
+                            <!-- Add icons to the links using the .nav-icon class
+                                                                                                           with font-awesome or any other icon font library -->
+                            @if (!Auth::user()->isAdmitted())
+                                <li class="nav-item">
+                                    <a href="{{ url('student/dashboard') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Dashboard
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('student/exam') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Exam
+                                        </p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if (!Auth::user()->isAdmitted() && Auth::user()->admissionEmailSent())
+                                <li class="nav-item">
+                                    <a href="{{ url('student/select-session/' . Auth::user()->userId) }}" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Choose Session
+                                        </p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if (Auth::user()->isAdmitted())
+                                <li class="nav-item">
+                                    <a href="{{ url('student/id-qrcode') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-qrcode"></i>
+                                        <p>
+                                            My ID (QR)
+                                        </p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('student/dashboard') }}" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Dashboard
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('student/exam') }}" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Exam
-                                </p>
-                            </a>
-                        </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('student/meeting-link') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-video"></i>
+                                        <p>
+                                            Class Meeting Link
+                                        </p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('student/logout') }}" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Logout
-                                </p>
-                            </a>
-                        </li>
-                        <!--
+                                <li class="nav-item">
+                                    <a href="{{ url('student/attendance') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-calendar"></i>
+                                        <p>
+                                            Attendance
+                                        </p>
+                                    </a>
+                                </li>
+                            @endif
+                            <li class="nav-item">
+                                <a href="{{ url('student/logout') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>
+                                        Logout
+                                    </p>
+                                </a>
+                            </li>
+                            <!--
 
 
-        </ul>
-      </nav>
-      <!-- /.sidebar-menu -->
-            </div>
-            <!-- /.sidebar -->
-        </aside>
-
+                                                                                                    </ul>
+                                                                                                  </nav>
+                                                                                                  <! /.sidebar-menu -->
+                </div>
+                <!-- /.sidebar -->
+            </aside>
+        @endunless
 
 
 
@@ -224,9 +254,28 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('.datatable').dataTable();
+            document.addEventListener('contextmenu', function(ev) {
+                ev.preventDefault();
+                return false;
+            }, false);
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const flashMessage = "{{ session('flash') }}";
+        const key = "{{ session('key') }}";
+
+        if (flashMessage) {
+            setTimeout(() => {
+                Swal.fire({
+                    text: flashMessage,
+                    icon: key || 'info'
+                })
+            }, 500);
+        }
+    </script>
+
+
     @stack('scripts')
 </body>
 

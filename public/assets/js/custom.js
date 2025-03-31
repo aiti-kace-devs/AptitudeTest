@@ -1,16 +1,38 @@
+sAlert = (message, options = {}, callbackFn = undefined) => {
+    options['toast'] = typeof options['toast'] === 'undefined' ? true : options['toast'];
+                    Swal.fire({
+                        title: 'Success!',
+                        text: message,
+                        icon: 'success',
+                        backdrop: options.toast ? false : `rgba(0,0,0,0.95)`,
+                        confirmButtonText: 'Okay',
+                        allowOutsideClick: false,
+                        timer: options.toast?  5000 : undefined,
+                        toast: true,
+                        position: options.toast ? 'top-end' : 'center',
+                        showConfirmButton: callbackFn ? true : false,
+                        preConfirm: () => {
+                            if (callbackFn){
+                                callbackFn();
+                            }
+                        },
+                        ...options
+                    });
+}
+
 $(document).on('submit','.database_operation',function(){
     var url=$(this).attr('action');
     var data=$(this).serialize();
     $.post(url,data,function(fb){
         var resp=$.parseJSON(fb);
         if(resp.status=='true'){
-            alert(resp.message);
+            sAlert(resp.message);
             setTimeout(() => {
                 window.location.href=resp.reload;
             }, 1000);
         }
         else{
-            alert(resp.message);
+            sAlert(resp.message);
         }
     });
     return false;
@@ -21,13 +43,13 @@ $(document).on('click','.apply_exam',function(){
     $.get(BASE_URL+'/student/apply_exam/'+id,function(fb){
         var resp=$.parseJSON(fb);
         if(resp.status=='true'){
-            alert(resp.message);
+            sAlert(resp.message);
             setTimeout(() => {
                 window.location.href=resp.reload;
             }, 1000);
         }
         else{
-            alert(resp.message);
+            sAlert(resp.message);
         }
     })
 })
@@ -35,7 +57,7 @@ $(document).on('click','.apply_exam',function(){
 $(document).on('click','.category_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/category_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
@@ -43,62 +65,65 @@ $(document).on('click','.category_status',function(){
 $(document).on('click','.exam_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/exam_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
 $(document).on('click','.student_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/student_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
 $(document).on('click','.portal_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/portal_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
 $(document).on('click','.question_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/question_status/'+id,function(fb){
-        alert("status successsfully changed");
+        sAlert("status successsfully changed");
     })
 })
 
+$(document).on('submit', '#manage_form', function (e) {
+    e.preventDefault();
+    $.ajax({
+        type: method,
+        url: manageAction,
+        data: $(this).serialize(),
+        success: function (response) {
+            // Refresh the page after a short delay (1 second)
+            setTimeout(() => {
+                window.location.href = response.reload;
+            }, 1000);
 
+            toastr.success(response.message);
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                toastr.error('Something went wrong. Try again.');
+                let errors = xhr.responseJSON.errors;
 
-var interval;
-	function countdown() {
-	  clearInterval(interval);
-	  interval = setInterval( function() {
-	      var timer = $('.js-timeout').html();
-	      timer = timer.split(':');
-	      var minutes = timer[0];
-	      var seconds = timer[1];
-	      seconds -= 1;
-	      if (minutes < 0) return;
-	      else if (seconds < 0 && minutes != 0) {
-	          minutes -= 1;
-	          seconds = 59;
-	      }
-	      else if (seconds < 10 && length.seconds != 2) seconds = '0' + seconds;
+                $.each(errors, function (field, messages) {
+                    field = field.replace('.', '_')
+                    $('#' + field).addClass('is-invalid');
+                    $('.' + field + '_error').text(messages[0]);
+                });
+            } else {
+                // Handle other types of errors if needed
+                alert("An unexpected error occurred. Please try again.");
+            }
+        }
+    });
+});
 
-	      $('.js-timeout').html(minutes + ':' + seconds);
-
-	      if (minutes == 0 && seconds == 0) { clearInterval(interval); alert('time UP'); myFunction() }
-	  }, 1000);
-	}
-
-    var time = document.getElementById('timer').value;
-	$('.js-timeout').text(time);
-	countdown();
-
-
-    function myFunction() {
-        document.getElementById("myCheck").click();
-      }
-    
-
+$('#manageModal').on('hide.bs.modal', function (event) {
+    $('#manage_form :input').removeClass('is-invalid');
+    $('#manage_form .invalid-feedback').text("");
+    $('#manage_form')[0].reset();
+});

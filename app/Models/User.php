@@ -24,6 +24,10 @@ class User extends Authenticatable
         'status',
         'mobile_no',
         'password',
+        'userId',
+        'ghcard',
+        'gender',
+        'network_type'
     ];
 
     /**
@@ -44,4 +48,26 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function isAdmitted()
+    {
+        return UserAdmission::where('user_id', $this->userId)
+            ->whereNotNull('confirmed')->count() == 1;
+    }
+
+    public function admissionEmailSent()
+    {
+        return UserAdmission::where('user_id', $this->userId)
+            ->whereNotNull('email_sent')->count() == 1;
+    }
+
+    public function detailsUpdated()
+    {
+        return $this->updated_at != $this->created_at;
+    }
+
+    public function isSuper()
+    {
+        return $this->is_super;
+    }
 }
