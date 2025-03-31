@@ -165,6 +165,10 @@ export default {
                         :id="question.field_name"
                         v-model="form.response_data[question.field_name]"
                         class="mt-1 w-full"
+                        :class="{
+                        'border-red-600':
+                          form.errors[`response_data.${question.field_name}`],
+                      }"
                       >
                         <option value="" disabled selected>-- Select an option --</option>
                         <option
@@ -230,7 +234,7 @@ export default {
                       </div>
                     </div>
                     <InputError
-                      :message="form.errors[`response_data.${question.field_name}`]"
+                      :message="form.errors[`response_data.${question.field_name}`] || form.errors['response_data.course_id']"
                     />
                   </div>
                 </div>

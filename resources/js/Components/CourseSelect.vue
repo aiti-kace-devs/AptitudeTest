@@ -22,12 +22,14 @@ array when the `selectedLocation` changes. */
         {{ branch.title }}
       </option>
     </SelectInput>
+
     <InputLabel for="course" value="Course" :required="true" class="mt-2" />
     <SelectInput
       class="mt-1 w-full"
       @change="updateCourses"
       v-model="form.response_data.course_id"
       name="course_id"
+       :class="{'border-red-600': form.errors['response_data.course_id']}"
     >
       <option value="" disabled selected>-- Select an option --</option>
       <option v-for="course in filteredCourses" :key="course.id" :value="course.id">

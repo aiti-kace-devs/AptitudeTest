@@ -151,6 +151,8 @@ class FormController extends Controller
         if (!$admissionForm) {
             return redirect('home');
         }
+
+        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
         $withLayout = false;
 
         $courses = Course::get();
