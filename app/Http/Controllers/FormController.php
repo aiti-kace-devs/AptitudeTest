@@ -176,7 +176,7 @@ class FormController extends Controller
             $fileName = time() . '.' . $image->getClientOriginalExtension();
 
             // Delete old image if it exists
-            if ($form->image && \Storage::disk('public')->exists($destinationPath . $form->image)) {
+            if ($form->image && \Storage::disk( 'public')->exists($destinationPath . $form->image)) {
                 \Storage::disk('public')->delete($destinationPath . $form->image);
             }
 
