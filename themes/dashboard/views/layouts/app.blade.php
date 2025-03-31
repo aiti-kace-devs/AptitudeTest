@@ -5,6 +5,7 @@
     <script type="text/javascript">
         BASE_URL = "<?php echo url(''); ?>"
     </script>
+    
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title> @yield('title')</title>
@@ -233,6 +234,16 @@
                                 <p>Go To Admission Portal</p>
                             </a>
                         </li>
+
+                        <!-- Add this code to your sidebar menu in app.blade.php -->
+
+    <li class="nav-item">
+        <a href="{{ route('admin.admins.index') }}" class="nav-link @if (isset($activePage) && $activePage == 'manageAdmins') active @endif">
+            <i class="fas fa-users-cog nav-icon"></i>
+            <p>Manage Admins</p>
+        </a>
+    </li>
+
 
 
                         <li class="nav-item">

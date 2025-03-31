@@ -15,7 +15,7 @@ use App\Http\Controllers\FormResponseController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
-
+use App\Http\Controllers\Admin\RegisteredUserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,6 +28,9 @@ use App\Http\Controllers\ProgrammeController;
 */
 
 Route::redirect('/', '/login');
+Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])
+    ->middleware('guest')
+    ->name('admin.login');
 
 
 // Route::get('/', function () {
@@ -41,6 +44,16 @@ Route::get('/home', function () {
 
 Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
 Route::post('form-responses/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
+
+
+Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {    // Admin management routes
+    Route::get('/admins', [RegisteredUserController::class, 'index'])->name('admins.index');
+    Route::get('/admins/create', [RegisteredUserController::class, 'create'])->name('admins.create');
+    Route::post('/admins/store', [RegisteredUserController::class, 'store'])->name('admins.store');
+    Route::get('/admins/{id}/edit', [RegisteredUserController::class, 'edit'])->name('admins.edit');
+    Route::put('/admins/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update');
+    Route::delete('/admins/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete');
+});
 
 
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {

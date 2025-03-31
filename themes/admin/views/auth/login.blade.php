@@ -8,7 +8,7 @@
                     <div class="card-body">
                         <h1 class="text-center"><b>Admin Login</b> </h1>
                         <form method="POST" action="{{ route('admin.login') }}" class="mt-4">
-                            @csrf
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
                             <div class="form-group row">
                                 <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
