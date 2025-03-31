@@ -139,7 +139,7 @@ export default {
       this.previewImage(file);
       this.imageConfig.image = file;
       this.imageConfig.isDirty = true;
-      this.form.image = file
+      this.form.image = file;
     },
     previewImage(file) {
       // Use FileReader to read the file and generate a data URL
@@ -205,7 +205,7 @@ export default {
                           autocomplete="title"
                           :class="{ 'border-red-600': form.errors.title }"
                         />
-                        <InputError :message="form.errors.title" /> 
+                        <InputError :message="form.errors.title" />
                       </div>
 
                       <div>
@@ -225,7 +225,7 @@ export default {
 
                       <div>
                         <InputLabel for="image" value="image" :required="false" />
-                        
+
                         <div class="flex flex-col gap-6 mt-3">
                           <!-- preview section -->
                           <div
@@ -265,7 +265,7 @@ export default {
 
                           <!-- Restore Button -->
                           <div v-if="this.editContent && imageConfig.isDirty">
-                            <button                              
+                            <button
                               @click="restoreImage"
                               class="py-2 px-4 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
                             >
@@ -328,8 +328,8 @@ export default {
                         <InputError :message="form.errors.message_when_inactive" />
                       </div>
 
-                       <!-- status -->
-                       <div>
+                      <!-- status -->
+                      <div>
                         <!-- <InputLabel
                           for="active"
                           value="Form Accepting Responses"

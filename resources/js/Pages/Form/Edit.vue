@@ -6,7 +6,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import { ref, nextTick  } from "vue";
+import { ref } from "vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
@@ -46,12 +46,12 @@ export default {
     const form = useForm({
       title: this.admissionForm.title,
       description: this.admissionForm.description,
-      image: imageConfig.image,
+      image: this.admissionForm.image,
       code: this.admissionForm.code,
-      schema: this.admissionForm.schema ?? [],
       message_when_inactive: this.admissionForm.message_when_inactive,
       message_after_registration: this.admissionForm.message_after_registration,
-      active: this.admissionForm.active
+      active: this.admissionForm.active,
+      schema: this.admissionForm.schema ?? [],
     });
 
     return {
@@ -134,19 +134,22 @@ export default {
       this.selections[swapIndex] = temp;
     },
     submit() {
-      this.form.put(route("admin.form.update", { form: this.admissionForm.uuid }), {
-        data: {
-          image_isDirty: this.imageConfig.isDirty,
-        },
-        forceFormData: true,
-        onSuccess: () => {
-          toastr.success("Form successfully updated");
-          this.resetForm();
-        },
-        onError: (errors) => {
-          toastr.error("Something went wrong");
-        },
-      });
+      this.form.post(
+        route("admin.form.update", {
+          form: this.admissionForm.uuid,
+          isDirty: this.imageConfig.isDirty,
+          _method: "put",
+        }),
+        {
+          onSuccess: () => {
+            toastr.success("Form successfully updated");
+            this.resetForm();
+          },
+          onError: (errors) => {
+            toastr.error("Something went wrong");
+          },
+        }
+      );
     },
     resetForm() {
       // Clear form and selections after successful submission
@@ -161,8 +164,8 @@ export default {
 
       this.previewImage(file);
       this.imageConfig.image = file;
-      this.imageConfig.isDirty = true;      
-        this.form.image = file;
+      this.imageConfig.isDirty = true;
+      this.form.image = file;
     },
     previewImage(file) {
       // Use FileReader to read the file and generate a data URL
@@ -182,12 +185,12 @@ export default {
     },
     restoreImage() {
       this.imageConfig.preview = this.imageConfig.original;
-      this.imageConfig.image = this.imageConfig.original;
+      this.imageConfig.image = null;
       this.imageConfig.isDirty = false;
     },
     resetInput() {
       if (this.fileInput) {
-        this.fileInput.value = ""; // Clear file input
+        this.fileInput = ""; // Clear file input
       }
     },
   },
@@ -248,7 +251,7 @@ export default {
 
                       <div>
                         <InputLabel for="image" value="image" :required="false" />
-                        {{ form }}
+
                         <div class="flex flex-col gap-6 mt-3">
                           <!-- preview section -->
                           <div
@@ -272,6 +275,7 @@ export default {
                           <!-- Upload Button -->
                           <div>
                             <FileInput
+                              ref="fileInput"
                               id="image-upload"
                               class="hidden"
                               @change="handleImageOnChange"
