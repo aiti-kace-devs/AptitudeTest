@@ -134,10 +134,6 @@ export default {
                       v-model="form.response_data[question.field_name]"
                       :placeholder="question.title"
                       :class="{
-                        'block w-full mt-2 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100':
-                          question.type == 'file',
-                        'file:bg-red-600 hover:file:bg-red-500 file:text-white':
-                          question.type == 'file',
                         'border-red-600':
                           form.errors[`response_data.${question.field_name}`],
                       }"
@@ -147,6 +143,10 @@ export default {
                     <div v-else-if="question.type === 'file'">
                       <FileInput
                         class="mt-1"
+                        @input="
+                          form.response_data[question.field_name] = $event.target.files[0]
+                        "
+                        :maxSize="2 * 1024"
                         :accept="
                           question.options
                             ? question.options.split(',').map((type) => '.' + type.trim())
@@ -237,7 +237,7 @@ export default {
 
                 <div>
                   <PrimaryButton
-                    v-if="!admin"
+                    v-if="admin"
                     type="submit"
                     :disabled="form.processing"
                     :class="{ 'opacity-25': form.processing }"

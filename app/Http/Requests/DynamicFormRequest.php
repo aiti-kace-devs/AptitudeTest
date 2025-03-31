@@ -27,7 +27,7 @@ class DynamicFormRequest extends FormRequest
                 'title' => ['required', 'string', 'max:100'],
                 'description' => ['nullable'],
                 'image' => [
-                    'required',
+                    'nullable',
                     $this->boolean('isDirty') ? ['required', 'image'] : [],
                     'max:2048',
                 ],

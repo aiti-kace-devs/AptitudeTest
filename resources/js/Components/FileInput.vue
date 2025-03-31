@@ -1,7 +1,14 @@
 <script setup>
 import { onMounted, ref } from "vue";
 
-defineProps(["modelValue"]);
+const props = defineProps({
+  modelValue: File, // Bound file
+  maxSize: { type: Number, default: 2 * 1024 * 1024 }, // Default 2MB
+  allowedTypes: {
+    type: Array,
+    default: () => ["image/jpeg", "image/png", "image/gif"],
+  },
+});
 
 defineEmits(["update:modelValue"]);
 

@@ -138,6 +138,7 @@ class FormResponseController extends Controller
 
                 case 'file':
                     $rules[] = 'file';
+                    $rules[] = 'max:2048';
 
                     if (!empty($field['options'])) {
                         $allowedMimes = array_map('trim', explode(',', strtolower($field['options'])));
@@ -146,6 +147,7 @@ class FormResponseController extends Controller
                     }
 
                     $customMessages["{$fieldKey}.file"] = "This field must be a file.";
+                    $customMessages["{$fieldKey}.max"] = "The file must not be greater than 2MB.";
 
                     break;
 
