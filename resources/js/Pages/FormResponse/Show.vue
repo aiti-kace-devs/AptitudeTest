@@ -102,8 +102,10 @@ export default {
                     <InputLabel
                       :for="`field-${index}`"
                       :value="question.title"
-                      :required="question.is_required"
+                      :required="false"
                     />
+                    <p class="text-gray-800">{{ form.response_data[question.field_name] }}</p>
+
                     <TextInput
                       v-if="
                         ['text', 'number', 'email', 'password'].includes(question.type)

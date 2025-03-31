@@ -200,6 +200,31 @@ class FormResponseController extends Controller
         $formResponse = FormResponse::where('uuid', $uuid)->with('form')->first();
         $admissionForm = $formResponse->form;
         $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
+ 
+
+        foreach ($formResponse->schema as $field) {
+            if ($field['type'] === 'file' && isset($field["response_data.{$field['field_name']}"])) {
+
+                $field["response_data.{$field['field_name']}"] =  asset('storage/form/banner/' . $field["response_data.{$field['field_name']}"]);
+
+                $destinationPath = 'form/uploads/';
+                $file = $request->file("response_data.{$field['field_name']}");
+
+                $fileName = time() . '.' . $file->getClientOriginalExtension();
+
+                // Delete old image if it exists
+                if (\Storage::disk('public')->exists($destinationPath . $fileName)) {
+                    \Storage::disk('public')->delete($destinationPath . $fileName);
+                }
+
+                // Save new image
+                \Storage::disk('public')->putFileAs($destinationPath, $file, $fileName);
+
+                $validated['response_data'][$field['field_name']] = $fileName;
+            } else{
+                $validated['response_data'][$field['field_name']] = $formReponse['response_data'][$field['field_name']];
+            }
+        }
 
         return Inertia::render('FormResponse/Show', compact('formResponse', 'admissionForm'));
     }
@@ -326,7 +351,7 @@ class FormResponseController extends Controller
 
                 $validated['response_data'][$field['field_name']] = $fileName;
             } else{
-                $validated['response_data'][$field['field_name']] = $formReponse['response_data'][$field['field_name']]
+                $validated['response_data'][$field['field_name']] = $formReponse['response_data'][$field['field_name']];
             }
         }
 
