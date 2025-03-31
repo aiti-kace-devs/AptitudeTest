@@ -189,13 +189,15 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
 
 
 /* Student section routes */
-Route::prefix('student')->middleware('theme:dashboard')->name('student.')->group(function () {
+Route::prefix('student')
+->middleware('theme:dashboard')
+->name('student.')->group(function () {
 
     Route::get('/select-session/{user_id}', [StudentOperation::class, 'select_session_view']);
     Route::post('/select-session/{user_id}', [StudentOperation::class, 'confirm_session'])->name('select-session');
 
     Route::middleware(['auth:web'])->group(function () {
-        Route::get('/dashboard', [StudentOperation::class, 'dashboard']);
+        Route::get('/dashboard', [StudentOperation::class, 'dashboard'])->name('dashboard');
 
         Route::get('/exam', [StudentOperation::class, 'exam']);
         Route::get('/join_exam/{id}', [StudentOperation::class, 'join_exam']);
