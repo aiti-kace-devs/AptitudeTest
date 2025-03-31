@@ -237,7 +237,7 @@ export default {
 
                 <div>
                   <PrimaryButton
-                    v-if="admin"
+                    v-if="!admin"
                     type="submit"
                     :disabled="form.processing"
                     :class="{ 'opacity-25': form.processing }"
