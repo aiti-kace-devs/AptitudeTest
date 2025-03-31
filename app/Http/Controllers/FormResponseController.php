@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 
 class FormResponseController extends Controller
 {
@@ -82,7 +83,8 @@ class FormResponseController extends Controller
      */
     public function store(Request $request)
     {
-        $form = Form::where('uuid', $request->form_uuid)->firstOrFail();
+        //$form = Form::where('uuid', $request->form_uuid)->firstOrFail();
+        $form = Form::where('uuid', '098faedf-3bfa-4440-bc9e-35b28d8e7822')->firstOrFail();
         $schema = $form->schema;
 
         $validationRules = [
@@ -93,21 +95,49 @@ class FormResponseController extends Controller
             'response_data.required' => 'The form responses are required.',
         ];
 
+
+        $formattedData = [];
+    
+        foreach ($request->input('response_data', []) as $key => $value) {
+            foreach ($schema as $field) {
+                if (strcasecmp($key, $field['title']) == 0) {
+                    $formattedData[$field['field_name']] = trim($value);
+                    break;
+                }
+            }
+        }
+        
         foreach ($schema as $field) {
             $fieldKey = $field['type'] == 'select_course' ? 'response_data.course_id' : "response_data.{$field['field_name']}";
-
+        
+            $fieldTitle = ucwords(str_replace('_', ' ', $field['title'])); 
+        
             $rules = [];
 
-            $field['title'] = strtolower($field['title']);
-
-            if (isset($field['validators']['required']) && $field['validators']['required']) {
+            if (!empty($field['validators']['required'])) {
                 $rules[] = 'required';
-                $customMessages["{$fieldKey}.required"] = "This field is required.";
-            } elseif (isset($field['validators']['unique']) && $field['validators']['unique']) {
-                $rules[] = "unique:form_responses,{$field['title']}";
-                $customMessages["{$fieldKey}.unique"] = "This field has already been taken.";
-            } else {
-                $rules[] = 'nullable';
+                $customMessages["{$fieldKey}.required"] = "{$fieldTitle} is required.";
+            }
+    
+            if (!empty($field['validators']['unique'])) {
+                $existingRecords = FormResponse::select('response_data')->get();
+                $isDuplicate = false;
+        
+                foreach ($existingRecords as $record) {
+                    $data = json_decode($record->response_data, true);
+                    if (!empty($data[$field['field_name']]) && $data[$field['field_name']] == ($formattedData[$field['field_name']] ?? null)) {
+                        $isDuplicate = true;
+                        break;
+                    }
+                }
+        
+                if ($isDuplicate) {
+                    return response()->json([
+                        'errors' => [
+                            $fieldKey => ["{$fieldTitle} has already been taken."]
+                        ]
+                    ], 422);
+                }
             }
 
             switch ($field['type']) {
@@ -180,6 +210,7 @@ class FormResponseController extends Controller
         Log::info($fieldName);
 
         FormSubmittedEvent::dispatch($validated['response_data'], $fieldName);
+
     }
 
 
