@@ -83,8 +83,7 @@ class FormResponseController extends Controller
      */
     public function store(Request $request)
     {
-        //$form = Form::where('uuid', $request->form_uuid)->firstOrFail();
-        $form = Form::where('uuid', '098faedf-3bfa-4440-bc9e-35b28d8e7822')->firstOrFail();
+        $form = Form::where('uuid', $request->form_uuid)->firstOrFail();
         $schema = $form->schema;
 
         $validationRules = [
