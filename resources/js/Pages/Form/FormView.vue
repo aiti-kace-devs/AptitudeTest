@@ -11,6 +11,7 @@ import DangerButton from "@/Components/DangerButton.vue";
 import RadioInput from "@/Components/RadioInput.vue";
 import CourseSelect from "@/Components/CourseSelect.vue";
 import FileInput from "@/Components/FileInput.vue";
+import { PhoneInput } from "@lbgm/phone-number-input";
 
 export default {
   components: {
@@ -25,7 +26,8 @@ export default {
     DangerButton,
     RadioInput,
     CourseSelect,
-    FileInput
+    FileInput,
+    PhoneInput
   },
   props: {
     errors: Object,
@@ -48,7 +50,7 @@ export default {
 
     this.admissionForm.schema.forEach((schema) => {
       if (
-        ["text", "number", "email", "file", "password", "radio"].includes(schema.type)
+        ["text", "number", "email", "file", "password", "radio", "phonenumber"].includes(schema.type)
       ) {
         formFields.response_data[schema.field_name] = null;
       } else if (schema.type === "checkbox") {
@@ -67,6 +69,7 @@ export default {
       showFormMessage,
       showForm,
       formIsActive,
+      phoneError: false,
     };
   },
   methods: {
@@ -90,7 +93,17 @@ export default {
        this.showFormMessage = true;
        this.showForm = false;
        this.formIsActive = true;
+    },
+    validatePhone(data, field_name) {
 
+      if (data.isValid) {
+          this.form.response_data[field_name] = data.number;
+          this.phoneError = false;
+        } else if (data.isValid === false) {
+          this.form.errors[field_name] = true;
+            this.form.response_data[field_name] = null;
+            this.phoneError = true;
+      }
     },
   },
 };
@@ -192,6 +205,28 @@ export default {
                         </SelectInput>
                       </div>
 
+                      <!-- Phone Input -->
+                      <div v-else-if="question.type === 'phonenumber'">
+                        <phone-input
+                            :has-error="phoneError"
+                            :errorMessage="phoneError ? 'You have entered an invalid phone number' : ''"
+                            :defaultCountry="'GH'"
+                            :required="question.validators.required"
+                            :id="question.field_name"
+                            :name="question.field_name"
+                            v-model="form.response_data[question.field_name]"
+                            :placeholder="question.title"
+                            @phoneData="validatePhone($event, question.field_name)"
+                            :listHeight="250"
+                            :allowed="['GH']"
+                            :class="{
+                              'border-red-600':
+                                form.errors[`response_data.${question.field_name}`],
+                                'border-0': true
+                            }"
+                            />
+                      </div>
+
                       <!-- Select Location and Course  -->
                     <div v-else-if="question.type === 'select_course'">
                         <CourseSelect
@@ -258,7 +293,7 @@ export default {
                     <PrimaryButton
                         v-if="!admin"
                       type="submit"
-                      :disabled="form.processing"
+                      :disabled="form.processing || phoneError || form.hasErrors"
                       :class="{ 'opacity-25': form.processing }"
                     >
                       Submit

@@ -50,9 +50,9 @@ class AdmitStudentJob implements ShouldQueue
             return;
         }
         Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))->queue(new ConfirmationSuccessful($user->name, $session->name, $session->course_time));
-        GoogleSheets::updateGoogleSheets($this->admission->user_id, [
-            "confirmed" => true,
-            "session" => $session->session,
-        ]);
+        // GoogleSheets::updateGoogleSheets($this->admission->user_id, [
+        //     "confirmed" => true,
+        //     "session" => $session->session,
+        // ]);
     }
 }

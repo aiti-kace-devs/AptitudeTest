@@ -27,7 +27,8 @@ class User extends Authenticatable
         'userId',
         'ghcard',
         'gender',
-        'network_type'
+        'network_type',
+        'registered_course'
     ];
 
     /**

@@ -39,6 +39,6 @@ class UpdateAttendanceOnSheetJob implements ShouldQueue
             "date" => (new Carbon($this->attendance->date))->format('d/m/Y'),
             "sheetTitle" => env('SHEET_TITLE', "Test Sheet")
         ];
-        GoogleSheets::updateGoogleSheets($this->attendance->user_id, $data);
+        // GoogleSheets::updateGoogleSheets($this->attendance->user_id, $data);
     }
 }

@@ -40,7 +40,7 @@ Route::get('/home', function () {
 })->middleware(['auth'])->name('home');
 
 Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
-Route::post('/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
+Route::post('form-responses/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
 
 
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {

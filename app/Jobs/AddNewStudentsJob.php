@@ -47,7 +47,9 @@ class AddNewStudentsJob implements ShouldQueue
                 'name' => 'required',
                 'email' => 'required|email',
                 'mobile_no' => 'required',
+                'gender' => 'required',
                 'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
+                'registered_course' => 'required|exists:courses,id',
                 'userId' => 'required',
                 'password' => 'sometimes',
                 'exam_name' => 'sometimes',
@@ -88,6 +90,8 @@ class AddNewStudentsJob implements ShouldQueue
                 $std->exam = $student['exam'];
                 $std->userId = $student['userId'];
                 $std->password = Hash::make($plainPassword);
+                $std->registered_course = $student['registered_course'];
+                $std->gender = $student['gender'];
                 $std->status = 1;
                 $std->save();
             }
@@ -107,9 +111,13 @@ class AddNewStudentsJob implements ShouldQueue
             );
 
             if ($existingUser == null) {
-                $userId = $std->userId;
-                GoogleSheets::updateGoogleSheets($userId, ["registered" => true, "result" => "N/A"]);
+                // $userId = $std->userId;
+                // GoogleSheets::updateGoogleSheets($userId, ["registered" => true, "result" => "N/A"]);
                 event(new UserRegistered($std, $plainPassword));
+                $details['message'] = "Hi " . $student['name'] . ", \nYour information has been successfully registered. Check your email for instructions on how to take the aptitude test. Goodluck";
+                $details['phonenumber'] = $student['mobile_no'];
+
+                SendSMSAfterRegistrationJob::dispatch($details);
             }
         }
 

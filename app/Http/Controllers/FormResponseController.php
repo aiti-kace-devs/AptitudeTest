@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\FormSubmittedEvent;
 use App\Models\Form;
 use App\Models\FormResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -80,7 +82,7 @@ class FormResponseController extends Controller
      */
     public function store(Request $request)
     {
-        $form = Form::where('uuid', $request->form_uuid)->first();
+        $form = Form::where('uuid', $request->form_uuid)->firstOrFail();
         $schema = $form->schema;
 
         $validationRules = [
@@ -154,6 +156,12 @@ class FormResponseController extends Controller
                     $customMessages["{$fieldKey}.exists"] = "The selected course is invalid";
                     break;
 
+                case 'phonenumber':
+                    $rules[] = 'phone';
+                    $customMessages["{$fieldKey}.phone"] = "This must be a valid phonenumber.";
+                    $fieldName = $field['field_name'];
+                    break;
+
                 default:
                     $rules[] = 'nullable';
                     break;
@@ -167,6 +175,11 @@ class FormResponseController extends Controller
         $response = new FormResponse($validated);
 
         $form->responses()->save($response);
+
+        Log::info($validated['response_data']);
+        Log::info($fieldName);
+
+        FormSubmittedEvent::dispatch($validated['response_data'], $fieldName);
     }
 
 
@@ -258,6 +271,11 @@ class FormResponseController extends Controller
                     $customMessages["{$fieldKey}.file"] = "The {$field['title']} must be a valid file.";
                     break;
 
+                case 'phonenumber':
+                    $rules[] = 'phone';
+                    $customMessages["{$fieldKey}.file"] = "The {$field['title']} must be a valid phonenumber.";
+                    break;
+
                 default:
                     $rules[] = 'nullable';
                     break;
@@ -265,7 +283,7 @@ class FormResponseController extends Controller
 
             $validationRules[$fieldKey] = implode('|', $rules);
         }
-
+        dd($validationRules);
         $validated = $request->validate($validationRules, $customMessages);
 
         $formReponse->fill($validated)->save();

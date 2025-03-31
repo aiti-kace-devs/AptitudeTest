@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\FormSubmittedEvent;
 use App\Events\UserRegistered;
+use App\Listeners\FormSubmitedListener;
 use App\Listeners\SendExamLoginCredentials;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -22,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         UserRegistered::class => [
             SendExamLoginCredentials::class,
+        ],
+        FormSubmittedEvent::class => [
+            FormSubmitedListener::class,
         ],
     ];
 

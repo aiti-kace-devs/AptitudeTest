@@ -9,7 +9,7 @@ use App\Mail\ExamLoginCredentials;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class SendExamLoginCredentials
+class SendExamLoginCredentials implements ShouldQueue
 {
     /**
      * Create the event listener.
