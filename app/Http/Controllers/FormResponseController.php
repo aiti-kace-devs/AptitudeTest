@@ -123,7 +123,11 @@ class FormResponseController extends Controller
                 $isDuplicate = false;
 
                 foreach ($existingRecords as $record) {
-                    $data = json_decode($record->response_data, true);
+                    // $data = json_decode($record->response_data, true);
+                    $data = is_array($record->response_data) 
+                    ? $record->response_data 
+                    : json_decode($record->response_data, true);
+                    
                     if (!empty($data[$field['field_name']]) && $data[$field['field_name']] == ($formattedData[$field['field_name']] ?? null)) {
                         $isDuplicate = true;
                         break;
@@ -131,6 +135,7 @@ class FormResponseController extends Controller
                 }
 
                 if ($isDuplicate) {
+                    Log::info("{$fieldTitle} has already been taken.");
                     return response()->json([
                         'errors' => [
                             $fieldKey => ["{$fieldTitle} has already been taken."]
