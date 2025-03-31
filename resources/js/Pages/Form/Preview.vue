@@ -6,8 +6,8 @@ import { Head } from "@inertiajs/vue3";
 export default {
   components: {
     AuthenticatedLayout,
-   FormView,
-   Head
+    FormView,
+    Head,
   },
   props: {
     errors: Object,
@@ -20,7 +20,7 @@ export default {
 </script>
 
 <template>
-  <Head title="Forms | Preview Form" v-if="withLayout"/>
+  <Head title="Forms | Preview Form" v-if="withLayout" />
   <AuthenticatedLayout v-if="withLayout">
     <template #header>
       <div class="flex items-center">
@@ -32,23 +32,23 @@ export default {
       </div>
     </template>
 
-   <FormView
+    <FormView
       :admissionForm="admissionForm"
       :courses="courses"
       :branches="branches"
       :admin="true"
       :errors="errors"
-      :form="form"/>
-
+      :form="form"
+    />
   </AuthenticatedLayout>
 
   <div v-if="!withLayout">
-       <FormView
+    <FormView
       :admissionForm="admissionForm"
       :admin="false"
       :courses="courses"
       :branches="branches"
-      :errors="errors"/>
+      :errors="errors"
+    />
   </div>
-
 </template>

@@ -36,23 +36,22 @@ export default {
     const selections = ref([]);
     const fileInput = ref(null);
 
-    const imageConfig = {
-      image: this.admissionForm.image ?? null,
-      isDirty: this.admissionForm.image ? false : true,
-      preview: this.admissionForm.image ?? null,
-      original: this.admissionForm.image ?? null,
-    };
+    const imageConfig = ref({
+      image: this.admissionForm.image,
+      isDirty: false,
+      preview: this.admissionForm.image,
+      original: this.admissionForm.image,
+    });
 
     const form = useForm({
       title: this.admissionForm.title,
       description: this.admissionForm.description,
-      image: imageConfig.image,
+      image: this.admissionForm.image,
       code: this.admissionForm.code,
-      schema: this.admissionForm.schema,
       message_when_inactive: this.admissionForm.message_when_inactive,
       message_after_registration: this.admissionForm.message_after_registration,
       active: this.admissionForm.active,
-      schema: [],
+      schema: this.admissionForm.schema ?? [],
     });
 
     return {
@@ -135,19 +134,22 @@ export default {
       this.selections[swapIndex] = temp;
     },
     submit() {
-      // Submit the form with schema as JSON
-      this.form.put(route("admin.form.update", { form: this.admissionForm.uuid }), {
-        data: {
+      this.form.post(
+        route("admin.form.update", {
+          form: this.admissionForm.uuid,
           isDirty: this.imageConfig.isDirty,
-        },
-        onSuccess: () => {
-          toastr.success("Form successfully updated");
-          this.resetForm();
-        },
-        onError: (errors) => {
-          toastr.error("Something went wrong");
-        },
-      });
+          _method: "put",
+        }),
+        {
+          onSuccess: () => {
+            toastr.success("Form successfully updated");
+            this.resetForm();
+          },
+          onError: (errors) => {
+            toastr.error("Something went wrong");
+          },
+        }
+      );
     },
     resetForm() {
       // Clear form and selections after successful submission
@@ -352,8 +354,8 @@ export default {
                         <InputError :message="form.errors.message_when_inactive" />
                       </div>
 
-                       <!-- status -->
-                       <div>
+                      <!-- status -->
+                      <div>
                         <!-- <InputLabel
                           for="active"
                           value="Form Accepting Responses"

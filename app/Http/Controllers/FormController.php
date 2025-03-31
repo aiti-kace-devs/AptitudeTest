@@ -151,6 +151,8 @@ class FormController extends Controller
         if (!$admissionForm) {
             return redirect('home');
         }
+
+        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
         $withLayout = false;
 
         $courses = Course::get();
@@ -174,7 +176,7 @@ class FormController extends Controller
             $fileName = time() . '.' . $image->getClientOriginalExtension();
 
             // Delete old image if it exists
-            if ($form->image && \Storage::disk('public')->exists($destinationPath . $form->image)) {
+            if ($form->image && \Storage::disk( 'public')->exists($destinationPath . $form->image)) {
                 \Storage::disk('public')->delete($destinationPath . $form->image);
             }
 

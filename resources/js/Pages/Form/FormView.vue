@@ -34,7 +34,7 @@ export default {
     admissionForm: Object,
     courses: Array,
     branches: Array,
-    admin: Boolean
+    admin: Boolean,
   },
   data() {
     const formFields = {
@@ -45,8 +45,7 @@ export default {
     let formIsActive = this.admin ? true : this.admissionForm.active;
 
     let showForm = this.admin ? true : formIsActive;
-    let showFormMessage =  false;
-
+    let showFormMessage = false;
 
     this.admissionForm.schema.forEach((schema) => {
       if (
@@ -107,27 +106,26 @@ export default {
     },
   },
 };
-
 </script>
 
 <template>
-      <div class="py-12"  v-if="showForm && formIsActive">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-             <div v-if="admissionForm.image" class="shadow-sm w-full h-44 lg:h-72">
-            <img
-              :src="admissionForm.image"
-              alt=""
-              class="inset-0 w-full h-full object-cover"
-            />
+  <div class="py-12" v-if="showForm && formIsActive">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+      <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+        <div v-if="admissionForm.image" class="shadow-sm w-full h-44 lg:h-72">
+          <img
+            :src="admissionForm.image"
+            alt=""
+            class="inset-0 w-full h-full object-cover"
+          />
+        </div>
+        <div class="p-6">
+          <div>
+            <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
+            <p v-if="admissionForm.description" class="text-sm text-gray-600">
+              {{ admissionForm.description }}
+            </p>
           </div>
-          <div class="p-6">
-            <div>
-              <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
-               <p v-if="admissionForm.description" class="text-sm text-gray-600">
-                {{ admissionForm.description }}
-              </p>
-            </div>
 
             <div class="mt-4">
               <form @submit.prevent="submit">
@@ -163,47 +161,51 @@ export default {
                       />
 
 
-                      <!-- File Input -->
-                       <div v-else-if="question.type === 'file'">
-                        <FileInput
-                          class="mt-1"
+                    <!-- File Input -->
+                    <div v-else-if="question.type === 'file'">
+                      <FileInput
+                        class="mt-1"
                         :required="question.validators.required"
 
-                          :accept="
-                            question.options
-                              ? question.options
-                                  .split(',')
-                                  .map((type) => '.' + type.trim())
-                              : []
-                          "
-                          :class="{
-                            'file:bg-red-600 hover:file:bg-red-500 file:text-white':
-                              form.errors[`response_data.${question.field_name}`],
-                          }"
-                        />
-                      </div>
+                        @input="
+                          form.response_data[question.field_name] = $event.target.files[0]
+                        "
+                        :maxSize="2 * 1024"
+                        :accept="
+                          question.options
+                            ? question.options.split(',').map((type) => '.' + type.trim())
+                            : []
+                        "
+                        :class="{
+                          'file:bg-red-600 hover:file:bg-red-500 file:text-white':
+                            form.errors[`response_data.${question.field_name}`],
+                        }"
+                      />
+                    </div>
 
-                      <!-- Select Input -->
-                      <div v-else-if="question.type === 'select'">
-                        <SelectInput
-                          :id="question.field_name"
-                          v-model="form.response_data[question.field_name]"
-                          class="mt-1 w-full"
+                    <!-- Select Input -->
+                    <div v-else-if="question.type === 'select'">
+                      <SelectInput
+                        :id="question.field_name"
+                        v-model="form.response_data[question.field_name]"
+                        class="mt-1 w-full"
                         :required="question.validators.required"
 
+                        :class="{
+                        'border-red-600':
+                          form.errors[`response_data.${question.field_name}`],
+                      }"
+                      >
+                        <option value="" disabled selected>-- Select an option --</option>
+                        <option
+                          v-for="option in question.options.split(',')"
+                          :key="option.trim()"
+                          :value="option.trim()"
                         >
-                          <option value="" disabled selected>
-                            -- Select an option --
-                          </option>
-                          <option
-                            v-for="option in question.options.split(',')"
-                            :key="option.trim()"
-                            :value="option.trim()"
-                          >
-                            {{ option.trim() }}
-                          </option>
-                        </SelectInput>
-                      </div>
+                          {{ option.trim() }}
+                        </option>
+                      </SelectInput>
+                    </div>
 
                       <!-- Phone Input -->
                       <div v-else-if="question.type === 'phonenumber'">
@@ -227,15 +229,16 @@ export default {
                             />
                       </div>
 
-                      <!-- Select Location and Course  -->
+                    <!-- Select Location and Course  -->
                     <div v-else-if="question.type === 'select_course'">
-                        <CourseSelect
-                          :branches="this.branches"
-                          :courses="this.courses"
-                          :form="form"
-                          :id="question.field_name"
-                          :required="true" ></CourseSelect>
-                      </div>
+                      <CourseSelect
+                        :branches="this.branches"
+                        :courses="this.courses"
+                        :form="form"
+                        :id="question.field_name"
+                        :required="true"
+                      ></CourseSelect>
+                    </div>
 
                       <div
                         class="flex items-center space-x-4"
@@ -307,15 +310,19 @@ export default {
       </div>
     </div>
 
-    <div class="p-6" v-if="showFormMessage && formIsActive">
-            <div>
-              <p class="text-2xl font-bold capitalize">{{ admissionForm.message_after_registration }}</p>
-            </div>
+  <div class="p-6" v-if="showFormMessage && formIsActive">
+    <div>
+      <p class="text-2xl font-bold capitalize">
+        {{ admissionForm.message_after_registration }}
+      </p>
     </div>
+  </div>
 
-    <div class="p-6" v-if="!formIsActive">
-            <div>
-              <p class="text-2xl font-bold capitalize">{{ admissionForm.message_when_inactive }}</p>
-            </div>
+  <div class="p-6" v-if="!formIsActive">
+    <div>
+      <p class="text-2xl font-bold capitalize">
+        {{ admissionForm.message_when_inactive }}
+      </p>
     </div>
+  </div>
 </template>

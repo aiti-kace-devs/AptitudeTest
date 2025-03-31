@@ -97,7 +97,7 @@ class FormResponseController extends Controller
 
 
         $formattedData = [];
-    
+
         foreach ($request->input('response_data', []) as $key => $value) {
             foreach ($schema as $field) {
                 if (strcasecmp($key, $field['title']) == 0) {
@@ -106,23 +106,23 @@ class FormResponseController extends Controller
                 }
             }
         }
-        
+
         foreach ($schema as $field) {
             $fieldKey = $field['type'] == 'select_course' ? 'response_data.course_id' : "response_data.{$field['field_name']}";
-        
-            $fieldTitle = ucwords(str_replace('_', ' ', $field['title'])); 
-        
+
+            $fieldTitle = ucwords(str_replace('_', ' ', $field['title']));
+
             $rules = [];
 
             if (!empty($field['validators']['required'])) {
                 $rules[] = 'required';
                 $customMessages["{$fieldKey}.required"] = "{$fieldTitle} is required.";
             }
-    
+
             if (!empty($field['validators']['unique'])) {
                 $existingRecords = FormResponse::select('response_data')->get();
                 $isDuplicate = false;
-        
+
                 foreach ($existingRecords as $record) {
                     $data = json_decode($record->response_data, true);
                     if (!empty($data[$field['field_name']]) && $data[$field['field_name']] == ($formattedData[$field['field_name']] ?? null)) {
@@ -130,7 +130,7 @@ class FormResponseController extends Controller
                         break;
                     }
                 }
-        
+
                 if ($isDuplicate) {
                     return response()->json([
                         'errors' => [
@@ -170,6 +170,7 @@ class FormResponseController extends Controller
 
                 case 'file':
                     $rules[] = 'file';
+                    $rules[] = 'max:2048';
 
                     if (!empty($field['options'])) {
                         $allowedMimes = array_map('trim', explode(',', strtolower($field['options'])));
@@ -178,6 +179,7 @@ class FormResponseController extends Controller
                     }
 
                     $customMessages["{$fieldKey}.file"] = "This field must be a file.";
+                    $customMessages["{$fieldKey}.max"] = "The file must not be greater than 2MB.";
 
                     break;
 
@@ -202,6 +204,26 @@ class FormResponseController extends Controller
 
         $validated = $request->validate($validationRules, $customMessages);
 
+        // Handle file uploads
+        foreach ($schema as $field) {
+            if ($field['type'] === 'file' && $request->hasFile("response_data.{$field['field_name']}")) {
+                $destinationPath = 'form/uploads/';
+                $file = $request->file("response_data.{$field['field_name']}");
+
+                $fileName = time() . '.' . $file->getClientOriginalExtension();
+
+                // Delete old image if it exists
+                if (\Storage::disk('public')->exists($destinationPath . $fileName)) {
+                    \Storage::disk('public')->delete($destinationPath . $fileName);
+                }
+
+                // Save new image
+                \Storage::disk('public')->putFileAs($destinationPath, $file, $fileName);
+
+                $validated['response_data'][$field['field_name']] = $fileName;
+            }
+        }
+
         $response = new FormResponse($validated);
 
         $form->responses()->save($response);
@@ -210,7 +232,6 @@ class FormResponseController extends Controller
         Log::info($fieldName);
 
         FormSubmittedEvent::dispatch($validated['response_data'], $fieldName);
-
     }
 
 
@@ -256,15 +277,18 @@ class FormResponseController extends Controller
         ];
 
         foreach ($schema as $field) {
-            $fieldKey = "response_data.{$field['field_name']}";
+            $fieldKey = $field['type'] == 'select_course' ? 'response_data.course_id' : "response_data.{$field['field_name']}";
 
             $rules = [];
 
             $field['title'] = strtolower($field['title']);
 
-            if (!empty($field['is_required'])) {
+            if (isset($field['validators']['required']) && $field['validators']['required']) {
                 $rules[] = 'required';
-                $customMessages["{$fieldKey}.required"] = "The {$field['title']} field is required.";
+                $customMessages["{$fieldKey}.required"] = "This field is required.";
+            } elseif (isset($field['validators']['unique']) && $field['validators']['unique']) {
+                $rules[] = "unique:form_responses,{$field['title']}";
+                $customMessages["{$fieldKey}.unique"] = "This field has already been taken.";
             } else {
                 $rules[] = 'nullable';
             }
@@ -273,33 +297,48 @@ class FormResponseController extends Controller
                 case 'text':
                 case 'textarea':
                     $rules[] = 'string';
-                    $customMessages["{$fieldKey}.string"] = "The {$field['title']} must be a valid string.";
+                    $customMessages["{$fieldKey}.string"] = "This field must be a string.";
                     break;
 
                 case 'radio':
                 case 'select':
                     $rules[] = 'string';
-                    $customMessages["{$fieldKey}.string"] = "The {$field['title']} must be a valid option.";
+                    $customMessages["{$fieldKey}.string"] = "This field must be a valid option.";
                     break;
 
                 case 'number':
                     $rules[] = 'numeric';
-                    $customMessages["{$fieldKey}.numeric"] = "The {$field['title']} must be a valid number.";
+                    $customMessages["{$fieldKey}.numeric"] = "This field must be a number.";
                     break;
 
                 case 'email':
                     $rules[] = 'email';
-                    $customMessages["{$fieldKey}.email"] = "The {$field['title']} must be a valid email address.";
+                    $customMessages["{$fieldKey}.email"] = "This field must be a valid email address.";
                     break;
 
                 case 'checkbox':
                     $rules[] = 'array';
-                    $customMessages["{$fieldKey}.array"] = "The {$field['title']} must be a valid array.";
+                    $customMessages["{$fieldKey}.array"] = "This field must be an array.";
                     break;
 
                 case 'file':
                     $rules[] = 'file';
-                    $customMessages["{$fieldKey}.file"] = "The {$field['title']} must be a valid file.";
+                    $rules[] = 'max:2048';
+
+                    if (!empty($field['options'])) {
+                        $allowedMimes = array_map('trim', explode(',', strtolower($field['options'])));
+                        $rules[] = 'mimes:' . implode(',', $allowedMimes);
+                        $customMessages["{$fieldKey}.mimes"] = "Must be a file of type: " . implode(', ', $allowedMimes) . ".";
+                    }
+
+                    $customMessages["{$fieldKey}.file"] = "This field must be a file.";
+                    $customMessages["{$fieldKey}.max"] = "The file must not be greater than 2MB.";
+
+                    break;
+
+                case 'select_course':
+                    $rules[] = 'exists:courses,id';
+                    $customMessages["{$fieldKey}.exists"] = "The selected course is invalid";
                     break;
 
                 case 'phonenumber':
@@ -316,6 +355,28 @@ class FormResponseController extends Controller
         }
         dd($validationRules);
         $validated = $request->validate($validationRules, $customMessages);
+
+        // Handle file uploads
+        foreach ($schema as $field) {
+            if ($field['type'] === 'file' && $request->hasFile("response_data.{$field['field_name']}")) {
+                $destinationPath = 'form/uploads/';
+                $file = $request->file("response_data.{$field['field_name']}");
+
+                $fileName = time() . '.' . $file->getClientOriginalExtension();
+
+                // Delete old image if it exists
+                if (\Storage::disk('public')->exists($destinationPath . $fileName)) {
+                    \Storage::disk('public')->delete($destinationPath . $fileName);
+                }
+
+                // Save new image
+                \Storage::disk('public')->putFileAs($destinationPath, $file, $fileName);
+
+                $validated['response_data'][$field['field_name']] = $fileName;
+            } else {
+                $validated['response_data'][$field['field_name']] = $formReponse['response_data'][$field['field_name']];
+            }
+        }
 
         $formReponse->fill($validated)->save();
 

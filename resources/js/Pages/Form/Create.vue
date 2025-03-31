@@ -139,7 +139,7 @@ export default {
       this.previewImage(file);
       this.imageConfig.image = file;
       this.imageConfig.isDirty = true;
-      this.form.image = file
+      this.form.image = file;
     },
     previewImage(file) {
       // Use FileReader to read the file and generate a data URL
@@ -328,8 +328,8 @@ export default {
                         <InputError :message="form.errors.message_when_inactive" />
                       </div>
 
-                       <!-- status -->
-                       <div>
+                      <!-- status -->
+                      <div>
                         <!-- <InputLabel
                           for="active"
                           value="Form Accepting Responses"
