@@ -85,7 +85,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/exam_status/{id}', [AdminController::class, 'exam_status'])->middleware('admin.super');
         Route::get('/delete_exam/{id}', [AdminController::class, 'delete_exam'])->middleware('admin.super');
         Route::get('/edit_exam/{id}', [AdminController::class, 'edit_exam'])->middleware('admin.super');
-        Route::get('/manage_students', [AdminController::class, 'manage_students'])->middleware('admin.super');
+        Route::get('/manage_students', [AdminController::class, 'manage_students'])->middleware('admin.super')->name('manage_students');
         Route::get('/student_status/{id}', [AdminController::class, 'student_status'])->middleware('admin.super');
         Route::get('/delete_students/{id}', [AdminController::class, 'delete_students'])->middleware('admin.super');
         Route::get('/add_questions/{id}', [AdminController::class, 'add_questions'])->middleware('admin.super');

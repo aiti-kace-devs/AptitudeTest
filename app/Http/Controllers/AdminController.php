@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Yajra\DataTables\Facades\DataTables;
 use App\Events\UserRegistered;
 use App\Jobs\AddNewStudentsJob;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,8 @@ use App\Models\Oex_portal;
 use App\Models\User;
 use App\Models\Oex_question_master;
 use Illuminate\Support\Arr;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -94,9 +97,7 @@ class AdminController extends Controller
     //Editing the categories
     public function edit_new_category(Request $request)
     {
-        $cat = Oex_category::where('id', $request->id)
-            ->get()
-            ->first();
+        $cat = Oex_category::where('id', $request->id)->get()->first();
         $cat->name = $request->name;
         $cat->update();
         echo json_encode(['status' => 'true', 'message' => 'updated successfully', 'reload' => url('admin/exam_category')]);
@@ -194,9 +195,7 @@ class AdminController extends Controller
     //Editing Exam
     public function edit_exam_sub(Request $request)
     {
-        $exam = Oex_exam_master::where('id', $request->id)
-            ->get()
-            ->first();
+        $exam = Oex_exam_master::where('id', $request->id)->get()->first();
         $exam->title = $request->title;
         $exam->exam_date = $request->exam_date;
         $exam->category = $request->exam_category;
@@ -209,23 +208,85 @@ class AdminController extends Controller
     }
 
     //Manage students
-    public function manage_students()
+    public function manage_students(Request $request)
     {
         $data['exam'] = Oex_exam_master::all();
-
         $data['exams'] = Oex_exam_master::where('status', '1')->get()->toArray();
 
-        $data['students'] = user_exam::with('result')
-            // select(['user_exams.*', 'users.name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.exam_date', 'oex_exam_masters.passmark'])
-            ->join('users', 'users.id', '=', 'user_exams.user_id')
-            ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
-            ->orderBy('user_exams.exam_id', 'desc')
-            // ->leftJoin('oex_results', 'user_exams.id', '=', 'oex_results.exam_id')
-            ->get();
-        // ->toArray();
+        if ($request->ajax()) {
+            $baseQuery = user_exam::with('result')
+                ->join('users', 'users.id', '=', 'user_exams.user_id')
+                ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
+                ->select(['user_exams.id', 'users.name', 'users.email', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined']);
+
+            // Manually apply filters (temporarily removing Spatie for debugging)
+            if ($request->has('filter.ex_name')) {
+                $baseQuery->where('oex_exam_masters.title', 'like', '%' . $request->input('filter.ex_name') . '%');
+            }
+
+            if ($request->has('filter.status')) {
+                $status = $request->input('filter.status');
+                if ($status === 'passed') {
+                    $baseQuery->whereHas('result', function ($q) {
+                        $q->whereColumn('yes_ans', '>=', 'oex_exam_masters.passmark');
+                    });
+                } elseif ($status === 'failed') {
+                    $baseQuery->whereHas('result', function ($q) {
+                        $q->whereColumn('yes_ans', '<', 'oex_exam_masters.passmark');
+                    });
+                } elseif ($status === 'not_taken') {
+                    $baseQuery->whereNull('submitted');
+                }
+            }
+
+            if ($request->has('filter.name')) {
+                $baseQuery->where('users.name', 'like', '%' . $request->input('filter.name') . '%');
+            }
+
+            if ($request->has('filter.email')) {
+                $baseQuery->where('users.email', 'like', '%' . $request->input('filter.email') . '%');
+            }
+
+            return DataTables::of($baseQuery)
+                ->addColumn('checkbox', function ($std) {
+                    return '<input type="checkbox" class="student-checkbox" value="' . $std->id . '">';
+                })
+                ->addColumn('score', function ($std) {
+                    return optional($std->result)->yes_ans ?? 'N/A';
+                })
+                ->addColumn('result', function ($std) {
+                    if (!$std->submitted) {
+                        return '<span class="badge badge-secondary">N/A</span>';
+                    }
+                    $yes_ans = optional($std->result)->yes_ans ?? 0;
+                    $percentage = round(($yes_ans / 30) * 100);
+                    $class = $yes_ans >= $std->passmark ? 'success' : 'danger';
+                    return '<span class="badge badge-' . $class . '">' . $percentage . '%</span>';
+                })
+                ->addColumn('status', function ($std) {
+                    if (!$std->submitted) {
+                        return '<span class="badge badge-secondary">Not Taken</span>';
+                    }
+                    $passed = optional($std->result)->yes_ans >= $std->passmark;
+                    return $passed ? '<span class="badge badge-success">PASS</span>' : '<span class="badge badge-danger">FAIL</span>';
+                })
+                ->addColumn('actions', function ($std) {
+                    $buttons = ['<a href="' . url('admin/delete_students/' . $std->id) . '" class="btn btn-danger btn-sm">Delete</a>'];
+
+                    if ($std->exam_joined) {
+                        $buttons[] = '<a href="' . url('admin/admin_view_result/' . $std->user_id) . '" class="btn btn-success btn-sm">View Result</a>';
+                    }
+
+                    $buttons[] = '<a href="' . route('admin.reset-exam', [$std->exam_id, $std->user_id]) . '" class="btn btn-info btn-sm">Reset Result</a>';
+
+                    return implode(' ', $buttons);
+                })
+                ->rawColumns(['checkbox', 'result', 'status', 'actions'])
+                ->toJson();
+        }
+
         return view('admin.manage_students', $data);
     }
-
     public function add_new_students(Request $request)
     {
         $data = $request->input('students') !== null ? $request->input('students') : [$request->all()];
@@ -234,32 +295,6 @@ class AdminController extends Controller
 
         echo json_encode(['status' => 'true', 'message' => 'Successfully updated', 'reload' => url('admin/manage_students')]);
     }
-
-    //Add new students
-    // public function add_new_students_arr(Request $request)
-    // {
-    //     $students = $request->input('students') ? $request->input('students') : [$request->all()];
-
-    //     foreach ($students as $student) {
-    //         $validator = Validator::make($student, [
-    //             'name' => 'required',
-    //             'email' => 'required|email',
-    //             'mobile_no' => 'required',
-    //             'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
-    //             'password' => 'sometimes',
-    //             'exam_name' => 'sometimes',
-    //         ]);
-
-    //         if ($validator->fails()) {
-    //             $arr = ['status' => 'false', 'message' => $validator->errors()->all()];
-    //         } else {
-    //             AddNewStudentsJob::dispatch($student);
-    //         }
-    //     }
-
-    //     $arr = ['status' => 'true', 'message' => 'student added successfully', 'reload' => url('admin/manage_students')];
-    //     echo json_encode($arr);
-    // }
 
     //Editing student status
     public function student_status($id)
@@ -288,9 +323,7 @@ class AdminController extends Controller
     //Editing students
     public function edit_students_final(Request $request)
     {
-        $std = User::where('id', $request->id)
-            ->get()
-            ->first();
+        $std = User::where('id', $request->id)->get()->first();
         $std->name = $request->name;
         $std->email = $request->email;
         $std->mobile_no = $request->mobile_no;
@@ -418,9 +451,7 @@ class AdminController extends Controller
     //Edit question
     public function edit_question_inner(Request $request)
     {
-        $q = Oex_question_master::where('id', $request->id)
-            ->get()
-            ->first();
+        $q = Oex_question_master::where('id', $request->id)->get()->first();
 
         $q->questions = $request->question;
 
@@ -445,9 +476,7 @@ class AdminController extends Controller
     {
         $std_exam = user_exam::where('user_id', $id)->first();
 
-        $data['result_info'] = Oex_result::where('exam_id', $std_exam->exam_id)
-            ->where('user_id', $id)
-            ->first();
+        $data['result_info'] = Oex_result::where('exam_id', $std_exam->exam_id)->where('user_id', $id)->first();
 
         $data['student_info'] = User::where('id', $id)->first();
 
@@ -487,10 +516,7 @@ class AdminController extends Controller
             $selectedCourse = Course::find($request->input('course_id'));
 
             if ($selectedCourse) {
-                $students = UserAdmission::where('course_id', $selectedCourse->id)
-                    ->join('users', 'user_admission.user_id', '=', 'users.userId')
-                    ->select('users.*')
-                    ->get();
+                $students = UserAdmission::where('course_id', $selectedCourse->id)->join('users', 'user_admission.user_id', '=', 'users.userId')->select('users.*')->get();
             }
         }
 
@@ -503,7 +529,7 @@ class AdminController extends Controller
 
         // match with ghana card format
         $correctFormat = preg_match('/GHA-[0-9]{9}-[0-9]{1}$/', $student->ghcard);
-        if ($student && $correctFormat || $student && $student->ghcard && $student->card_type !== 'ghcard') {
+        if (($student && $correctFormat) || ($student && $student->ghcard && $student->card_type !== 'ghcard')) {
             $adminId = Auth::id();
             $student->verification_date = now();
             $student->verified_by = $adminId;
@@ -559,11 +585,7 @@ class AdminController extends Controller
             $selectedDate = $request->input('date');
 
             if ($selectedCourse && $selectedDate) {
-                $attendance = Attendance::select('attendances.*', 'users.name', 'users.email')
-                    ->join('users', 'users.userId', '=', 'attendances.user_id')
-                    ->where('attendances.course_id', $selectedCourse->id)
-                    ->whereDate('attendances.date', '=', $selectedDate)
-                    ->get();
+                $attendance = Attendance::select('attendances.*', 'users.name', 'users.email')->join('users', 'users.userId', '=', 'attendances.user_id')->where('attendances.course_id', $selectedCourse->id)->whereDate('attendances.date', '=', $selectedDate)->get();
             }
         }
 
@@ -628,9 +650,7 @@ class AdminController extends Controller
                 $admission->location = $course->location;
                 $admission->save();
 
-                Mail::to($user->email)
-                    ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
-                    ->queue(new StudentAdmitted(name: $user->name, course: $course->course_name, location: $course->location, url: $url));
+                Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))->queue(new StudentAdmitted(name: $user->name, course: $course->course_name, location: $course->location, url: $url));
 
                 AdmitStudentJob::dispatch($admission);
             }
@@ -685,9 +705,9 @@ class AdminController extends Controller
             'report_type' => null,
             'dates' => '',
             'selectedCourse' => [],
-            'selectedDailyOption' => "no",
+            'selectedDailyOption' => 'no',
             'virtualQuery' => false,
-            'virtual_week' => []
+            'virtual_week' => [],
         ];
 
         return view('admin.reports', $data);
@@ -724,7 +744,8 @@ class AdminController extends Controller
                 $attendanceData = $attendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate]);
             }
 
-            $attendanceData = $attendanceData->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
+            $attendanceData = $attendanceData
+                ->whereRaw('DATE(attendance_date) BETWEEN ? AND ?', [$startDate, $endDate])
                 ->select('v1.*')
                 ->selectRaw('(SELECT AVG(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as average', [$startDate, $endDate])
                 ->selectRaw('(SELECT SUM(v2.total) from `vDailyCourseAttendance` v2 where v2.course_id = v1.course_id AND DATE(attendance_date) BETWEEN ? AND ? group by v1.course_id ) as attendance_total', [$startDate, $endDate])
@@ -736,28 +757,37 @@ class AdminController extends Controller
 
         if ($request->get('report_type') == 'student_summary') {
             $courseId = $validated['course_id'] ?? [0];
-            $whereCourseClause = $courseId[0] == 0 ? '' : ' WHERE c.id in ( ' . implode(',', (collect($courseId)->flatten()->all())) . ')';
+            $whereCourseClause = $courseId[0] == 0 ? '' : ' WHERE c.id in ( ' . implode(',', collect($courseId)->flatten()->all()) . ')';
             // use total attendance when start to date and no daily
             // if ($s)
-            $virtualQuery =  isset($validated['virtual_week']) && count($validated['virtual_week']) > 0;
+            $virtualQuery = isset($validated['virtual_week']) && count($validated['virtual_week']) > 0;
 
-            $whereVirtualClause = $virtualQuery ? " AND WEEK(a.date, 3) IN (" . implode(',', $validated['virtual_week']) . ") " : '';
-            $optimizeQuery = "select _ta.total as attendance_total, _ta.user_id,
-                u.name as user_name, u.email as email, u.gender as user_gender, u.contact as user_contact, u.network_type as user_network_type, c.course_name, c.location as course_location, c.id " . ($dailyQuery ? ', _da.date as attendance_date' : '') . ($virtualQuery ? ', _va.t as virtual_attendance, (_ta.total - _va.t) as in_person' : '') . " from
+            $whereVirtualClause = $virtualQuery ? ' AND WEEK(a.date, 3) IN (' . implode(',', $validated['virtual_week']) . ') ' : '';
+            $optimizeQuery =
+                "select _ta.total as attendance_total, _ta.user_id,
+                u.name as user_name, u.email as email, u.gender as user_gender, u.contact as user_contact, u.network_type as user_network_type, c.course_name, c.location as course_location, c.id " .
+                ($dailyQuery ? ', _da.date as attendance_date' : '') .
+                ($virtualQuery ? ', _va.t as virtual_attendance, (_ta.total - _va.t) as in_person' : '') .
+                " from
                 (select count(distinct `a`.`date`) AS `total`,max(`a`.`user_id`) AS `user_id`
                 from `attendances` `a`
                 where DATE(a.date) between ? AND ?
                 group by `a`.`user_id`) as _ta " .
-                ($virtualQuery ? "inner join
+                ($virtualQuery
+                    ? "inner join
                 (select COUNT(*) as t, MAX(a.user_id) AS user_id FROM `attendances` `a`
                 where DATE(a.date) between ? AND ? $whereVirtualClause
                 group by `a`.`user_id` ) as _va
-                ON _ta.user_id  = _va.user_id " : '') .
-                ($dailyQuery ? "inner join
+                ON _ta.user_id  = _va.user_id "
+                    : '') .
+                ($dailyQuery
+                    ? "inner join
                 (select distinct date_format(`a`.`date`,'%Y-%m-%d') AS `date`,
                 `a`.`user_id` from `attendances` `a`
                 where DATE(a.date) between ? AND ? ) as _da
-                ON _ta.user_id  = _da.user_id " : "") . "
+                ON _ta.user_id  = _da.user_id "
+                    : '') .
+                "
                 left join users u on u.userId = _ta.user_id
                 left join user_admission ua on ua.user_id = _ta.user_id
                 inner join courses c on c.id = ua.course_id
@@ -767,11 +797,11 @@ class AdminController extends Controller
             $groupBy = ['user_id', 'attendance_date'];
 
             if ($dailyQuery) {
-                $params =  array_merge($params, $dateParams);
+                $params = array_merge($params, $dateParams);
             }
 
             if ($virtualQuery) {
-                $params =  array_merge($params, $dateParams);
+                $params = array_merge($params, $dateParams);
             }
 
             // if ($courseId[0] !== 'all') {
@@ -781,12 +811,10 @@ class AdminController extends Controller
             // dd($optimizeQuery);
             // DB::bindValues($optimizeQuery, $params);
 
-
-            $studentAttendanceData = collect(DB::select($optimizeQuery, $params))
-                ->groupBy($groupBy);
+            $studentAttendanceData = collect(DB::select($optimizeQuery, $params))->groupBy($groupBy);
             // dd($studentAttendanceData);
 
-            $selectedCourse = $courseId[0] == '0' ||  count($courseId) > 1 ? '0' : Course::find($courseId[0]);
+            $selectedCourse = $courseId[0] == '0' || count($courseId) > 1 ? '0' : Course::find($courseId[0]);
         }
 
         $data = [
@@ -801,8 +829,7 @@ class AdminController extends Controller
             'selectedCourse' => $selectedCourse ?? '0',
             'selectedDailyOption' => $request->get('daily'),
             'virtualQuery' => $virtualQuery,
-            'virtual_week' => $validated['virtual_week'] ?? []
-
+            'virtual_week' => $validated['virtual_week'] ?? [],
         ];
         // dd($data);
         return view('admin.reports', $data);

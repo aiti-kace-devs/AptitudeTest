@@ -36,76 +36,62 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <table class="table table-striped table-bordered table-hover datatable">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <select class="form-control filter-select" data-column="3"
+                                                data-filter="ex_name">
+                                                <option value="">All Exams</option>
+                                                @foreach ($exams as $exam)
+                                                    <option value="{{ $exam['title'] }}">{{ $exam['title'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-control filter-select" data-column="6" data-filter="status">
+                                                <option value="">All Statuses</option>
+                                                <option value="passed">Passed</option>
+                                                <option value="failed">Failed</option>
+                                                <option value="not_taken">Not Taken</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control filter-input"
+                                                placeholder="Search by name" data-column="1" data-filter="name">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control filter-input"
+                                                placeholder="Search by email" data-column="2" data-filter="email">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12 text-right">
+                                            <button class="btn btn-primary" id="admit-selected">Admit Selected
+                                                Students</button>
+                                        </div>
+                                    </div>
+                                    <table id="studentsTable" class="table table-striped table-bordered table-hover">
                                         <thead>
                                             <tr>
-                                                <th>#</th>
+                                                <th width="20px"><input type="checkbox" id="select-all"></th>
                                                 <th>Name</th>
                                                 <th>Email</th>
-                                                {{-- <th>DOB</th> --}}
                                                 <th>Exam</th>
-                                                {{-- <th>Exam Date</th> --}}
+                                                <th>Score</th>
                                                 <th>Result</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            @foreach ($students as $key => $std)
-                                                <tr>
-                                                    <td>{{ $std['id'] }}</td>
-                                                    <td>{{ $std['name'] }}</td>
-                                                    <td>{{ $std['email'] }}</td>
-                                                    <td>{{ $std['title'] }}</td>
-                                                    <td>
-
-                                                        @if ($std['submitted'] == null)
-                                                            <span class="badge badge-secondary">N/A</span>
-                                                        @else
-                                                            <span
-                                                                class="badge badge-{{ ($std->result->yes_ans <= 20 ? 'danger' : $std->result->yes_ans <= 25) ? 'primary' : 'success' }}">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
-                                                            {{-- <span class="badge badge-warning">{{ $std->result->yes_ans}}</span> --}}
-                                                        @endif
-
-                                                    </td>
-                                                    <td>
-                                                        @if ($std['submitted'] == null)
-                                                            <span class="badge badge-secondary">Not Taken</span>
-                                                        @elseif($std->result->yes_ans >= $std['passmark'])
-                                                            <span class="badge badge-success">PASS</span>
-                                                        @else
-                                                            <span class="badge badge-danger">FAIL</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{-- <a href="{{url('admin/edit_students/'.$std['id'])}}" class="btn btn-primary">Edit</a> --}}
-                                                        <a href="{{ url('admin/delete_students/' . $std['id']) }}"
-                                                            class="btn btn-danger btn-sm">Delete</a>
-
-                                                        @if ($std['exam_joined'] == 1)
-                                                            <a href="{{ url('admin/admin_view_result/' . $std['user_id']) }}"
-                                                                class="btn btn-success btn-sm">View Result</a>
-                                                        @endif
-                                                        <a href="{{ route('admin.reset-exam', [$std['exam_id'], $std['user_id']]) }}"
-                                                            class="btn btn-info btn-sm">Reset Result</a>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot>
-
-                                        </tfoot>
+                                        <tbody></tbody>
                                     </table>
                                 </div>
-                                <!-- /.card-body -->
                             </div>
-                            <!-- /.card -->
                         </div>
                     </div>
                 </div>
             </section>
         </div>
-        <!-- /.content-header -->
 
         <!-- Modal -->
         <div class="modal fade" id="myModal" role="dialog">
@@ -181,5 +167,143 @@
             </div>
 
 
+            <script>
+                $(document).ready(function() {
+                    var table = $('#studentsTable').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        ajax: {
+                            url: "{{ route('admin.manage_students') }}",
+                            type: "GET",
+                            data: function(d) {
+                                d.draw = d.draw;
+                                d.start = d.start;
+                                d.length = d.length;
+                                d.search = d.search;
+
+                                if ($('select[data-filter="ex_name"]').val()) {
+                                    d['filter[ex_name]'] = $('select[data-filter="ex_name"]').val();
+                                }
+                                if ($('select[data-filter="status"]').val()) {
+                                    d['filter[status]'] = $('select[data-filter="status"]').val();
+                                }
+                                if ($('input[data-filter="name"]').val()) {
+                                    d['filter[name]'] = $('input[data-filter="name"]').val();
+                                }
+                                if ($('input[data-filter="email"]').val()) {
+                                    d['filter[email]'] = $('input[data-filter="email"]').val();
+                                }
+                            },
+                            error: function(xhr, error, thrown) {
+                                console.log("AJAX Error:", xhr.responseText);
+                                $('#studentsTable tbody').html(
+                                    '<tr><td colspan="9" class="text-center text-danger">Error loading data. Please try again.</td></tr>'
+                                );
+                            }
+                        },
+                        columns: [{
+                                data: 'checkbox',
+                                name: 'checkbox',
+                                orderable: false,
+                                searchable: false
+                            },
+                            {
+                                data: 'name',
+                                name: 'users.name'
+                            },
+                            {
+                                data: 'email',
+                                name: 'users.email'
+                            },
+                            {
+                                data: 'ex_name',
+                                name: 'oex_exam_masters.title'
+                            },
+                            {
+                                data: 'score',
+                                name: 'score',
+                                orderable: false
+                            },
+                            {
+                                data: 'result',
+                                name: 'result',
+                                orderable: false
+                            },
+                            {
+                                data: 'status',
+                                name: 'status',
+                                orderable: false
+                            },
+                            {
+                                data: 'actions',
+                                name: 'actions',
+                                orderable: false
+                            }
+                        ],
+                        columnDefs: [{
+                                targets: 0,
+                                width: "5%"
+                            },
+                            {
+                                targets: -1,
+                                width: "15%"
+                            }
+                        ],
+                        order: [
+                            [1, 'asc']
+                        ]
+                    });
+
+                    $('.filter-select, .filter-input').on('change keyup', function() {
+                        table.ajax.reload();
+                    });
+
+                    $('#select-all').change(function() {
+                        $('.student-checkbox').prop('checked', $(this).prop('checked'));
+                    });
+
+                    $('#admit-selected').click(function() {
+                        var selected = [];
+                        $('.student-checkbox:checked').each(function() {
+                            selected.push($(this).val());
+                        });
+
+                        if (selected.length === 0) {
+                            toastr.warning('Please select at least one student');
+                            return;
+                        }
+
+                        Swal.fire({
+                            title: 'Admit Selected Students?',
+                            text: 'You are about to admit ' + selected.length + ' students. Continue?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, admit them',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.admit_user_ui') }}",
+                                    type: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        student_ids: selected
+                                    },
+                                    success: function(response) {
+                                        toastr.success(response.message);
+                                        table.ajax.reload();
+                                    },
+                                    error: function(xhr) {
+                                        toastr.error(xhr.responseJSON?.message ||
+                                            'An error occurred');
+                                    }
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
 
         @endsection
