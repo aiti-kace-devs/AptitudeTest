@@ -6,7 +6,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import { ref } from "vue";
+import { ref, nextTick  } from "vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
@@ -36,23 +36,22 @@ export default {
     const selections = ref([]);
     const fileInput = ref(null);
 
-    const imageConfig = {
-      image: this.admissionForm.image ?? null,
-      isDirty: this.admissionForm.image ? false : true,
-      preview: this.admissionForm.image ?? null,
-      original: this.admissionForm.image ?? null,
-    };
+    const imageConfig = ref({
+      image: this.admissionForm.image,
+      isDirty: false,
+      preview: this.admissionForm.image,
+      original: this.admissionForm.image,
+    });
 
     const form = useForm({
       title: this.admissionForm.title,
       description: this.admissionForm.description,
       image: imageConfig.image,
       code: this.admissionForm.code,
-      schema: this.admissionForm.schema,
+      schema: this.admissionForm.schema ?? [],
       message_when_inactive: this.admissionForm.message_when_inactive,
       message_after_registration: this.admissionForm.message_after_registration,
-      active: this.admissionForm.active,
-      schema: [],
+      active: this.admissionForm.active
     });
 
     return {
@@ -135,11 +134,11 @@ export default {
       this.selections[swapIndex] = temp;
     },
     submit() {
-      // Submit the form with schema as JSON
       this.form.put(route("admin.form.update", { form: this.admissionForm.uuid }), {
         data: {
-          isDirty: this.imageConfig.isDirty,
+          image_isDirty: this.imageConfig.isDirty,
         },
+        forceFormData: true,
         onSuccess: () => {
           toastr.success("Form successfully updated");
           this.resetForm();
@@ -162,8 +161,8 @@ export default {
 
       this.previewImage(file);
       this.imageConfig.image = file;
-      this.imageConfig.isDirty = true;
-      this.form.image = file;
+      this.imageConfig.isDirty = true;      
+        this.form.image = file;
     },
     previewImage(file) {
       // Use FileReader to read the file and generate a data URL
@@ -183,12 +182,12 @@ export default {
     },
     restoreImage() {
       this.imageConfig.preview = this.imageConfig.original;
-      this.imageConfig.image = null;
+      this.imageConfig.image = this.imageConfig.original;
       this.imageConfig.isDirty = false;
     },
     resetInput() {
       if (this.fileInput) {
-        this.fileInput = ""; // Clear file input
+        this.fileInput.value = ""; // Clear file input
       }
     },
   },
@@ -249,7 +248,7 @@ export default {
 
                       <div>
                         <InputLabel for="image" value="image" :required="false" />
-
+                        {{ form }}
                         <div class="flex flex-col gap-6 mt-3">
                           <!-- preview section -->
                           <div
@@ -273,7 +272,6 @@ export default {
                           <!-- Upload Button -->
                           <div>
                             <FileInput
-                              ref="fileInput"
                               id="image-upload"
                               class="hidden"
                               @change="handleImageOnChange"
@@ -352,8 +350,8 @@ export default {
                         <InputError :message="form.errors.message_when_inactive" />
                       </div>
 
-                       <!-- status -->
-                       <div>
+                      <!-- status -->
+                      <div>
                         <!-- <InputLabel
                           for="active"
                           value="Form Accepting Responses"
