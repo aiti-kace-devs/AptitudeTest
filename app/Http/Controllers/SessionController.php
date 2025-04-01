@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SessionFormRequest;
+use App\Models\Course;
 use App\Models\Session;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,14 +27,11 @@ class SessionController extends Controller
 
     public function fetch()
     {
-        $data = Session::get(['uuid', 'title', 'starts_at', 'ends_at', 'updated_at']);
+        $data = Session::get(['uuid', 'name', 'limit', 'course_time']);
         return DataTables::of($data)
             ->addIndexColumn()
-            ->editColumn('starts_at', function ($row) {
-                return '<span class="hidden">' . strtotime($row->starts_at) . '</span>' . Carbon::parse($row->starts_at)->format('h:i A');
-            })
-            ->editColumn('ends_at', function ($row) {
-                return '<span class="hidden">' . strtotime($row->ends_at) . '</span>' . Carbon::parse($row->ends_at)->format('h:i A');
+            ->editColumn('duration', function ($row){
+                return $row->course_time;
             })
             ->addColumn('action', function ($row) {
                 $linkClass = 'inline-flex items-center w-full px-4 py-2 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-25 hover:text-gray-50 hover:bg-gray-100';
@@ -62,13 +60,15 @@ class SessionController extends Controller
 
                 return $action;
             })
-            ->rawColumns(['starts_at', 'ends_at', 'action'])
+            ->rawColumns(['duration', 'action'])
             ->make(true);
     }
 
     public function create()
     {
-        return Inertia::render('Session/Create');
+        $courses = Course::orderBy('course_name')->get();
+
+        return Inertia::render('Session/Create', compact('courses'));
     }
 
     /**
@@ -81,6 +81,13 @@ class SessionController extends Controller
     public function store(SessionFormRequest $request)
     {
         $validated = $request->validated();
+
+        $course = Course::find($validated['course_id']);
+
+        $name = $course->course_name . ' ' . $validated['session'] . ' session';
+
+        $validated['name'] = ucwords($name);
+        $validated['session'] = ucwords($validated['session']);
 
         Session::create($validated);
 
@@ -108,8 +115,9 @@ class SessionController extends Controller
     public function edit($uuid)
     {
         $session = Session::where('uuid', $uuid)->firstOrFail();
+        $courses = Course::orderBy('course_name')->get();
 
-        return Inertia::render('Session/Edit', compact('session'));
+        return Inertia::render('Session/Edit', compact('session', 'courses'));
     }
 
     /**
@@ -122,6 +130,13 @@ class SessionController extends Controller
     public function update(SessionFormRequest $request, $uuid)
     {
         $validated = $request->validated();
+        $course = Course::find($validated['course_id']);
+
+        $name = $course->course_name . ' ' . $validated['session'] . ' session';
+
+        $validated['name'] = ucwords($name);
+        $validated['session'] = ucwords($validated['session']);
+
         $session = Session::where('uuid', $uuid)->first();
 
         $session->fill($validated)->save();

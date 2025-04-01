@@ -62,9 +62,9 @@ export default {
           url: route("admin.session.fetch"),
         },
         columns: [
-          { data: "title", name: "title" },
-          { data: "starts_at", name: "starts_at" },
-          { data: "ends_at", name: "ends_at" },
+          { data: "name", name: "name" },
+          { data: "duration", name: "duration" },
+          { data: "limit", name: "limit" },
           {
             data: "action",
             name: "action",
@@ -144,13 +144,13 @@ export default {
                       <thead class="capitalize border-b bg-gray-100 font-medium">
                         <tr>
                           <th scope="col" class="text-gray-900 px-6 py-4 text-left">
-                            Title
+                            Name
                           </th>
                           <th scope="col" class="text-gray-900 px-6 py-4 text-left">
-                            Starts At
+                            Duration
                           </th>
                           <th scope="col" class="text-gray-900 px-6 py-4 text-left">
-                            Ends At
+                            Limit
                           </th>
                           <th scope="col" class="text-gray-900 px-6 py-4 text-left">
                             Action

@@ -5,6 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import SelectInput from "@/Components/SelectInput.vue";
 
 export default {
   components: {
@@ -14,16 +15,19 @@ export default {
     TextInput,
     InputError,
     InputLabel,
+    SelectInput,
   },
   props: {
     errors: Object,
     session: Object,
+    courses: Object,
   },
   data() {
     const form = useForm({
-      title: this.session.title,
-      starts_at: this.session.starts_at,
-      ends_at: this.session.ends_at,
+      course_id: this.session.course_id,
+      limit: this.session.limit,
+      course_time: this.session.course_time,
+      session: this.session.session,
     });
 
     return {
@@ -71,44 +75,62 @@ export default {
           <div class="p-6">
             <form @submit.prevent="submit">
               <div class="grid grid-cols-12 gap-5">
-                <div class="col-span-full">
-                  <InputLabel for="title" value="Title" :required="true" />
+                <div class="lg:col-span-6">
+                  <InputLabel for="course_id" value="course" :required="true" />
+                  <SelectInput
+                    id="'course_id"
+                    v-model="form.course_id"
+                    class="w-full"
+                    :class="{ 'border-red-600': form.errors.course_id }"
+                  >
+                    <option :value="''" disabled>-- Select Course --</option>
+                    <option v-for="course in courses" :key="course.id" :value="course.id">
+                      {{ course.course_name }}
+                    </option>
+                  </SelectInput>
+                  <InputError :message="form.errors.course_id" />
+                </div>
+
+                <div class="lg:col-span-6">
+                  <InputLabel for="limit" value="limit" :required="true" />
                   <TextInput
-                    id="title"
+                    id="limit"
+                    type="number"
+                    class="w-full"
+                    v-model="form.limit"
+                    :placeholder="'Limit'"
+                    autocomplete="limit"
+                    :class="{ 'border-red-600': form.errors.limit }"
+                  />
+                  <InputError :message="form.errors.limit" />
+                </div>
+
+                <div class="lg:col-span-6">
+                  <InputLabel for="course_time" value="Duration" :required="true" />
+                  <TextInput
+                    id="course_time"
                     type="text"
                     class="w-full"
-                    v-model="form.title"
-                    :placeholder="'Title'"
-                    autocomplete="title"
-                    :class="{ 'border-red-600': form.errors.title }"
+                    v-model="form.course_time"
+                    :placeholder="'Duration'"
+                    autocomplete="false"
+                    :class="{ 'border-red-600': form.errors.course_time }"
                   />
-                  <InputError :message="form.errors.title" />
+                  <InputError :message="form.errors.course_time" />
                 </div>
 
-                <div class="col-span-6">
-                  <InputLabel for="starts_at" value="Starts at" :required="true" />
+                <div class="lg:col-span-6">
+                  <InputLabel for="session" value="Session" :required="true" />
                   <TextInput
-                    id="starts_at"
-                    type="time"
+                    id="session"
+                    type="text"
                     class="w-full"
-                    v-model="form.starts_at"
-                    :placeholder="'Starts At'"
-                    :class="{ 'border-red-600': form.errors.starts_at }"
+                    v-model="form.session"
+                    :placeholder="'Session'"
+                    autocomplete="false"
+                    :class="{ 'border-red-600': form.errors.session }"
                   />
-                  <InputError :message="form.errors.starts_at" />
-                </div>
-
-                <div class="col-span-6">
-                  <InputLabel for="ends_at" value="ends at" :required="true" />
-                  <TextInput
-                    id="ends_at"
-                    type="time"
-                    class="w-full"
-                    v-model="form.ends_at"
-                    :placeholder="'Ends At'"
-                    :class="{ 'border-red-600': form.errors.ends_at }"
-                  />
-                  <InputError :message="form.errors.ends_at" />
+                  <InputError :message="form.errors.session" />
                 </div>
 
                 <div class="col-span-full">

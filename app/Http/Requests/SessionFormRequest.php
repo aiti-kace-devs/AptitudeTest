@@ -22,9 +22,18 @@ class SessionFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:100'],
-            'starts_at' => 'required',
-            'ends_at' => ['required', 'after:starts_at']
+            'course_id' => 'required',
+            'limit' => ['required', 'numeric', 'min:0'],
+            'course_time' => ['required', 'string', 'max:100'],
+            'session' => ['required', 'string', 'max:100']
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'course_id' => 'course',
+            'course_time' => 'duration'
         ];
     }
 }

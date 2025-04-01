@@ -10,10 +10,14 @@ class Session extends Model
 {
     use HasFactory;
 
+    protected $table = 'course_sessions';
+
     protected $fillable = [
-        'title',
-        'starts_at',
-        'ends_at'
+        'name',
+        'course_id',
+        'limit',
+        'course_time',
+        'session'
     ];
 
     protected static function boot()
