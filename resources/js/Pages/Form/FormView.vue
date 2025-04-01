@@ -298,7 +298,7 @@ export default {
                     <PrimaryButton
                         v-if="!admin"
                       type="submit"
-                      :disabled="form.processing || phoneError || form.hasErrors"
+                      :disabled="form.processing || phoneError "
                       :class="{ 'opacity-25': form.processing }"
                     >
                       Submit
