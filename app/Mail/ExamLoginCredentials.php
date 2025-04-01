@@ -21,11 +21,18 @@ class ExamLoginCredentials extends Mailable
      *
      * @return void
      */
-    public function __construct(public $std, public $plainPassword, public $deadline)
+
+    public $password, $deadline, $examUrl, $name, $email;
+
+
+
+    public function __construct($std = null, $plainPassword = null, $deadline = null, $examUrl = null)
     {
-        $this->std = $std;
-        $this->plainPassword = $plainPassword;
+        $this->name = $std?->name;
+        $this->email = $std?->email;
+        $this->password = $plainPassword;
         $this->deadline = $deadline;
+        $this->examUrl = url('/student/exam');
     }
 
 
@@ -34,18 +41,39 @@ class ExamLoginCredentials extends Mailable
      *
      * @return $this
      */
-    public function build()
-    {
-        $examUrl = url('/login');
+    // public function build()
+    // {
 
-        return $this->subject('Your Exam Login Credentials')
-            ->markdown('mail.exam_credentials')
-            ->with([
-                'name' => $this->std->name,
-                'email' => $this->std->email,
-                'password' => $this->plainPassword,
-                'examUrl' => $examUrl,
-                'deadline' => $this->deadline,
-            ]);
+    //     return $this->subject('Your Exam Login Credentials')
+    //         ->markdown('mail.exam_credentials')
+    //         ->with([
+    //             'name' => $this->std->name,
+    //             'email' => $this->std->email,
+    //             'password' => $this->plainPassword,
+    //             'examUrl' => $examUrl,
+    //             'deadline' => $this->deadline,
+    //         ]);
+    // }
+
+    public function content()
+    {
+
+        return new Content(
+            markdown: 'mail.exam_credentials'
+        );
+        // ->with([
+        //     'name' => $this->std->name,
+        //     'email' => $this->std->email,
+        //     'password' => $this->plainPassword,
+        //     'examUrl' => $this->examUrl,
+        //     'deadline' => $this->deadline,
+        // ]);
+    }
+
+    public function envelope()
+    {
+        return new Envelope(
+            subject: 'Confirmation Successful',
+        );
     }
 }
