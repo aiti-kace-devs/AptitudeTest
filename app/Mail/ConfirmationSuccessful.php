@@ -20,7 +20,7 @@ class ConfirmationSuccessful extends Mailable
      *
      * @return void
      */
-    public function __construct($name, $session, $sessionTime)
+    public function __construct($name = 'Guest', $session = 'General', $sessionTime = '00:00 AM')
     {
         $this->name = $name;
         $this->session = $session;

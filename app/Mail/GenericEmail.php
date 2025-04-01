@@ -19,7 +19,7 @@ class GenericEmail extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct($data = null)
     {
         $this->data = $data;
         //
