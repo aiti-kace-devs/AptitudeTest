@@ -52,7 +52,7 @@ class FormController extends Controller
                           </button>
                         </div>
 
-                        <div id="dropdown-menu-' . $row->uuid . '" class="hidden dropdown-menu absolute right-0 z-50 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                        <div id="dropdown-menu-' . $row->uuid . '" class="hidden dropdown-menu fixed right-0 z-50 mt-1 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                             <button type="button" data-id="' . $row->uuid . '" class="edit ' . $linkClass . '">
                                 Edit
                             </button>
