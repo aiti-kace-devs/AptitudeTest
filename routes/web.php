@@ -12,7 +12,7 @@ use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormResponseController;
-use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
 
@@ -164,13 +164,15 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         });
         // end of manage course routes
 
-        // manage period routes
-        Route::prefix('manage-period')->group(function () {
-            Route::get('/', [PeriodController::class, 'index'])->name('period.index');
-            Route::post('/', [PeriodController::class, 'store'])->name('period.store');
-            Route::get('/{id}/edit', [PeriodController::class, 'edit'])->name('period.edit');
-            Route::put('/{period}/update', [PeriodController::class, 'update'])->name('period.update');
-            Route::get('/{period}/delete', [PeriodController::class, 'destroy'])->name('period.destroy');
+        // manage session routes
+        Route::prefix('sessions')->name('session.')->group(function () {
+            Route::get('/', [SessionController::class, 'index'])->name('index');
+            Route::get('/fetch', [SessionController::class, 'fetch'])->name('fetch');
+            Route::get('/create', [SessionController::class, 'create'])->name('create');
+            Route::post('/', [SessionController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [SessionController::class, 'edit'])->name('edit');
+            Route::put('/{session}/update', [SessionController::class, 'update'])->name('update');
+            Route::get('/{session}/delete', [SessionController::class, 'destroy'])->name('destroy');
         });
         // end of manage period routes
 

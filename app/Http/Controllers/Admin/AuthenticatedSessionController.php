@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -32,7 +33,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->authenticate();
 
-       
+
         $request->session()->regenerate();
 
         return redirect(RouteServiceProvider::ADMIN_HOME);
@@ -52,6 +53,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        $url = redirect()->intended(route('admin.login'))->getTargetUrl();
+
+        return Inertia::location($url);
     }
 }
