@@ -41,7 +41,9 @@
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/buttons.bootstrap4.min.css') }}">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 </head>
 
@@ -120,84 +122,88 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         @if (Auth::user()->isSuper())
-                        <li class="nav-item">
-                            <a href="{{ url('admin/dashboard') }}" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Dashboard
-                                </p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ url('admin/dashboard') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>
+                                        Dashboard
+                                    </p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/exam_category') }}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Category</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ url('admin/exam_category') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Category</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.branch.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'manageBranch') active @endif">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Branch</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.branch.index') }}"
+                                    class="nav-link @if (isset($activePage) && $activePage == 'manageBranch') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manage Branch</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.centre.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'manageCentre') active @endif">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Centre</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.centre.index') }}"
+                                    class="nav-link @if (isset($activePage) && $activePage == 'manageCentre') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manage Centre</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.programme.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'manageProgramme') active @endif">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Programme</p>
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a href="{{ route('admin.course.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'manageCourse') active @endif">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Course</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.programme.index') }}"
+                                    class="nav-link @if (isset($activePage) && $activePage == 'manageProgramme') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manage Programme</p>
+                                </a>
+                            </li>
 
-                        <!-- <li class="nav-item">
-                            <a href="{{ route('admin.period.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'managePeriod') active @endif">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.course.index') }}"
+                                    class="nav-link @if (isset($activePage) && $activePage == 'manageCourse') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manage Course</p>
+                                </a>
+                            </li>
+
+                            <!-- <li class="nav-item">
+                            <a href="{{ route('admin.period.index') }}" class="nav-link @if (isset($activePage) && $activePage == 'managePeriod') active @endif">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Period</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('admin.class.schedule.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'manageClassSchedule') active @endif">
+                            <a href="{{ route('admin.class.schedule.index') }}" class="nav-link @if (isset($activePage) && $activePage == 'manageClassSchedule') active @endif">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Class Schedule</p>
                             </a>
                         </li> -->
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/manage_exam') }}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Exam</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ url('admin/manage_exam') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manage Exam</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/manage_students') }}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Students</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ url('admin/manage_students') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Students</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/registered_students') }}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Registered students</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ url('admin/registered_students') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Registered students</p>
+                                </a>
+                            </li>
                         @endif
                         {{-- <li class="nav-item">
                             <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">
@@ -224,6 +230,13 @@
                             <a href="{{ url('admin/view_attendance') }}" class="nav-link">
                                 <i class="fas fa-clipboard-list nav-icon"></i>
                                 <p>View Attendance</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ url('admin/manage-sms-template') }}" class="nav-link">
+                                <i class="fas fa-clipboard-list nav-icon"></i>
+                                <p>SMS Templates</p>
                             </a>
                         </li>
 
@@ -374,12 +387,10 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('.datatable').DataTable({
-                columnDefs: [
-                    {
+                columnDefs: [{
                     width: "15%",
                     targets: -1
-                },
-            ],
+                }, ],
                 "responsive": true,
                 "lengthChange": true,
                 "autoWidth": true,
