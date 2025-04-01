@@ -78,9 +78,9 @@ export default {
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-          <div v-if="admissionForm.image" class="shadow-sm w-full h-44 lg:h-72">
+          <div class="w-full h-44 lg:h-72">
             <img
-              :src="admissionForm.image"
+              src="https://v3.tailwindcss.com/_next/static/media/classic-utility-jacket.82031370.jpg"
               alt=""
               class="inset-0 w-full h-full object-cover"
             />

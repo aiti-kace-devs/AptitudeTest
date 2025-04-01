@@ -11,7 +11,7 @@ import SelectInput from "@/Components/SelectInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
-import FileInput from "@/Components/FileInput.vue";
+import PreviewImage from "@/Components/PreviewImage.vue";
 
 export default {
   components: {
@@ -26,7 +26,7 @@ export default {
     Checkbox,
     DangerButton,
     TextAreaInput,
-    FileInput,
+    PreviewImage,
   },
   props: {
     errors: Object,
@@ -34,30 +34,24 @@ export default {
   },
   data() {
     const selections = ref([]);
-    const fileInput = ref(null);
 
-    const imageConfig = ref({
-      image: this.admissionForm.image,
-      isDirty: false,
-      preview: this.admissionForm.image,
-      original: this.admissionForm.image,
-    });
+    const imageConfig = {
+      image: null,
+      isDirty: this.admissionForm.image ? false : true,
+      preview: this.admissionForm.image ?? null,
+      original: this.admissionForm.image ?? null,
+    };
 
     const form = useForm({
       title: this.admissionForm.title,
       description: this.admissionForm.description,
-      image: this.admissionForm.image,
-      code: this.admissionForm.code,
-      message_when_inactive: this.admissionForm.message_when_inactive,
-      message_after_registration: this.admissionForm.message_after_registration,
-      active: this.admissionForm.active,
-      schema: this.admissionForm.schema ?? [],
+      image: imageConfig.image,
+      schema: this.admissionForm.schema,
     });
 
     return {
       form,
       imageConfig,
-      fileInput,
       selections,
       editContent: true,
     };
@@ -68,14 +62,10 @@ export default {
         id: `field_${this.selections.length + 1}`, // Unique ID
         label: `Field ${this.selections.length + 1}`, // Default label
         title: schema.title,
-        description: schema.description,
         type: schema.type, // Default type
         placeholder: "Question", // Placeholder
         options: schema.options, // Options for dropdown/select fields
-        validators: {
-          required: schema.validators.required ?? false,
-          unique: schema.validators.unique ?? false,
-        },
+        is_required: schema.is_required, // Default required status
       };
 
       this.selections.push(newField);
@@ -94,17 +84,14 @@ export default {
     addSelection() {
       // Add a new field with default values
       const newField = {
-        id: `field_${this.selections.length + 1}`, // Unique ID
+        id: `field_${Date.now()}`, // Unique ID
         label: `Field ${this.selections.length + 1}`, // Default label
         title: null,
         description: null,
         type: "text", // Default type
         placeholder: "Question", // Placeholder
         options: null, // Options for dropdown/select fields
-        validators: {
-          required: false,
-          unique: false,
-        },
+        is_required: false, // Default required status
       };
 
       this.selections.push(newField);
@@ -116,12 +103,10 @@ export default {
       this.selections.splice(index, 1);
     },
     changeSelectionType(index) {
-      this.form.clearErrors(`schema.${index}.options`);
-
+      // Reset specific field properties when type changes
       const selection = this.selections[index];
-
-      if (!["select", "radio", "checkbox", "file"].includes(selection.type)) {
-        selection.options = null;
+      if (selection.type !== "select") {
+        selection.options = null; // Remove options for non-dropdown fields
       }
     },
     moveField(index, direction) {
@@ -134,22 +119,19 @@ export default {
       this.selections[swapIndex] = temp;
     },
     submit() {
-      this.form.post(
-        route("admin.form.update", {
-          form: this.admissionForm.uuid,
+      // Submit the form with schema as JSON
+      this.form.put(route("admin.form.update", { form: this.admissionForm.uuid }), {
+        data: {
           isDirty: this.imageConfig.isDirty,
-          _method: "put",
-        }),
-        {
-          onSuccess: () => {
-            toastr.success("Form successfully updated");
-            this.resetForm();
-          },
-          onError: (errors) => {
-            toastr.error("Something went wrong");
-          },
-        }
-      );
+        },
+        onSuccess: () => {
+          toastr.success("Form successfully updated");
+          this.resetForm();
+        },
+        onError: (errors) => {
+          toastr.error("Something went wrong");
+        },
+      });
     },
     resetForm() {
       // Clear form and selections after successful submission
@@ -160,12 +142,12 @@ export default {
 
     handleImageOnChange(event) {
       const file = event.target.files[0];
-      if (!file) return;
 
-      this.previewImage(file);
-      this.imageConfig.image = file;
-      this.imageConfig.isDirty = true;
-      this.form.image = file;
+      if (file) {
+        this.previewImage(file);
+        this.imageConfig.image = file;
+        this.imageConfig.isDirty = true;
+      }
     },
     previewImage(file) {
       // Use FileReader to read the file and generate a data URL
@@ -177,20 +159,35 @@ export default {
 
       reader.readAsDataURL(file);
     },
-    removeImage() {
+    toggleImageChange() {
+      this.imageConfig.isDirty = !this.imageConfig.isDirty;
+
+      if (this.imageConfig.isDirty) {
+        this.form.image = null;
+      } else {
+        this.restoreImage();
+      }
+    },
+    cancelImage() {
       this.imageConfig.preview = null;
-      this.imageConfig.image = null;
       this.imageConfig.isDirty = false;
-      this.resetInput();
+      this.form.reset("image");
+
+      const fileInput = document.getElementById("image");
+      if (fileInput) {
+        fileInput.value = ""; // This clears the file input
+      }
     },
     restoreImage() {
       this.imageConfig.preview = this.imageConfig.original;
-      this.imageConfig.image = null;
-      this.imageConfig.isDirty = false;
     },
-    resetInput() {
-      if (this.fileInput) {
-        this.fileInput = ""; // Clear file input
+    clearImage() {
+      this.imageConfig.preview = null;
+      this.form.reset("image");
+
+      const fileInput = document.getElementById("image");
+      if (fileInput) {
+        fileInput.value = ""; // This clears the file input
       }
     },
   },
@@ -251,131 +248,56 @@ export default {
 
                       <div>
                         <InputLabel for="image" value="image" :required="false" />
-
-                        <div class="flex flex-col gap-6 mt-3">
-                          <!-- preview section -->
-                          <div
-                            v-if="imageConfig.preview"
-                            class="relative h-28 w-28 md:w-56 md:h-36"
-                          >
-                            <img
+                        <div
+                          v-if="imageConfig.preview != null"
+                          class="mt-1 mb-4 flex items-start gap-3 shrink-0"
+                        >
+                          <div class="flex items-center gap-5">
+                            <PreviewImage
                               :src="imageConfig.preview"
-                              alt="Preview"
-                              class="w-full h-full object-cover rounded-lg shadow-md"
+                              :alt="imageConfig.preview ? 'image' : 'No image'"
                             />
 
-                            <button
-                              @click="removeImage"
-                              class="inline-flex absolute top-0 right-0 bg-red-600 text-white p-1 rounded-full shadow-lg hover:bg-red-700"
-                            >
-                              <span class="material-symbols-outlined"> close </span>
-                            </button>
+                            <div v-if="!editContent">
+                              <DangerButton
+                                type="button"
+                                @click="clearImage"
+                                class="h-9 w-9 flex items-center justify-center"
+                              >
+                                <span class="material-symbols-outlined"> delete </span>
+                              </DangerButton>
+                            </div>
                           </div>
-
-                          <!-- Upload Button -->
-                          <div>
-                            <FileInput
-                              ref="fileInput"
-                              id="image-upload"
-                              class="hidden"
-                              @change="handleImageOnChange"
-                              accept="image/*"
-                            />
-                            <label
-                              for="image-upload"
-                              class="cursor-pointer text-sm py-2 px-4 bg-gray-100 text-gray-700 rounded-md shadow hover:bg-gray-200"
-                            >
-                              Choose Image
-                            </label>
-                          </div>
-
-                          <!-- Restore Button -->
-                          <div v-if="this.editContent && imageConfig.isDirty">
-                            <button
-                              @click="restoreImage"
-                              class="py-2 px-4 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                            >
-                              Restore Original
-                            </button>
+                          <div v-if="editContent">
+                            <div class="grid gap-2">
+                              <button
+                                type="button"
+                                @click="toggleImageChange"
+                                class="py-2 px-4 text-sm capitalize text-slate-600 font-semibold bg-gray-100 rounded-full hover:text-gray-700 hover:bg-gray-200"
+                              >
+                                <span v-if="!imageConfig.isDirty">Change image</span>
+                                <span v-else>Cancel</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
 
-                        <InputError class="mt-2" :message="form.errors.image" />
-                      </div>
-
-                      <div>
-                        <InputLabel for="code" value="Unique Code" :required="true" />
-                        <TextInput
-                          id="code"
-                          type="text"
-                          class="w-full"
-                          v-model="form.code"
-                          :placeholder="'Code'"
-                          autocomplete="code"
-                          :class="{ 'border-red-600': form.errors.code }"
-                        />
-                        <InputError :message="form.errors.code" />
-                      </div>
-                      <!-- message after registration -->
-                      <div>
-                        <InputLabel
-                          for="message_after_registration"
-                          value="Message After Registration"
-                          :required="true"
-                        />
-                        <TextInput
-                          id="message_after_registration"
-                          type="text"
-                          class="w-full"
-                          v-model="form.message_after_registration"
-                          :placeholder="'Message After Registration'"
-                          :class="{
-                            'border-red-600': form.errors.message_after_registration,
-                          }"
-                        />
-                        <InputError :message="form.errors.message_after_registration" />
-                      </div>
-
-                      <!-- message when inactive -->
-                      <div>
-                        <InputLabel
-                          for="message_when_inactive"
-                          value="Message When Inactive"
-                          :required="true"
-                        />
-                        <TextInput
-                          id="code"
-                          type="text"
-                          class="w-full"
-                          v-model="form.message_when_inactive"
-                          :placeholder="'Message When Inactive'"
-                          :class="{ 'border-red-600': form.errors.message_when_inactive }"
-                        />
-                        <InputError :message="form.errors.message_when_inactive" />
-                      </div>
-
-                      <!-- status -->
-                      <div>
-                        <!-- <InputLabel
-                          for="active"
-                          value="Form Accepting Responses"
-                          :required="true"
-                        /> -->
-                        <div>
-                          <label
-                            class="inline-flex items-center cursor-pointer space-x-3 text-sm"
-                          >
-                            Active (Accept Responses)
-                            <Checkbox
-                              v-model:checked="form.active"
-                              class="sr-only peer"
-                            />
-                            <div
-                              class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
-                            ></div>
-                          </label>
+                        <div v-if="imageConfig.isDirty" class="mt-1">
+                          <span class="sr-only">Choose restoreImage</span>
+                          <input
+                            type="file"
+                            id="image"
+                            accept="image/*"
+                            class="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                            :class="{
+                              'file:bg-red-600 hover:file:bg-red-500 file:text-white':
+                                form.errors.image,
+                            }"
+                            @change="handleImageOnChange"
+                          />
                         </div>
-                        <InputError :message="form.errors.active" />
+
+                        <InputError :message="form.errors.image" />
                       </div>
                     </div>
                   </div>
@@ -413,15 +335,12 @@ export default {
                               class="w-full"
                             >
                               <option value="text" selected>Text</option>
-                              <option value="email">Email</option>
-                              <option value="phonenumber">Phonenumber</option>
                               <option value="textarea">Textarea</option>
                               <option value="select">Select</option>
                               <option value="checkbox">Checkbox</option>
                               <option value="radio">Radio</option>
                               <option value="number">Number</option>
                               <option value="file">File</option>
-                              <option value="select_course">Course Selection</option>
                             </SelectInput>
                           </div>
 
@@ -449,9 +368,7 @@ export default {
                         <div>
                           <div
                             v-if="
-                              ['select', 'radio', 'checkbox', 'file'].includes(
-                                selection.type
-                              )
+                              ['select', 'radio', 'checkbox'].includes(selection.type)
                             "
                           >
                             <TextInput
@@ -459,57 +376,46 @@ export default {
                               type="text"
                               class="w-full"
                               v-model="selection.options"
-                              :placeholder="
-                                (selection.type == 'file' ? 'File type' : 'Options') +
-                                ' (comma-separated)'
-                              "
+                              :placeholder="'Options (comma-separated)'"
                               :class="{
                                 'border-red-600': form.errors[`schema.${row}.options`],
                               }"
                             />
-
-                            <div class="mt-1" v-if="selection.type == 'file'">
-                              <p class="text-sm text-gray-600">
-                                Supported formats: jpg, jpeg, png, gif, docx, txt, pdf,
-                                csv, xlsx and zip.
-                              </p>
-                            </div>
-
                             <InputError :message="form.errors[`schema.${row}.options`]" />
+                          </div>
+
+                          <div v-if="['file'].includes(selection.type)">
+                            <TextInput
+                              :id="selection.id"
+                              type="text"
+                              class="w-full"
+                              v-model="selection.file_type"
+                              :placeholder="'File type (comma-separated)'"
+                              :class="{
+                                'border-red-600': form.errors[`schema.${row}.file_type`],
+                              }"
+                            />
+                            <p>Files</p>
+                            <InputError
+                              :message="form.errors[`schema.${row}.file_type`]"
+                            />
                           </div>
                         </div>
 
                         <div class="flex justify-between items-center">
-                          <div class="flex items-center gap-4">
-                            <div>
-                              <label
-                                class="inline-flex items-center cursor-pointer space-x-3 text-sm"
-                              >
-                                Required
-                                <Checkbox
-                                  v-model:checked="selection.validators.required"
-                                  class="sr-only peer"
-                                />
-                                <div
-                                  class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
-                                ></div>
-                              </label>
-                            </div>
-
-                            <div>
-                              <label
-                                class="inline-flex items-center cursor-pointer space-x-3 text-sm"
-                              >
-                                Unique
-                                <Checkbox
-                                  v-model:checked="selection.validators.unique"
-                                  class="sr-only peer"
-                                />
-                                <div
-                                  class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
-                                ></div>
-                              </label>
-                            </div>
+                          <div>
+                            <label
+                              class="inline-flex items-center cursor-pointer space-x-3 text-sm"
+                            >
+                              Required
+                              <Checkbox
+                                v-model:checked="selection.is_required"
+                                class="sr-only peer"
+                              />
+                              <div
+                                class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700 peer-disabled:cursor-not-allowed"
+                              ></div>
+                            </label>
                           </div>
 
                           <div

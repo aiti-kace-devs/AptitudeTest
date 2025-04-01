@@ -42,20 +42,6 @@ Route::get('/home', function () {
     return view('home');
 })->middleware(['auth'])->name('home');
 
-Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
-Route::post('form-responses/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
-
-
-Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {    // Admin management routes
-    Route::get('/admins', [RegisteredUserController::class, 'index'])->name('admins.index');
-    Route::get('/admins/create', [RegisteredUserController::class, 'create'])->name('admins.create');
-    Route::post('/admins/store', [RegisteredUserController::class, 'store'])->name('admins.store');
-    Route::get('/admins/{id}/edit', [RegisteredUserController::class, 'edit'])->name('admins.edit');
-    Route::put('/admins/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update');
-    Route::delete('/admins/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete');
-});
-
-
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
 
     // forms route
@@ -76,6 +62,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         Route::get('/', [FormController::class, 'index'])->name('index');
         Route::get('/fetch', [FormResponseController::class, 'fetch'])->name('fetch');
         Route::get('/create', [FormController::class, 'create'])->name('create');
+        Route::post('/', [FormResponseController::class, 'store'])->name('store');
         Route::get('/{response}/edit', [FormResponseController::class, 'edit'])->name('edit');
         Route::put('/{response}/update', [FormResponseController::class, 'update'])->name('update');
         Route::get('/{response}/view', [FormResponseController::class, 'show'])->name('show');

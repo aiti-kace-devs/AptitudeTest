@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Str;
 
 class FormController extends Controller
 {
@@ -101,6 +102,7 @@ class FormController extends Controller
             $validated['image'] = $fileName;
         }
 
+        
         Form::create($validated);
 
         return redirect()->route('admin.form.index');
@@ -121,7 +123,7 @@ class FormController extends Controller
      */
     public function edit($uuid)
     {
-        $admissionForm = Form::where('uuid', $uuid)->firstOrFail();
+        $admissionForm = Form::where('uuid', $uuid)->first();
         $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
         return Inertia::render('Form/Edit', compact('admissionForm'));
@@ -132,33 +134,7 @@ class FormController extends Controller
         $admissionForm = Form::where('uuid', $uuid)->first();
         $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
-        $courses = [];
-        $branches = [];
-        $withLayout = true;
-
-        if (isset($admissionForm->schema)) {
-            $courses = Course::get();
-            $branches = Branch::orderBy('title')->get();
-        }
-        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'withLayout'));
-    }
-
-
-    public function submitForm($formCode)
-    {
-        // 679c89bf-91ec-488e-9878-0d010468ca3e
-        $admissionForm = Form::where('code', $formCode)->first();
-        if (!$admissionForm) {
-            return redirect('home');
-        }
-
-        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
-        $withLayout = false;
-
-        $courses = Course::get();
-        $branches = Branch::orderBy('title')->get();
-
-        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'withLayout'));
+        return Inertia::render('Form/Preview', compact('admissionForm'));
     }
 
     /**
@@ -169,14 +145,14 @@ class FormController extends Controller
         $validated = $request->validated();
         $form = Form::where('uuid', $uuid)->first();
 
-        // Handle image upload if necessary
-        if ($request->isDirty && $request->hasFile('image')) {
+         // Handle image upload if necessary
+         if ($request->isDirty && $request->hasFile('image')) {
             $destinationPath = 'form/banner/';
             $image = $request->file('image');
             $fileName = time() . '.' . $image->getClientOriginalExtension();
 
             // Delete old image if it exists
-            if ($form->image && \Storage::disk( 'public')->exists($destinationPath . $form->image)) {
+            if ($form->image && \Storage::disk('public')->exists($destinationPath . $form->image)) {
                 \Storage::disk('public')->delete($destinationPath . $form->image);
             }
 

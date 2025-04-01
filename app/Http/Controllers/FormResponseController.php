@@ -12,6 +12,7 @@ use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 
+
 class FormResponseController extends Controller
 {
     /**
@@ -83,7 +84,7 @@ class FormResponseController extends Controller
      */
     public function store(Request $request)
     {
-        $form = Form::where('uuid', $request->form_uuid)->firstOrFail();
+        $form = Form::where('uuid', $request->form_uuid)->first();
         $schema = $form->schema;
 
         $validationRules = [
@@ -94,103 +95,51 @@ class FormResponseController extends Controller
             'response_data.required' => 'The form responses are required.',
         ];
 
-
-        $formattedData = [];
-
-        foreach ($request->input('response_data', []) as $key => $value) {
-            foreach ($schema as $field) {
-                if (strcasecmp($key, $field['title']) == 0) {
-                    $formattedData[$field['field_name']] = trim($value);
-                    break;
-                }
-            }
-        }
-
         foreach ($schema as $field) {
-            $fieldKey = $field['type'] == 'select_course' ? 'response_data.course_id' : "response_data.{$field['field_name']}";
-
-            $fieldTitle = ucwords(str_replace('_', ' ', $field['title']));
+            $fieldKey = "response_data.{$field['field_name']}";
 
             $rules = [];
 
-            if (!empty($field['validators']['required'])) {
+            $field['title'] = strtolower($field['title']);
+
+            if (!empty($field['is_required'])) {
                 $rules[] = 'required';
-                $customMessages["{$fieldKey}.required"] = "{$fieldTitle} is required.";
-            }
-
-            if (!empty($field['validators']['unique'])) {
-                $existingRecords = FormResponse::select('response_data')->get();
-                $isDuplicate = false;
-
-                foreach ($existingRecords as $record) {
-                    $data = json_decode($record->response_data, true);
-                    if (!empty($data[$field['field_name']]) && $data[$field['field_name']] == ($formattedData[$field['field_name']] ?? null)) {
-                        $isDuplicate = true;
-                        break;
-                    }
-                }
-
-                if ($isDuplicate) {
-                    return response()->json([
-                        'errors' => [
-                            $fieldKey => ["{$fieldTitle} has already been taken."]
-                        ]
-                    ], 422);
-                }
+                $customMessages["{$fieldKey}.required"] = "The {$field['title']} field is required.";
+            } else {
+                $rules[] = 'nullable';
             }
 
             switch ($field['type']) {
                 case 'text':
                 case 'textarea':
                     $rules[] = 'string';
-                    $customMessages["{$fieldKey}.string"] = "This field must be a string.";
+                    $customMessages["{$fieldKey}.string"] = "The {$field['title']} must be a valid string.";
                     break;
 
                 case 'radio':
                 case 'select':
                     $rules[] = 'string';
-                    $customMessages["{$fieldKey}.string"] = "This field must be a valid option.";
+                    $customMessages["{$fieldKey}.string"] = "The {$field['title']} must be a valid option.";
                     break;
 
                 case 'number':
                     $rules[] = 'numeric';
-                    $customMessages["{$fieldKey}.numeric"] = "This field must be a number.";
+                    $customMessages["{$fieldKey}.numeric"] = "The {$field['title']} must be a valid number.";
                     break;
 
                 case 'email':
                     $rules[] = 'email';
-                    $customMessages["{$fieldKey}.email"] = "This field must be a valid email address.";
+                    $customMessages["{$fieldKey}.email"] = "The {$field['title']} must be a valid email address.";
                     break;
 
                 case 'checkbox':
                     $rules[] = 'array';
-                    $customMessages["{$fieldKey}.array"] = "This field must be an array.";
+                    $customMessages["{$fieldKey}.array"] = "The {$field['title']} must be a valid array.";
                     break;
 
                 case 'file':
                     $rules[] = 'file';
-                    $rules[] = 'max:2048';
-
-                    if (!empty($field['options'])) {
-                        $allowedMimes = array_map('trim', explode(',', strtolower($field['options'])));
-                        $rules[] = 'mimes:' . implode(',', $allowedMimes);
-                        $customMessages["{$fieldKey}.mimes"] = "Must be a file of type: " . implode(', ', $allowedMimes) . ".";
-                    }
-
-                    $customMessages["{$fieldKey}.file"] = "This field must be a file.";
-                    $customMessages["{$fieldKey}.max"] = "The file must not be greater than 2MB.";
-
-                    break;
-
-                case 'select_course':
-                    $rules[] = 'exists:courses,id';
-                    $customMessages["{$fieldKey}.exists"] = "The selected course is invalid";
-                    break;
-
-                case 'phonenumber':
-                    $rules[] = 'phone';
-                    $customMessages["{$fieldKey}.phone"] = "This must be a valid phonenumber.";
-                    $fieldName = $field['field_name'];
+                    $customMessages["{$fieldKey}.file"] = "The {$field['title']} must be a valid file.";
                     break;
 
                 default:
@@ -203,34 +152,9 @@ class FormResponseController extends Controller
 
         $validated = $request->validate($validationRules, $customMessages);
 
-        // Handle file uploads
-        foreach ($schema as $field) {
-            if ($field['type'] === 'file' && $request->hasFile("response_data.{$field['field_name']}")) {
-                $destinationPath = 'form/uploads/';
-                $file = $request->file("response_data.{$field['field_name']}");
-
-                $fileName = time() . '.' . $file->getClientOriginalExtension();
-
-                // Delete old image if it exists
-                if (\Storage::disk('public')->exists($destinationPath . $fileName)) {
-                    \Storage::disk('public')->delete($destinationPath . $fileName);
-                }
-
-                // Save new image
-                \Storage::disk('public')->putFileAs($destinationPath, $file, $fileName);
-
-                $validated['response_data'][$field['field_name']] = $fileName;
-            }
-        }
-
         $response = new FormResponse($validated);
 
         $form->responses()->save($response);
-
-        Log::info($validated['response_data']);
-        Log::info($fieldName);
-
-        FormSubmittedEvent::dispatch($validated['response_data'], $fieldName);
     }
 
 
@@ -241,7 +165,6 @@ class FormResponseController extends Controller
     {
         $formResponse = FormResponse::where('uuid', $uuid)->with('form')->first();
         $admissionForm = $formResponse->form;
-        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
         return Inertia::render('FormResponse/Show', compact('formResponse', 'admissionForm'));
     }
@@ -253,7 +176,6 @@ class FormResponseController extends Controller
     {
         $formResponse = FormResponse::where('uuid', $uuid)->with('form')->first();
         $admissionForm = $formResponse->form;
-        $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
 
         return Inertia::render('FormResponse/Edit', compact('formResponse', 'admissionForm'));
     }
@@ -277,6 +199,7 @@ class FormResponseController extends Controller
 
         foreach ($schema as $field) {
             $fieldKey = $field['type'] == 'select_course' ? 'response_data.course_id' : "response_data.{$field['field_name']}";
+            $fieldKey = "response_data.{$field['field_name']}";
 
             $rules = [];
 
