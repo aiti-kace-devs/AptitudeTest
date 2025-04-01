@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Course;
 use App\Http\Requests\DynamicFormRequest;
+use App\Models\Centre;
 use App\Models\Form;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -134,13 +135,15 @@ class FormController extends Controller
 
         $courses = [];
         $branches = [];
+        $centres = [];
         $withLayout = true;
 
         if (isset($admissionForm->schema)) {
-            $courses = Course::get();
+            $courses = Course::orderBy('course_name')->get();
             $branches = Branch::orderBy('title')->get();
+            $centres = Centre::orderBy('title')->get();
         }
-        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'withLayout'));
+        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'centres', 'withLayout'));
     }
 
 
@@ -155,10 +158,12 @@ class FormController extends Controller
         $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
         $withLayout = false;
 
-        $courses = Course::get();
+        $courses = Course::orderBy('course_name')->get();
+        $centres = Centre::orderBy('title')->get();
+
         $branches = Branch::orderBy('title')->get();
 
-        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'withLayout'));
+        return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'centres', 'withLayout'));
     }
 
     /**
@@ -176,7 +181,7 @@ class FormController extends Controller
             $fileName = time() . '.' . $image->getClientOriginalExtension();
 
             // Delete old image if it exists
-            if ($form->image && \Storage::disk( 'public')->exists($destinationPath . $form->image)) {
+            if ($form->image && \Storage::disk('public')->exists($destinationPath . $form->image)) {
                 \Storage::disk('public')->delete($destinationPath . $form->image);
             }
 

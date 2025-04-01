@@ -35,6 +35,7 @@ export default {
     courses: Array,
     branches: Array,
     admin: Boolean,
+    centres: Array,
   },
   data() {
     const formFields = {
@@ -112,11 +113,11 @@ export default {
   <div class="py-12" v-if="showForm && formIsActive">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
       <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-        <div v-if="admissionForm.image" class="shadow-sm w-full h-44 lg:h-72">
+        <div v-if="admissionForm.image" class="shadow-sm w-full h-44">
           <img
             :src="admissionForm.image"
             alt=""
-            class="inset-0 w-full h-full object-cover"
+            class="inset-0 w-full h-full object-contain"
           />
         </div>
         <div class="p-6">
@@ -224,7 +225,7 @@ export default {
                             :class="{
                               'border-red-600':
                                 form.errors[`response_data.${question.field_name}`],
-                                'border-0': true
+                                'border-0 py-0': true
                             }"
                             />
                       </div>
@@ -234,6 +235,7 @@ export default {
                       <CourseSelect
                         :branches="this.branches"
                         :courses="this.courses"
+                        :centres="this.centres"
                         :form="form"
                         :id="question.field_name"
                         :required="true"
