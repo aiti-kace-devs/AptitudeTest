@@ -31,7 +31,7 @@ class StudentAdmitted extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($name, $course, $location, $url = null)
+    public function __construct($name = null, $course = null, $location = [], $url = null)
     {
         $this->setDetails($course, $location);
         $this->url = $url ?? 'https://';
@@ -390,21 +390,26 @@ class StudentAdmitted extends Mailable implements ShouldQueue
             ]
         ];
 
-        $this->data = $data[$location][$course];
-        $mode = $this->data['mode'];
-        $mode = collect($mode);
-        $keyed = collect($mode)->map(function ($item, $key) {
-            return collect($item)->map(function ($week) use ($key) {
-                return ['Week ' . $week => $key];
-            });
-        });
+        // $this->data = $data[$location]->$course;
+        // $location = is_object($location) ? (string) $location : $location;
+        // $course = is_object($course) ? (string) $course : $course;
 
-        $merged = collect($keyed->get('Virtual'))->merge($keyed->get('In-Person'))->values()->collapse()->all();
+        // dd($location, gettype($location));
+        // $this->data = $data[$location][$course];
+        // $mode = $this->data['mode'];
+        // $mode = collect($mode);
+        // $keyed = collect($mode)->map(function ($item, $key) {
+        //     return collect($item)->map(function ($week) use ($key) {
+        //         return ['Week ' . $week => $key];
+        //     });
+        // });
 
-        $sorted = collect($merged)->sortBy(function ($mode, $key) {
-            return (int)(substr($key, -2));
-        });
+        // $merged = collect($keyed->get('Virtual'))->merge($keyed->get('In-Person'))->values()->collapse()->all();
 
-        $this->data['modes'] = $sorted->all();
+        // $sorted = collect($merged)->sortBy(function ($mode, $key) {
+        //     return (int)(substr($key, -2));
+        // });
+
+        // $this->data['modes'] = $sorted->all();
     }
 }
