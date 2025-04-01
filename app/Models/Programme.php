@@ -10,7 +10,11 @@ class Programme extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title'
+        'title',
+        'duration',
+        'start_date',
+        'end_date',
+        'status'
     ];
 
     public function centre(){

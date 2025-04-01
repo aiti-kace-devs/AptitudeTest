@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('course_name');
             $table->string('course')->nullable();
             $table->string('location')->nullable();
+            $table->string('duration')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
 
@@ -28,6 +32,7 @@ return new class extends Migration
             $table->integer('limit')->default(100);
             $table->string('course_time');
             $table->string('session');
+            $table->string('status')->nullable();
             $table->timestamps();
         });
 
@@ -40,6 +45,7 @@ return new class extends Migration
             $table->dateTime('email_sent')->nullable();
             $table->string('location')->nullable();
             $table->string('session')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

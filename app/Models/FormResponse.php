@@ -12,7 +12,8 @@ class FormResponse extends Model
 
     protected $fillable = [
         'form_id',
-        'response_data'
+        'response_data',
+        'status'
     ];
 
     protected $casts = [

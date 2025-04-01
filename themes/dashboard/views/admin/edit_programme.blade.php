@@ -43,6 +43,35 @@
                         <span class="title_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
                       </div>
                     </div>
+
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <label for="duration">Duration</label>
+                        <input type="text" value="{{ $programme->duration }}" name="duration" placeholder="Enter duration" class="form-control" id="duration">
+                        <span class="duration_id_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                      </div>
+                    </div>
+
+
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" value="{{ $programme->start_date }}" name="start_date" placeholder="Enter start_date" class="form-control" id="start_date">
+                        <span class="start_date_id_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                      </div>
+                    </div>
+
+
+
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <label for="end_date">End Date</label>
+                        <input type="date" value="{{ $programme->end_date }}" name="end_date" placeholder="Enter end_date" class="form-control" id="end_date">
+                        <span class="end_date_id_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                      </div>
+                    </div>
+
+
                     <div class="col-sm-12">
                       <div class="form-group">
                         <button class="btn btn-primary">Update</button>

@@ -12,6 +12,7 @@ class Period extends Model
     protected $fillable = [
         'title',
         'starts_at',
-        'ends_at'
+        'ends_at',
+        'status'
     ];
 }

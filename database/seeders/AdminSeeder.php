@@ -14,12 +14,24 @@ class AdminSeeder extends Seeder
     public function run()
     {
         //
-        $admin=[
-            'name'=>'Admin',
-            'email'=>'admin@gmail.com',
-            'password'=>bcrypt('password'),
+        $admins = [
+            [
+                'name' => 'Admin',
+                'email' => 'admin@gmail.com',
+                'password' => bcrypt('password'),
+                'is_super' => 0
+            ],
+            [
+                'name' => 'Super Admin',
+                'email' => 'superadmin@gmail.com',
+                'password' => bcrypt('password'),
+                'is_super' => 1
+            ]
         ];
-
-        Admin::create($admin);
+    
+        foreach ($admins as $admin) {
+            Admin::create($admin);
+        }
     }
+    
 }
