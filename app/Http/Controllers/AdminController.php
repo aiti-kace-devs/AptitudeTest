@@ -213,21 +213,14 @@ class AdminController extends Controller
         $data['exam'] = Oex_exam_master::all();
         $data['exams'] = Oex_exam_master::where('status', '1')->get()->toArray();
 
-        $data['courses'] = User::whereNotNull('registered_course')
-        ->where('registered_course', '!=', '')
-        ->select('registered_course')
-        ->distinct()
-        ->pluck('registered_course')
-        ->toArray();
-
+        $data['courses'] = Course::pluck('course_name')->toArray();
         if ($request->ajax()) {
             $baseQuery = user_exam::with('result')
                 ->join('users', 'users.id', '=', 'user_exams.user_id')
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
-                ->select(['user_exams.id', 'users.name', 'users.email', 'users.age',
-                'users.registered_course', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined']);
+                ->leftJoin('courses', 'users.registered_course', '=', 'course_id')
+                ->select(['user_exams.id', 'users.name', 'users.email', 'users.age', 'courses.course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined']);
 
-            // Manually apply filters (temporarily removing Spatie for debugging)
             if ($request->has('filter.ex_name')) {
                 $baseQuery->where('oex_exam_masters.title', 'like', '%' . $request->input('filter.ex_name') . '%');
             }
@@ -248,25 +241,31 @@ class AdminController extends Controller
             }
             if ($request->has('filter.age_range')) {
                 $ageRange = $request->input('filter.age_range');
-                if ($ageRange === '18-30') {
-                    $baseQuery->whereBetween('users.age', [18, 30]);
-                } elseif ($ageRange === '31-45') {
-                    $baseQuery->whereBetween('users.age', [31, 45]);
-                } elseif ($ageRange === '46+') {
+                if ($ageRange === '15-19') {
+                    $baseQuery->whereBetween('users.age', [15, 19]);
+                } elseif ($ageRange === '20-24') {
+                    $baseQuery->whereBetween('users.age', [20, 24]);
+                }
+                elseif ($ageRange === '25-35') {
+                    $baseQuery->whereBetween('users.age', [25, 35]);
+                }
+                elseif ($ageRange === '36-45') {
+                    $baseQuery->whereBetween('users.age', [36, 45]);
+                }
+                elseif ($ageRange === '45+') {
                     $baseQuery->where('users.age', '>=', 46);
                 }
             }
 
             if ($request->has('filter.course')) {
-                $course = $request->input('filter.course');
-                $baseQuery->where('users.registered_course', 'like', '%' . $course . '%');
+                $courseName = $request->input('filter.course');
+                $baseQuery->where('users.registered_course', 'like', '%' . $courseName . '%');
             }
 
             if ($request->has('filter.search_term')) {
                 $searchTerm = $request->input('filter.search_term');
-                $baseQuery->where(function($query) use ($searchTerm) {
-                    $query->where('users.name', 'like', '%' . $searchTerm . '%')
-                          ->orWhere('users.email', 'like', '%' . $searchTerm . '%');
+                $baseQuery->where(function ($query) use ($searchTerm) {
+                    $query->where('users.name', 'like', '%' . $searchTerm . '%')->orWhere('users.email', 'like', '%' . $searchTerm . '%');
                 });
             }
             return DataTables::of($baseQuery)

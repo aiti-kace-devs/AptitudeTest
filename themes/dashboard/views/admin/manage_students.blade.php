@@ -56,10 +56,11 @@
                                         </div>
                                         <div class="col-md-2">
                                             <select class="form-control filter-select" data-filter="age_range">
-                                                <option value="">All Ages</option>
-                                                <option value="18-30">18-30</option>
-                                                <option value="31-45">31-45</option>
-                                                <option value="46+">46+</option>
+                                                <option value="15-19">15-19</option>
+                                                <option value="20-24">20-24</option>
+                                                <option value="25-35">25-35</option>
+                                                <option value="36-45">36-45</option>
+                                                <option value="45+">45+</option>
                                             </select>
                                         </div>
                                         <div class="col-md-2">
