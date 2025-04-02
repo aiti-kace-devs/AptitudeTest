@@ -15,6 +15,7 @@ use App\Http\Controllers\FormResponseController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
+use App\Http\Controllers\SmsTemplateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -185,6 +186,16 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::get('/{course}/delete', [ClassScheduleController::class, 'destroy'])->name('class.schedule.destroy');
         });
         // end of manage class schedule routes
+
+        // manage sms_template routes
+        Route::prefix('manage-sms-template')->group(function () {
+            Route::get('/', [SmsTemplateController::class, 'index'])->name('sms.template.index');
+            Route::post('/', [SmsTemplateController::class, 'store'])->name('sms.template.store');
+            Route::get('/{id}/edit', [SmsTemplateController::class, 'edit'])->name('sms.template.edit');
+            Route::put('/{template}/update', [SmsTemplateController::class, 'update'])->name('sms.template.update');
+            Route::get('/{template}/delete', [SmsTemplateController::class, 'destroy'])->name('sms.template.destroy');
+        });
+        // end of manage sms_template routes
     });
 });
 
