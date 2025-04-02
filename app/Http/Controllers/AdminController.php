@@ -105,7 +105,7 @@ class AdminController extends Controller
     //Editing categories status
     public function category_status($id)
     {
-        $cat = Oex_category::where('id', $id)->get()->first();
+        $cat = User::where('id', $id)->get()->first();
 
         if ($cat->status == 1) {
             $status = 0;
@@ -113,10 +113,13 @@ class AdminController extends Controller
             $status = 1;
         }
 
-        $cat1 = Oex_category::where('id', $id)->get()->first();
+        $cat1 = User::where('id', $id)->get()->first();
         $cat1->status = $status;
         $cat1->update();
     }
+
+
+
 
     //Manage exam page
     public function manage_exam()

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentOperation;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\RegisteredUserController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BranchController;
@@ -73,6 +74,13 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
 
 
 
+
+
+
+
+
+
+
 Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(function () {
 
     Route::middleware(['auth:admin'])->group(function () {
@@ -117,6 +125,16 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/view_attendance', [AdminController::class, 'viewAttendanceByDate'])->name('viewAttendanceByDate');
         Route::get('/reports', [AdminController::class, 'getReportView'])->name('getReportView');
         Route::post('/reports', [AdminController::class, 'generateReport'])->name('generateReport');
+
+
+        Route::get('/manage_admins', [RegisteredUserController::class, 'index'])->name('manage_admins')->middleware('admin.super');
+        Route::get('/create', [RegisteredUserController::class, 'create'])->name('admins.create')->middleware('admin.super');
+        Route::post('/add_new_admin', [RegisteredUserController::class, 'store'])->middleware('admin.super');
+        Route::get('/edit_admin/{id}/edit', [RegisteredUserController::class, 'edit'])->name('admins.edit')->middleware('admin.super');
+        Route::put('/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update')->middleware('admin.super');
+        Route::delete('/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete')->middleware('admin.super');
+        Route::get('/is_super_admin_status/{id}', [RegisteredUserController::class, 'is_super_admin_status'])->middleware('admin.super');
+        
 
         Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])->name('remove-attendance');
 
