@@ -125,7 +125,7 @@ div[data-children="inputcore"]:focus-within {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(55 65 81 / var(--tw-ring-opacity));
   --tw-ring-offset-shadow: 0 0 #0000;
-  --tw-ring-shadow: 0 0 0 2px var(--tw-ring-color);
+  --tw-ring-shadow: 0 0 0 1.7px var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), 0 0 #0000; /* Resets any other shadows */
   outline: none; /* Removes default browser outline */
 }
@@ -143,7 +143,7 @@ input[data-children="htmlInput"]:focus {
 }
 
 div[data-widget-item="baseinput"].border-red-600 div[data-children="inputcore"] {
-  border-color: rgb(220 38 38);
+  border-color: rgb(220 38 38 / var(--tw-border-opacity, 1));
 }
 </style>
 <template>
