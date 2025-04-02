@@ -213,11 +213,19 @@ class AdminController extends Controller
         $data['exam'] = Oex_exam_master::all();
         $data['exams'] = Oex_exam_master::where('status', '1')->get()->toArray();
 
+        $data['courses'] = User::whereNotNull('registered_course')
+        ->where('registered_course', '!=', '')
+        ->select('registered_course')
+        ->distinct()
+        ->pluck('registered_course')
+        ->toArray();
+
         if ($request->ajax()) {
             $baseQuery = user_exam::with('result')
                 ->join('users', 'users.id', '=', 'user_exams.user_id')
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
-                ->select(['user_exams.id', 'users.name', 'users.email', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined']);
+                ->select(['user_exams.id', 'users.name', 'users.email', 'users.age',
+                'users.registered_course', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined']);
 
             // Manually apply filters (temporarily removing Spatie for debugging)
             if ($request->has('filter.ex_name')) {
@@ -238,15 +246,29 @@ class AdminController extends Controller
                     $baseQuery->whereNull('submitted');
                 }
             }
-
-            if ($request->has('filter.name')) {
-                $baseQuery->where('users.name', 'like', '%' . $request->input('filter.name') . '%');
+            if ($request->has('filter.age_range')) {
+                $ageRange = $request->input('filter.age_range');
+                if ($ageRange === '18-30') {
+                    $baseQuery->whereBetween('users.age', [18, 30]);
+                } elseif ($ageRange === '31-45') {
+                    $baseQuery->whereBetween('users.age', [31, 45]);
+                } elseif ($ageRange === '46+') {
+                    $baseQuery->where('users.age', '>=', 46);
+                }
             }
 
-            if ($request->has('filter.email')) {
-                $baseQuery->where('users.email', 'like', '%' . $request->input('filter.email') . '%');
+            if ($request->has('filter.course')) {
+                $course = $request->input('filter.course');
+                $baseQuery->where('users.registered_course', 'like', '%' . $course . '%');
             }
 
+            if ($request->has('filter.search_term')) {
+                $searchTerm = $request->input('filter.search_term');
+                $baseQuery->where(function($query) use ($searchTerm) {
+                    $query->where('users.name', 'like', '%' . $searchTerm . '%')
+                          ->orWhere('users.email', 'like', '%' . $searchTerm . '%');
+                });
+            }
             return DataTables::of($baseQuery)
                 ->addColumn('checkbox', function ($std) {
                     return '<input type="checkbox" class="student-checkbox" value="' . $std->id . '">';
@@ -281,6 +303,7 @@ class AdminController extends Controller
 
                     return implode(' ', $buttons);
                 })
+                ->with(['all_filtered_ids' => $baseQuery->pluck('user_exams.id')->toArray()])
                 ->rawColumns(['checkbox', 'result', 'status', 'actions'])
                 ->toJson();
         }

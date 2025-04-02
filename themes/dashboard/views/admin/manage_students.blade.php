@@ -37,7 +37,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row mb-3">
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <select class="form-control filter-select" data-column="3"
                                                 data-filter="ex_name">
                                                 <option value="">All Exams</option>
@@ -46,7 +46,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <select class="form-control filter-select" data-column="6" data-filter="status">
                                                 <option value="">All Statuses</option>
                                                 <option value="passed">Passed</option>
@@ -54,13 +54,25 @@
                                                 <option value="not_taken">Not Taken</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
-                                            <input type="text" class="form-control filter-input"
-                                                placeholder="Search by name" data-column="1" data-filter="name">
+                                        <div class="col-md-2">
+                                            <select class="form-control filter-select" data-filter="age_range">
+                                                <option value="">All Ages</option>
+                                                <option value="18-30">18-30</option>
+                                                <option value="31-45">31-45</option>
+                                                <option value="46+">46+</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <select class="form-control filter-select" data-filter="course">
+                                                <option value="">All Courses</option>
+                                                @foreach ($courses as $course)
+                                                    <option value="{{ $course }}">{{ $course }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <input type="text" class="form-control filter-input"
-                                                placeholder="Search by email" data-column="2" data-filter="email">
+                                            <input type="text" class="form-control" id="studentSearch"
+                                                placeholder="Search by name or email">
                                         </div>
                                     </div>
 
@@ -76,6 +88,8 @@
                                                 <th width="20px"><input type="checkbox" id="select-all"></th>
                                                 <th>Name</th>
                                                 <th>Email</th>
+                                                <th>Age</th>
+                                                <th>Courses</th>
                                                 <th>Exam</th>
                                                 <th>Score</th>
                                                 <th>Result</th>
@@ -169,6 +183,11 @@
 
             <script>
                 $(document).ready(function() {
+                    var allFilteredIds = []; // Stores all IDs from current filter
+                    var manuallySelectedIds = []; // Stores manually selected IDs
+                    var isFilterApplied = false; // Tracks if any filter is active
+                    var debounceTimer;
+
                     var table = $('#studentsTable').DataTable({
                         processing: true,
                         serverSide: true,
@@ -179,68 +198,67 @@
                                 d.draw = d.draw;
                                 d.start = d.start;
                                 d.length = d.length;
-                                d.search = d.search;
+
+                                // Reset filter tracking when no filters are active
+                                isFilterApplied = false;
 
                                 if ($('select[data-filter="ex_name"]').val()) {
                                     d['filter[ex_name]'] = $('select[data-filter="ex_name"]').val();
+                                    isFilterApplied = true;
                                 }
                                 if ($('select[data-filter="status"]').val()) {
                                     d['filter[status]'] = $('select[data-filter="status"]').val();
+                                    isFilterApplied = true;
                                 }
-                                if ($('input[data-filter="name"]').val()) {
-                                    d['filter[name]'] = $('input[data-filter="name"]').val();
+                                if ($('select[data-filter="age_range"]').val()) {
+                                    d['filter[age_range]'] = $('select[data-filter="age_range"]').val();
+                                    isFilterApplied = true;
                                 }
-                                if ($('input[data-filter="email"]').val()) {
-                                    d['filter[email]'] = $('input[data-filter="email"]').val();
+                                if ($('select[data-filter="course"]').val()) {
+                                    d['filter[course]'] = $('select[data-filter="course"]').val();
+                                    isFilterApplied = true;
                                 }
+                                if ($('#studentSearch').val()) {
+                                    // Combined name/email search
+                                    d['filter[search_term]'] = $('#studentSearch').val();
+                                    isFilterApplied = true;
+                                }
+                            },
+                            dataSrc: function(json) {
+                                // Store all IDs from current filtered results
+                                allFilteredIds = json.all_filtered_ids || [];
+                                return json.data;
                             },
                             error: function(xhr, error, thrown) {
                                 console.log("AJAX Error:", xhr.responseText);
                                 $('#studentsTable tbody').html(
-                                    '<tr><td colspan="9" class="text-center text-danger">Error loading data. Please try again.</td></tr>'
+                                    '<tr><td colspan="10" class="text-center text-danger">Error loading data. Please try again.</td></tr>'
                                 );
                             }
                         },
-                        columns: [{
+                        columns: [
+                            {
                                 data: 'checkbox',
                                 name: 'checkbox',
                                 orderable: false,
-                                searchable: false
+                                searchable: false,
+                                render: function(data, type, row) {
+                                    return '<input type="checkbox" class="student-checkbox" value="' + row.id + '" ' +
+                                        (isFilterApplied ? 'checked' : '') + '>';
+                                }
                             },
-                            {
-                                data: 'name',
-                                name: 'users.name'
-                            },
-                            {
-                                data: 'email',
-                                name: 'users.email'
-                            },
-                            {
-                                data: 'ex_name',
-                                name: 'oex_exam_masters.title'
-                            },
-                            {
-                                data: 'score',
-                                name: 'score',
-                                orderable: false
-                            },
-                            {
-                                data: 'result',
-                                name: 'result',
-                                orderable: false
-                            },
-                            {
-                                data: 'status',
-                                name: 'status',
-                                orderable: false
-                            },
-                            {
-                                data: 'actions',
-                                name: 'actions',
-                                orderable: false
-                            }
+                            { data: 'name', name: 'users.name' },
+                            { data: 'email', name: 'users.email' },
+                            { data: 'age', name: 'users.age' },
+                            { data: 'registered_course', name: 'users.registered_course' },
+                            { data: 'ex_name', name: 'oex_exam_masters.title' },
+                            { data: 'score', name: 'score', orderable: false },
+                            { data: 'result', name: 'result', orderable: false },
+                            { data: 'status', name: 'status', orderable: false },
+                            { data: 'actions', name: 'actions', orderable: false }
                         ],
-                        columnDefs: [{
+                        columnDefs: [
+                            {
                                 targets: 0,
                                 width: "5%"
                             },
@@ -251,30 +269,81 @@
                         ],
                         order: [
                             [1, 'asc']
-                        ]
+                        ],
+                        drawCallback: function(settings) {
+                            // Auto-check all checkboxes when filters are applied
+                            if (isFilterApplied) {
+                                $('.student-checkbox').prop('checked', true);
+                                manuallySelectedIds = [...allFilteredIds]; // Copy all filtered IDs
+                            } else {
+                                manuallySelectedIds = []; // Reset when no filters
+                            }
+
+                            // Update select all checkbox state
+                            var allChecked = $('.student-checkbox:not(:checked)').length === 0;
+                            $('#select-all').prop('checked', allChecked);
+                        }
                     });
 
-                    $('.filter-select, .filter-input').on('change keyup', function() {
-                        table.ajax.reload();
+                    // Combined search handler for name/email with debounce
+                    $('#studentSearch').on('keyup', function() {
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(function() {
+                            table.ajax.reload();
+                        }, 500);
                     });
 
+                    // Exam, status, age range, and course filter handlers
+                    $('select[data-filter="ex_name"], select[data-filter="status"], select[data-filter="age_range"], select[data-filter="course"]').on('change', function() {
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(function() {
+                            table.ajax.reload();
+                        }, 300);
+                    });
+
+                    // Handle manual checkbox changes
+                    $(document).on('change', '.student-checkbox', function() {
+                        var studentId = $(this).val();
+                        if ($(this).is(':checked')) {
+                            if (!manuallySelectedIds.includes(studentId)) {
+                                manuallySelectedIds.push(studentId);
+                            }
+                        } else {
+                            manuallySelectedIds = manuallySelectedIds.filter(id => id != studentId);
+                        }
+
+                        // Update select all checkbox state
+                        var allChecked = $('.student-checkbox:not(:checked)').length === 0;
+                        $('#select-all').prop('checked', allChecked);
+                    });
+
+                    // Select all checkbox functionality
                     $('#select-all').change(function() {
-                        $('.student-checkbox').prop('checked', $(this).prop('checked'));
+                        var isChecked = $(this).prop('checked');
+                        $('.student-checkbox').prop('checked', isChecked);
+
+                        if (isChecked) {
+                            manuallySelectedIds = [...allFilteredIds]; // Copy all filtered IDs
+                        } else {
+                            manuallySelectedIds = []; // Clear manual selections
+                        }
                     });
 
+                    // Admit selected students - will use either manual selection or all filtered
                     $('#admit-selected').click(function() {
-                        var selected = [];
-                        $('.student-checkbox:checked').each(function() {
-                            selected.push($(this).val());
-                        });
+                        var selected = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
 
                         if (selected.length === 0) {
-                            toastr.warning('Please select at least one student');
+                            toastr.warning('No students selected or no students match your filters');
                             return;
                         }
 
+                        // Show loading state
+                        var btn = $(this);
+                        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+
                         Swal.fire({
-                            title: 'Admit Selected Students?',
+                            title: 'Admit Students?',
                             text: 'You are about to admit ' + selected.length + ' students. Continue?',
                             icon: 'question',
                             showCancelButton: true,
@@ -283,7 +352,7 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "{{ route('admin.admit_user_ui') }}",
+                                    url: "{{ route('admit_student') }}",
                                     type: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -294,16 +363,21 @@
                                     success: function(response) {
                                         toastr.success(response.message);
                                         table.ajax.reload();
+                                        manuallySelectedIds = []; // Reset after admission
                                     },
                                     error: function(xhr) {
                                         toastr.error(xhr.responseJSON?.message ||
                                             'An error occurred');
+                                    },
+                                    complete: function() {
+                                        btn.prop('disabled', false).html(
+                                            'Admit Selected Students');
                                     }
                                 });
+                            } else {
+                                btn.prop('disabled', false).html('Admit Selected Students');
                             }
                         });
                     });
                 });
-            </script>
-
-        @endsection
+            </script>        @endsection
