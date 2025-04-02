@@ -11,8 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('sessions');
-
         Schema::table('course_sessions', function (Blueprint $table) {
             $table->string('uuid')->unique();
         });
