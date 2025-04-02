@@ -140,6 +140,14 @@
                                         </p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('student.profile') }}" class="nav-link {{ request()->is('student/profile') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-user"></i>
+                                        <p>
+                                            My Profile
+                                        </p>
+                                    </a>
+                                </li>
                             @endif
                             @if (!Auth::user()->isAdmitted() && Auth::user()->admissionEmailSent())
                                 <li class="nav-item">
