@@ -47,6 +47,20 @@ class StudentOperation extends Controller
         return view('student.dashboard', $data);
     }
 
+    // application status
+    public function application_status()
+    {
+        $user_exam = user_exam::where(
+            'user_id',
+            Session::get('id')
+        )->first();
+        $user_admission = UserAdmission::where('user_id', Auth::user()->userId)->first();
+        // dd($exam_submitted, $data);
+
+        return view('student.application-status', compact('user_exam', 'user_admission'));
+    }
+
+
     //Exam page
     public function exam()
     {
@@ -159,7 +173,8 @@ class StudentOperation extends Controller
             $percentage = round(($yes_ans / $total) * 100);
 
             return redirect(url('student/exam'))->with([
-                'flash' => "Test already submitted on this exam. Submission Date: {$std_info->submitted} .Result: {$percentage}% ({$yes_ans}/{$total})",
+                // 'flash' => "Test already submitted on this exam. Submission Date: {$std_info->submitted} .Result: {$percentage}% ({$yes_ans}/{$total})",
+                'flash' => "Test already submitted on this exam. Submission Date: {$std_info->submitted}",
                 'key' => 'info',
             ]);
         }
@@ -199,14 +214,15 @@ class StudentOperation extends Controller
         $res->result_json = json_encode($result);
         $total = $yes_ans + $no_ans;
         $percentage = round(($yes_ans / $total) * 100);
-        echo $res->save();
-        $storedResult = Oex_result::where('user_id', $user->id)
-            ->where('exam_id', $request->exam_id)
-            ->first();
+        // echo $res->save();
+        // $storedResult = Oex_result::where('user_id', $user->id)
+        //     ->where('exam_id', $request->exam_id)
+        //     ->first();
         // GoogleSheets::updateGoogleSheets($userId, ['result' => $storedResult->yes_ans]);
 
         return redirect(url('student/exam'))->with([
-            'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
+            // 'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
+            'flash' => "Test submitted successfully.",
             'key' => 'success',
         ]);
     }

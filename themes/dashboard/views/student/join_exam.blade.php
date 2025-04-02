@@ -160,7 +160,7 @@
 
             const showWarning = (e) => {
                 const form = $('[name="examination_form"]');
-                if (warn === 4) {
+                if (warn === 3) {
                     Swal.fire({
                         title: 'Violation!',
                         text: `Test submitted due to repeated violations`,
