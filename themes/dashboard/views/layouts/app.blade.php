@@ -164,7 +164,7 @@
                             </a>
                         </li>
 
-                        <!-- <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ route('admin.period.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'managePeriod') active @endif">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Period</p>
@@ -176,7 +176,7 @@
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Class Schedule</p>
                             </a>
-                        </li> -->
+                        </li> --}}
 
                         <li class="nav-item">
                             <a href="{{ url('admin/manage_exam') }}" class="nav-link">
@@ -230,7 +230,7 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.form.index') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Go To Admission Portal</p>
+                                <p>Go To RVMP Portal</p>
                             </a>
                         </li>
 

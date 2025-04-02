@@ -124,10 +124,10 @@ class FormResponseController extends Controller
 
                 foreach ($existingRecords as $record) {
                     // $data = json_decode($record->response_data, true);
-                    $data = is_array($record->response_data) 
-                    ? $record->response_data 
-                    : json_decode($record->response_data, true);
-                    
+                    $data = is_array($record->response_data)
+                        ? $record->response_data
+                        : json_decode($record->response_data, true);
+
                     if (!empty($data[$field['field_name']]) && $data[$field['field_name']] == ($formattedData[$field['field_name']] ?? null)) {
                         $isDuplicate = true;
                         break;
@@ -135,12 +135,15 @@ class FormResponseController extends Controller
                 }
 
                 if ($isDuplicate) {
-                    Log::info("{$fieldTitle} has already been taken.");
-                    return response()->json([
-                        'errors' => [
-                            $fieldKey => ["{$fieldTitle} has already been taken."]
-                        ]
-                    ], 422);
+                    // Log::info("{$fieldTitle} has already been taken.");
+                    return redirect()->back()->withInput()->withErrors([
+                        $fieldKey => ["{$fieldTitle} has already been taken."]
+                    ]);
+                    // return response()->json([
+                    //     'errors' => [
+                    //         $fieldKey => ["{$fieldTitle} has already been taken."]
+                    //     ]
+                    // ], 422);
                 }
             }
 
@@ -232,8 +235,8 @@ class FormResponseController extends Controller
 
         $form->responses()->save($response);
 
-        Log::info($validated['response_data']);
-        Log::info($fieldName);
+        // Log::info($validated['response_data']);
+        // Log::info($fieldName);
 
         FormSubmittedEvent::dispatch($validated['response_data'], $fieldName);
     }
