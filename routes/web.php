@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentOperation;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\RegisteredUserController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BranchController;
@@ -12,9 +13,10 @@ use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormResponseController;
-use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
+use App\Http\Controllers\SmsTemplateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +74,13 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
 
 
 
+
+
+
+
+
+
+
 Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(function () {
 
     Route::middleware(['auth:admin'])->group(function () {
@@ -120,6 +129,16 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/view_attendance', [AdminController::class, 'viewAttendanceByDate'])->name('viewAttendanceByDate');
         Route::get('/reports', [AdminController::class, 'getReportView'])->name('getReportView');
         Route::post('/reports', [AdminController::class, 'generateReport'])->name('generateReport');
+
+
+        Route::get('/manage_admins', [RegisteredUserController::class, 'index'])->name('manage_admins')->middleware('admin.super');
+        Route::get('/create', [RegisteredUserController::class, 'create'])->name('admins.create')->middleware('admin.super');
+        Route::post('/add_new_admin', [RegisteredUserController::class, 'store'])->middleware('admin.super');
+        Route::get('/edit_admin/{id}/edit', [RegisteredUserController::class, 'edit'])->name('admins.edit')->middleware('admin.super');
+        Route::put('/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update')->middleware('admin.super');
+        Route::delete('/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete')->middleware('admin.super');
+        Route::get('/is_super_admin_status/{id}', [RegisteredUserController::class, 'is_super_admin_status'])->middleware('admin.super');
+        
 
         Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])->name('remove-attendance');
 
@@ -170,13 +189,15 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         });
         // end of manage course routes
 
-        // manage period routes
-        Route::prefix('manage-period')->group(function () {
-            Route::get('/', [PeriodController::class, 'index'])->name('period.index');
-            Route::post('/', [PeriodController::class, 'store'])->name('period.store');
-            Route::get('/{id}/edit', [PeriodController::class, 'edit'])->name('period.edit');
-            Route::put('/{period}/update', [PeriodController::class, 'update'])->name('period.update');
-            Route::get('/{period}/delete', [PeriodController::class, 'destroy'])->name('period.destroy');
+        // manage session routes
+        Route::prefix('sessions')->name('session.')->group(function () {
+            Route::get('/', [SessionController::class, 'index'])->name('index');
+            Route::get('/fetch', [SessionController::class, 'fetch'])->name('fetch');
+            Route::get('/create', [SessionController::class, 'create'])->name('create');
+            Route::post('/', [SessionController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [SessionController::class, 'edit'])->name('edit');
+            Route::put('/{session}/update', [SessionController::class, 'update'])->name('update');
+            Route::get('/{session}/delete', [SessionController::class, 'destroy'])->name('destroy');
         });
         // end of manage period routes
 
@@ -189,6 +210,16 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::get('/{course}/delete', [ClassScheduleController::class, 'destroy'])->name('class.schedule.destroy');
         });
         // end of manage class schedule routes
+
+        // manage sms_template routes
+        Route::prefix('manage-sms-template')->group(function () {
+            Route::get('/', [SmsTemplateController::class, 'index'])->name('sms.template.index');
+            Route::post('/', [SmsTemplateController::class, 'store'])->name('sms.template.store');
+            Route::get('/{id}/edit', [SmsTemplateController::class, 'edit'])->name('sms.template.edit');
+            Route::put('/{template}/update', [SmsTemplateController::class, 'update'])->name('sms.template.update');
+            Route::get('/{template}/delete', [SmsTemplateController::class, 'destroy'])->name('sms.template.destroy');
+        });
+        // end of manage sms_template routes
     });
 });
 
@@ -196,41 +227,45 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
 
 /* Student section routes */
 Route::prefix('student')
-->middleware('theme:dashboard')
-->name('student.')->group(function () {
+    ->middleware('theme:dashboard')
+    ->name('student.')->group(function () {
 
-    Route::get('/select-session/{user_id}', [StudentOperation::class, 'select_session_view']);
-    Route::post('/select-session/{user_id}', [StudentOperation::class, 'confirm_session'])->name('select-session');
+        Route::get('/select-session/{user_id}', [StudentOperation::class, 'select_session_view']);
+        Route::post('/select-session/{user_id}', [StudentOperation::class, 'confirm_session'])->name('select-session');
 
-    Route::middleware(['auth:web'])->group(function () {
-        Route::get('/dashboard', [StudentOperation::class, 'dashboard'])->name('dashboard');
+        Route::middleware(['auth:web'])->group(function () {
+            Route::get('/dashboard', [StudentOperation::class, 'dashboard'])->name('dashboard');
+            Route::get('/application-status', [StudentOperation::class, 'application_status'])->name('dashboard');
+            Route::get('/profile', [StudentOperation::class, 'profile'])->name('profile');
+            Route::get('/change-course', [StudentOperation::class, 'change_course'])->name('change-course');
+            Route::post('/update-course', [StudentOperation::class, 'update_course'])->name('update-course');
 
-        Route::get('/exam', [StudentOperation::class, 'exam']);
-        Route::get('/join_exam/{id}', [StudentOperation::class, 'join_exam']);
-        Route::post('/submit_questions', [StudentOperation::class, 'submit_questions']);
-        Route::get('/show_result/{id}', [StudentOperation::class, 'show_result']);
-        Route::get('/apply_exam/{id}', [StudentOperation::class, 'apply_exam']);
-        Route::get('/view_result/{id}', [StudentOperation::class, 'view_result']);
-        Route::post('/attendance/record', [AttendanceController::class, 'recordAttendance'])->name('attendance.record');
-        Route::get('/attendance', [AttendanceController::class, 'viewAttendance'])->name('attendance.show');
-        Route::get('/id-qrcode', [StudentOperation::class, 'get_details_page']);
-        Route::get('/scan-qrcode', [StudentOperation::class, 'get_scanner_page']);
-        Route::get('/meeting-link', [StudentOperation::class, 'get_meeting_link_page']);
-        Route::post('/update-details', [StudentOperation::class, 'updateDetails'])->name('updateDetails');
+            Route::get('/exam', [StudentOperation::class, 'exam']);
+            Route::get('/join_exam/{id}', [StudentOperation::class, 'join_exam']);
+            Route::post('/submit_questions', [StudentOperation::class, 'submit_questions']);
+            Route::get('/show_result/{id}', [StudentOperation::class, 'show_result']);
+            Route::get('/apply_exam/{id}', [StudentOperation::class, 'apply_exam']);
+            // Route::get('/view_result/{id}', [StudentOperation::class, 'view_result']);
+            Route::post('/attendance/record', [AttendanceController::class, 'recordAttendance'])->name('attendance.record');
+            Route::get('/attendance', [AttendanceController::class, 'viewAttendance'])->name('attendance.show');
+            Route::get('/id-qrcode', [StudentOperation::class, 'get_details_page']);
+            Route::get('/scan-qrcode', [StudentOperation::class, 'get_scanner_page']);
+            Route::get('/meeting-link', [StudentOperation::class, 'get_meeting_link_page']);
+            Route::post('/update-details', [StudentOperation::class, 'updateDetails'])->name('updateDetails');
 
 
 
-        // Route::get('/ateendance', [StudentOperation::class, 'view_result']);
+            // Route::get('/ateendance', [StudentOperation::class, 'view_result']);
 
 
 
-        // Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
+            // Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
 
-        Route::post('/start-exam/{id}', [StudentOperation::class, 'start_exam']);
-        Route::get('/mark_attendance', [AttendanceController::class, 'recordAttendance'])->name('mark-attendance');
-        Route::get('/logout', [AuthenticatedSessionController::class, 'destroy']);
+            Route::post('/start-exam/{id}', [StudentOperation::class, 'start_exam']);
+            Route::get('/mark_attendance', [AttendanceController::class, 'recordAttendance'])->name('mark-attendance');
+            Route::get('/logout', [AuthenticatedSessionController::class, 'destroy']);
+        });
     });
-});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

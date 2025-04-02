@@ -95,6 +95,15 @@ $(document).on('click','.programme_status',function(){
 $(document).on('click','.course_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/course_status/'+id,function(fb){
+      sAlert("status successsfully changed");
+    })
+})
+
+
+
+$(document).on('click','.is_super_admin_status',function(){
+    var id=$(this).attr('data-id');
+    $.get(BASE_URL+'/admin/is_super_admin_status/'+id,function(fb){
         sAlert("status successsfully changed");
     })
 })
