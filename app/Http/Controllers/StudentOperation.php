@@ -51,10 +51,6 @@ class StudentOperation extends Controller
         // Get the current authenticated user
         $user = Auth::user();
         
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'Please login to view your profile.');
-        }
-        
         // Get course details if available in user's record
         $course = null;
         if (!empty($user->exam)) {
@@ -62,10 +58,8 @@ class StudentOperation extends Controller
             $course = Course::find($user->registered_course);
         }
         
-        // Get session information from user record if available
-        $session = $user->status; // Assuming 'status' field holds session information
-        
-        return view('student.profile', compact('user', 'course', 'session'));
+
+        return view('student.profile', compact('user', 'course'));
     }
 
     //Exam page
@@ -379,8 +373,8 @@ class StudentOperation extends Controller
         
         // Current course (if any)
         $currentCourse = null;
-        if (!empty($user->exam)) {
-            $currentCourse = Course::find($user->exam);
+        if (!empty($user->registered_course)) {
+            $currentCourse = Course::find($user->registered_course);
         }
         
         return view('student.change-course', compact('user', 'courses', 'currentCourse'));
@@ -392,8 +386,7 @@ class StudentOperation extends Controller
    public function update_course(Request $request)
 {
     $request->validate([
-        'course_id' => 'required|exists:courses,id',
-        'session' => 'required'
+        'course_id' => 'required|exists:courses,id'
     ]);
     
     $user = Auth::user();
@@ -407,7 +400,6 @@ class StudentOperation extends Controller
     
     // Update user record with course and session information
     $user->registered_course = $request->course_id; // Store course_id in exam field
-    $user->status = $request->session; // Store session in status field
     $user->save();
     
     return redirect()->route('student.profile')->with('success', 'Course changed successfully.');

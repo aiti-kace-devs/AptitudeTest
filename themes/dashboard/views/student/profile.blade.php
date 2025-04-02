@@ -91,10 +91,10 @@
                 <div class="col-md-3 font-weight-bold">Location:</div>
                 <div class="col-md-9">{{ $course->location }}</div>
             </div>
-            <div class="row mb-3">
+            <!-- <div class="row mb-3">
                 <div class="col-md-3 font-weight-bold">Session:</div>
                 <div class="col-md-9">{{ $user->status }}</div>
-            </div>
+            </div> -->
             <div class="row mt-4">
                 <div class="col-12">
                     <a href="{{ route('student.change-course') }}" class="btn btn-warning">

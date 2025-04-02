@@ -67,23 +67,7 @@
                                             </span>
                                         @enderror
                                     </div>
-                                    
-                                    <!-- Session Selection -->
-                                    <div class="form-group">
-                                        <label for="session">Session <span class="text-danger">*</span></label>
-                                        <select class="form-control @error('session') is-invalid @enderror" id="session" name="session" required>
-                                            <option value="">-- Select Session --</option>
-                                            <option value="Morning" {{ ($user->status == 'Morning') ? 'selected' : '' }}>Morning</option>
-                                            <option value="Afternoon" {{ ($user->status == 'Afternoon') ? 'selected' : '' }}>Afternoon</option>
-                                            <option value="Evening" {{ ($user->status == 'Evening') ? 'selected' : '' }}>Evening</option>
-                                            <option value="Weekend" {{ ($user->status == 'Weekend') ? 'selected' : '' }}>Weekend</option>
-                                        </select>
-                                        @error('session')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+              
                                     
                                     <div class="form-group">
                                         <div class="alert alert-warning">
