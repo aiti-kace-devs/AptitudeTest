@@ -170,19 +170,19 @@
                                 </a>
                             </li>
 
-                            <!-- <li class="nav-item">
-                            <a href="{{ route('admin.period.index') }}" class="nav-link @if (isset($activePage) && $activePage == 'managePeriod') active @endif">
+                            {{-- <li class="nav-item">
+                            <a href="{{ route('admin.period.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'managePeriod') active @endif">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Period</p>
                             </a>
-                        </li>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.class.schedule.index') }}" class="nav-link @if (isset($activePage) && $activePage == 'manageClassSchedule') active @endif">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Class Schedule</p>
-                            </a>
-                        </li> -->
+                            <li class="nav-item">
+                                <a href="{{ route('admin.class.schedule.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'manageClassSchedule') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manage Class Schedule</p>
+                                </a>
+                            </li> --}}
 
                             <li class="nav-item">
                                 <a href="{{ url('admin/manage_exam') }}" class="nav-link">
@@ -202,6 +202,13 @@
                                 <a href="{{ url('admin/registered_students') }}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Registered students</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/manage-sms-template') }}" class="nav-link">
+                                    <i class="fas fa-clipboard-list nav-icon"></i>
+                                    <p>SMS Templates</p>
                                 </a>
                             </li>
                         @endif
@@ -234,16 +241,9 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ url('admin/manage-sms-template') }}" class="nav-link">
-                                <i class="fas fa-clipboard-list nav-icon"></i>
-                                <p>SMS Templates</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
                             <a href="{{ route('admin.form.index') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Go To Admission Portal</p>
+                                <p>Go To RVMP Portal</p>
                             </a>
                         </li>
 
