@@ -15,19 +15,31 @@ array when the `selectedLocation` changes. */
     <SelectInput
       class="mt-1 mb-1 w-full"
       v-model="selectedLocation"
-      @change="updateCourses"
+      @change="clearCentre"
       :required="true"
     >
       <option value="" disabled selected>-- Select an option --</option>
-      <option v-for="branch in branches" :key="branch.id" :value="branch.title">
+      <option v-for="branch in branches" :key="branch.id" :value="branch.id">
         {{ branch.title }}
+      </option>
+    </SelectInput>
+
+     <InputLabel for="centre" value="Centre" :required="true" class="mt-2" />
+    <SelectInput
+      class="mt-1 mb-1 w-full"
+      v-model="selectedCentre"
+      @change="clearCourse"
+      :required="true"
+    >
+      <option value="" disabled selected>-- Select an option --</option>
+      <option v-for="centre in filteredCentres" :key="centre.id" :value="centre.id">
+        {{ centre.title }}
       </option>
     </SelectInput>
 
     <InputLabel for="course" value="Course" :required="true" class="mt-2" />
     <SelectInput
       class="mt-1 w-full"
-      @change="updateCourses"
       v-model="form.response_data.course_id"
       name="course_id"
       :required="true"
@@ -54,21 +66,30 @@ export default {
     branches: Array,
     courses: Array,
     form: Object,
+    centres: Array,
   },
   data() {
     return {
       selectedLocation: "",
       selectedCourse: "",
+        selectedCentre: "",
     };
   },
   computed: {
     filteredCourses() {
-      return this.courses.filter((course) => course.location === this.selectedLocation);
+      return this.courses.filter((course) => course.centre_id == this.selectedCentre);
+    },
+    filteredCentres() {
+      return this.centres.filter((centre) => centre.branch_id == this.selectedLocation);
     },
   },
   methods: {
-    updateCourses() {
-      this.selectedCourse = "";
+    clearCourse() {
+        this.selectedCourse = "";
+    },
+    clearCentre() {
+        this.selectedCentre = "";
+        this.clearCourse();
     },
   },
 };

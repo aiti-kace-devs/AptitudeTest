@@ -14,7 +14,13 @@ const props = defineProps({
   active: {
     type: Boolean,
   },
+  redirect: {
+    type: Boolean,
+    default: false 
+  },
 });
+
+const linkComponent = props.redirect ? "a" : Link;
 
 const classes = computed(() =>
   props.active
@@ -25,7 +31,10 @@ const classes = computed(() =>
 
 <template>
   <div class="group/item">
-    <Link :href="href" :class="classes">
+    <component
+      :is="linkComponent"
+       :href="href" 
+       :class="classes">
       <slot />
 
       <div
@@ -33,6 +42,6 @@ const classes = computed(() =>
       >
         <p class="capitalize">{{ label }}</p>
       </div>
-    </Link>
+    </component>
   </div>
 </template>

@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ConfirmationSuccessful extends Mailable
+class ConfirmationSuccessful extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -20,7 +20,7 @@ class ConfirmationSuccessful extends Mailable
      *
      * @return void
      */
-    public function __construct($name, $session, $sessionTime)
+    public function __construct($name = 'Guest', $session = 'General', $sessionTime = '00:00 AM')
     {
         $this->name = $name;
         $this->session = $session;

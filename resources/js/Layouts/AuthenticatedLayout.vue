@@ -19,6 +19,13 @@ const toggleSidebar = () => {
   isSidebarCollapsed.value = !isSidebarCollapsed.value;
 };
 
+const hardRedirect = (url, event) => {
+  window.location.href = url;
+  // event.stopPropagation();
+  event.stopImmediatePropagation();
+  return false;
+};
+
 // Get the current route name for active link highlighting
 const { component } = usePage().props;
 </script>
@@ -27,7 +34,7 @@ const { component } = usePage().props;
   <div class="min-h-screen">
     <!-- header -->
     <div
-      class="sticky top-0 z-[1001] flex justify-between items-center border-b border-gray-200 bg-white px-4 py-2.5 transition-all"
+      class="sticky h-[65px] top-0 z-[1001] flex justify-between items-center border-b border-gray-200 bg-white px-4 py-2.5 transition-all"
     >
       <div class="flex items-center gap-x-6">
         <div class="flex items-center lg:gap-2">
@@ -89,7 +96,7 @@ const { component } = usePage().props;
 
       <div class="flex space-x-3 items-center">
         <!-- Settings Dropdown -->
-        <div class="relative">
+        <!-- <div class="relative">
           <Dropdown align="right" width="48">
             <template #trigger>
               <span class="inline-flex rounded-md">
@@ -125,7 +132,7 @@ const { component } = usePage().props;
                 <span class="material-symbols-outlined me-1"> person </span> Profile
               </DropdownLink>
               <DropdownLink
-                :href="route('logout')"
+                :href="route('admin.logout')"
                 method="post"
                 as="button"
                 class="inline-flex items-center"
@@ -135,7 +142,7 @@ const { component } = usePage().props;
               </DropdownLink>
             </template>
           </Dropdown>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -157,12 +164,20 @@ const { component } = usePage().props;
             class="flex flex-col justify-center mx-3 space-y-3 md:space-y-5 lg:group-[.sidebar-not-collapsed]/container:mx-4 lg:group-[.sidebar-collapsed]/container:space-y-2"
           >
             <div>
-              <SidebarNavLink
+              <!-- <SidebarNavLink
                 :href="route('admin.dashboard')"
                 :active="route().current('admin.dashboard')"
                 :label="'overview'"
               >
                 <span class="material-symbols-outlined">dashboard</span>
+              </SidebarNavLink> -->
+              <SidebarNavLink
+                :active="route().current('admin.dashboard')"
+                :href="route('admin.dashboard')"
+                :label="'home'"
+                :redirect="true"
+              >
+                <span class="material-symbols-outlined">home</span>
               </SidebarNavLink>
 
               <SidebarNavLink
@@ -175,15 +190,24 @@ const { component } = usePage().props;
               >
                 <span class="material-symbols-outlined">ballot</span>
               </SidebarNavLink>
+
+              <SidebarNavLink
+                :href="route('admin.session.index')"
+                :active="route().current('admin.session.*')"
+                :label="'sessions'"
+              >
+                <span class="material-symbols-outlined">schedule</span>
+              </SidebarNavLink>
             </div>
 
             <div>
               <SidebarNavLink
-                :href="route('admin.dashboard')"
-                :active="route().current('admin.dashboard')"
-                :label="'home'"
+                :href="route('admin.logout')"
+                :active="route().current('admin.logout')"
+                :label="'log out'"
+                :redirect="true"
               >
-                <span class="material-symbols-outlined"> home </span>
+                <span class="material-symbols-outlined"> logout </span>
               </SidebarNavLink>
             </div>
           </nav>

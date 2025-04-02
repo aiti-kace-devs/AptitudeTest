@@ -15,6 +15,7 @@ export default {
     courses: Array,
     branches: Array,
     withLayout: Boolean,
+    centres: Array,
   },
 };
 </script>
@@ -36,6 +37,7 @@ export default {
       :admissionForm="admissionForm"
       :courses="courses"
       :branches="branches"
+      :centres="centres"
       :admin="true"
       :errors="errors"
       :form="form"
@@ -46,6 +48,7 @@ export default {
     <FormView
       :admissionForm="admissionForm"
       :admin="false"
+      :centres="centres"
       :courses="courses"
       :branches="branches"
       :errors="errors"

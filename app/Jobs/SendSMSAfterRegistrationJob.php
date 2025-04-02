@@ -27,6 +27,8 @@ class SendSMSAfterRegistrationJob implements ShouldQueue
      */
     public function handle(): void
     {
-        SendSmsJob::dispatch($this->details['phonenumber'], $this->details['message']);
+        if (isset($this->details['message']) && isset($this->details['phonenumber']) && $this->details['message'] != '' && $this->details['phonenumber'] != '') {
+            SendSmsJob::dispatch($this->details['phonenumber'], $this->details['message']);
+        }
     }
 }

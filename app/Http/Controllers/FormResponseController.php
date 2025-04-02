@@ -83,8 +83,7 @@ class FormResponseController extends Controller
      */
     public function store(Request $request)
     {
-        //$form = Form::where('uuid', $request->form_uuid)->firstOrFail();
-        $form = Form::where('uuid', '098faedf-3bfa-4440-bc9e-35b28d8e7822')->firstOrFail();
+        $form = Form::where('uuid', $request->form_uuid)->firstOrFail();
         $schema = $form->schema;
 
         $validationRules = [
@@ -124,7 +123,11 @@ class FormResponseController extends Controller
                 $isDuplicate = false;
 
                 foreach ($existingRecords as $record) {
-                    $data = json_decode($record->response_data, true);
+                    // $data = json_decode($record->response_data, true);
+                    $data = is_array($record->response_data)
+                        ? $record->response_data
+                        : json_decode($record->response_data, true);
+
                     if (!empty($data[$field['field_name']]) && $data[$field['field_name']] == ($formattedData[$field['field_name']] ?? null)) {
                         $isDuplicate = true;
                         break;
@@ -132,11 +135,15 @@ class FormResponseController extends Controller
                 }
 
                 if ($isDuplicate) {
-                    return response()->json([
-                        'errors' => [
-                            $fieldKey => ["{$fieldTitle} has already been taken."]
-                        ]
-                    ], 422);
+                    // Log::info("{$fieldTitle} has already been taken.");
+                    return redirect()->back()->withInput()->withErrors([
+                        $fieldKey => ["{$fieldTitle} has already been taken."]
+                    ]);
+                    // return response()->json([
+                    //     'errors' => [
+                    //         $fieldKey => ["{$fieldTitle} has already been taken."]
+                    //     ]
+                    // ], 422);
                 }
             }
 
@@ -228,8 +235,8 @@ class FormResponseController extends Controller
 
         $form->responses()->save($response);
 
-        Log::info($validated['response_data']);
-        Log::info($fieldName);
+        // Log::info($validated['response_data']);
+        // Log::info($fieldName);
 
         FormSubmittedEvent::dispatch($validated['response_data'], $fieldName);
     }

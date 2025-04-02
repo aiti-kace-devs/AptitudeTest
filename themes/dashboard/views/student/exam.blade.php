@@ -36,7 +36,7 @@
                                                 <th>Exam title</th>
                                                 <th>Exam deadline</th>
                                                 <th>Status</th>
-                                                <th>Result</th>
+                                                {{-- <th>Result</th> --}}
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -67,13 +67,13 @@
                                                             <span class="badge badge-danger">Not Submitted</span>
                                                         @endif
                                                     </td>
-                                                    <td>
+                                                    {{-- <td>
 
                                                         @if ($std_info['submitted'] != null)
                                                             <a href="{{ url('student/view_result/' . $std_info['exam_id']) }}"
                                                                 class="btn btn-info btn-sm">View Result</a>
                                                         @endif
-                                                    </td>
+                                                    </td> --}}
 
 
                                                     <td>
