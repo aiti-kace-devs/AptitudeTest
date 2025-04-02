@@ -90,6 +90,10 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/exam_category', [AdminController::class, 'exam_category'])->middleware('admin.super');
         Route::get('/edit_category/{id}', [AdminController::class, 'edit_category'])->middleware('admin.super');
         Route::get('/category_status/{id}', [AdminController::class, 'category_status'])->middleware('admin.super');
+        Route::get('/branch_status/{id}', [AdminController::class, 'branch_status'])->middleware('admin.super');
+        Route::get('/centre_status/{id}', [AdminController::class, 'centre_status'])->middleware('admin.super');
+        Route::get('/programme_status/{id}', [AdminController::class, 'programme_status'])->middleware('admin.super');
+        Route::get('/course_status/{id}', [AdminController::class, 'course_status'])->middleware('admin.super');
         Route::get('/manage_exam', [AdminController::class, 'manage_exam'])->middleware('admin.super');
         Route::get('/exam_status/{id}', [AdminController::class, 'exam_status'])->middleware('admin.super');
         Route::get('/delete_exam/{id}', [AdminController::class, 'delete_exam'])->middleware('admin.super');
@@ -180,6 +184,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::get('/fetch/centre', [CourseController::class, 'fetchCentre'])->name('course.fetch.centre');
             Route::put('/{course}/update', [CourseController::class, 'update'])->name('course.update');
             Route::get('/{course}/delete', [CourseController::class, 'destroy'])->name('course.destroy');
+            Route::get('/fetch-programme', [CourseController::class, 'fetchProgrammeDetails'])->name('course.fetch.programme');
+
         });
         // end of manage course routes
 

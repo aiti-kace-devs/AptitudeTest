@@ -11,7 +11,8 @@ class Centre extends Model
 
     protected $fillable = [
         'title',
-        'branch_id'
+        'branch_id',
+        'status'
     ];
 
     public function branch(){

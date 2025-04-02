@@ -18,7 +18,8 @@ class Form extends Model
         'code',
         'message_after_registration',
         'message_when_inactive',
-        'active'
+        'active',
+        'status'
     ];
 
     protected $casts = [

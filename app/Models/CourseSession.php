@@ -9,7 +9,7 @@ class CourseSession extends Model
 {
     use HasFactory;
 
-    public $fillable = ['name', 'course_id', 'course', 'session', 'course_time'];
+    public $fillable = ['name', 'course_id', 'course', 'session', 'course_time', 'status'];
 
     protected $table = 'course_sessions';
 

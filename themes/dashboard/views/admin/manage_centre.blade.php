@@ -43,6 +43,7 @@
                       <th>#</th>
                       <th>Title</th>
                       <th>Branch</th>
+                      <th>Status</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -52,6 +53,7 @@
                       <td>{{ $key+1}}</td>
                       <td>{{ $centre['title']}}</td>
                       <td>{{ $centre->branch->title }}</td>
+                      <td><input class="centre_status" data-id="<?php echo $centre['id'] ?>" <?php if($centre['status']==1){ echo "checked";} ?> type="checkbox" name="status"></td>
                       <td class="d-flex">
                         <a href="{{ route('admin.centre.edit', $centre->id) }}" class="btn btn-info">Edit</a>
                         <a href="{{ route('admin.centre.destroy', $centre->id) }}" class="btn btn-danger ml-2">Delete</a>

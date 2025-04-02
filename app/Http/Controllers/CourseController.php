@@ -62,10 +62,14 @@ class CourseController extends Controller
                 'branch_id' => 'required',
                 'centre_id' => 'required',
                 'programme_id' => 'required',
+                'duration' => 'required',
+                'start_date' => 'sometimes',
+                'end_date' => 'sometimes',
             ], [
                 'branch_id.required' => 'The branch field is required.',
                 'centre_id.required' => 'The centre field is required.',
                 'programme_id.required' => 'The programme field is required.',
+                'duration.required' => 'The duration field is required.',
             ]);
 
             if ($validation->fails()) {
@@ -81,6 +85,9 @@ class CourseController extends Controller
 
             $input['course_name'] = "$programme_name - ($branch_name)";
             $input['location'] = $branch_name;
+            $input['duration'] = $request->duration;
+            $input['start_date'] = $request->start_date;;
+            $input['end_date'] = $request->end_date;
             Course::create($input);
 
             return response()->json([
@@ -136,10 +143,14 @@ class CourseController extends Controller
                 'branch_id' => 'required',
                 'centre_id' => 'required',
                 'programme_id' => 'required',
+                'duration' => 'required',
+                'start_date' => 'sometimes',
+                'end_date' => 'sometimes',
             ], [
                 'branch_id.required' => 'The branch field is required.',
                 'centre_id.required' => 'The centre field is required.',
                 'programme_id.required' => 'The programme field is required.',
+                'duration.required' => 'The duration field is required.',
             ]);
 
             if ($validation->fails()) {
@@ -173,4 +184,25 @@ class CourseController extends Controller
 
         return redirect()->route('admin.course.index');
     }
+
+
+
+    public function fetchProgrammeDetails(Request $request)
+    {
+        $programme = Programme::find($request->programme_id);
+
+        if ($programme) {
+            return response()->json([
+                'duration' => $programme->duration,
+                'start_date' => $programme->start_date,
+                'end_date' => $programme->end_date,
+            ]);
+        } else {
+            return response()->json(['error' => 'Programme not found'], 404);
+        }
+    }
+
+
+
+
 }

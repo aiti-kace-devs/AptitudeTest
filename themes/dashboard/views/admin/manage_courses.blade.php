@@ -44,6 +44,10 @@
                                                 <th>#</th>
                                                 <th>Title</th>
                                                 <th>Centre</th>
+                                                <th>Duration</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -53,6 +57,10 @@
                                                     <td>{{ $key + 1 }}</td>
                                                     <td>{{ $course->programme?->title }}</td>
                                                     <td>{{ $course->centre?->title }}, {{ $course->centre?->branch->title }}
+                                                    <td>{{ $course['duration']}}</td>
+                                                    <td>{{ $course['start_date']}}</td>
+                                                    <td>{{ $course['end_date']}}</td>
+                                                    <td><input class="course_status" data-id="<?php echo $course['id'] ?>" <?php if($course['status']==1){ echo "checked";} ?> type="checkbox" name="status"></td>
                                                     </td>
                                                     <td class="d-flex">
                                                         <a href="{{ route('admin.course.edit', $course->id) }}"
@@ -132,6 +140,33 @@
                                     </div>
                                 </div>
 
+
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                    <label for="">Duration</label>
+                                    <input type="text" name="duration" placeholder="Enter duration" class="form-control" id="duration">
+                                    <span class="duration_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                    <label for="">Start Date</label>
+                                    <input type="date" name="start_date" placeholder="Enter start_date" class="form-control" id="start_date">
+                                    <span class="start_date_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                    <label for="">End Date</label>
+                                    <input type="date" name="end_date" placeholder="Enter end_date" class="form-control" id="end_date">
+                                    <span class="end_date_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                                    </div>
+                                </div>
+
+
+
+
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">Add</button>
@@ -183,4 +218,36 @@
                 const manageAction = "{{ route('admin.course.store') }}";
                 const method = 'POST';
             </script>
+
+
+
+            <script>
+
+            $(document).ready(function() {
+                $(document).on('change', '#programme_id', function() {
+                    const programmeId = $(this).val();
+
+                    if (programmeId) {
+                        $.ajax({
+                            type: 'GET',
+                            url: "{{ route('admin.course.fetch.programme') }}",
+                            data: { programme_id: programmeId },
+                            success: function(response) {
+                                // Populate the form fields
+                                $('#duration').val(response.duration);
+                                $('#start_date').val(response.start_date);
+                                $('#end_date').val(response.end_date);
+                            },
+                            error: function(xhr) {
+                                console.error("An error occurred: ", xhr.responseText);
+                                alert("Failed to fetch programme details. Please try again.");
+                            }
+                        });
+                    }
+                });
+            });
+            </script>
+
+
+
         @endsection

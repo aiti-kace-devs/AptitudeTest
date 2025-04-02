@@ -63,6 +63,43 @@ $(document).on('click','.category_status',function(){
 
 
 
+$(document).on('click','.branch_status',function(){
+    var id=$(this).attr('data-id');
+    $.get(BASE_URL+'/admin/branch_status/'+id,function(fb){
+        sAlert("status successsfully changed");
+    })
+})
+
+
+
+$(document).on('click','.centre_status',function(){
+    var id=$(this).attr('data-id');
+    $.get(BASE_URL+'/admin/centre_status/'+id,function(fb){
+        sAlert("status successsfully changed");
+    })
+})
+
+
+
+
+$(document).on('click','.programme_status',function(){
+    var id=$(this).attr('data-id');
+    $.get(BASE_URL+'/admin/programme_status/'+id,function(fb){
+        sAlert("status successsfully changed");
+    })
+})
+
+
+
+
+$(document).on('click','.course_status',function(){
+    var id=$(this).attr('data-id');
+    $.get(BASE_URL+'/admin/course_status/'+id,function(fb){
+      sAlert("status successsfully changed");
+    })
+})
+
+
 
 $(document).on('click','.is_super_admin_status',function(){
     var id=$(this).attr('data-id');

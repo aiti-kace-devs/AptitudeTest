@@ -42,6 +42,10 @@
                     <tr>
                       <th>#</th>
                       <th>Title</th>
+                      <th>Duration</th>
+                      <th>Start Date</th>
+                      <th>End Date</th>
+                      <th>Status</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -50,6 +54,10 @@
                     <tr>
                       <td>{{ $key+1}}</td>
                       <td>{{ $programme['title']}}</td>
+                      <td>{{ $programme['duration']}}</td>
+                      <td>{{ $programme['start_date']}}</td>
+                      <td>{{ $programme['end_date']}}</td>
+                      <td><input class="programme_status" data-id="<?php echo $programme['id'] ?>" <?php if($programme['status']==1){ echo "checked";} ?> type="checkbox" name="status"></td>
                       <td class="d-flex">
                         <a href="{{ route('admin.programme.edit', $programme->id) }}" class="btn btn-info">Edit</a>
                         <a href="{{ route('admin.programme.destroy', $programme->id) }}" class="btn btn-danger ml-2">Delete</a>
@@ -92,6 +100,27 @@
                   <label for="">Enter title</label>
                   <input type="text" name="title" placeholder="Enter title" class="form-control" id="title">
                   <span class="title_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                </div>
+              </div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label for="">Duration</label>
+                  <input type="text" name="duration" placeholder="Enter duration" class="form-control" id="duration">
+                  <span class="duration_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                </div>
+              </div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label for="">Start Date</label>
+                  <input type="date" name="start_date" placeholder="Enter start_date" class="form-control" id="start_date">
+                  <span class="start_date_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
+                </div>
+              </div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label for="">End Date</label>
+                  <input type="date" name="end_date" placeholder="Enter end_date" class="form-control" id="end_date">
+                  <span class="end_date_error font-weight-bold invalid-feedback" style="display: block;" role="alert"></span>
                 </div>
               </div>
               <div class="col-sm-12">

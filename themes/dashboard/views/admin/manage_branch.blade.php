@@ -42,6 +42,7 @@
                     <tr>
                       <th>#</th>
                       <th>Title</th>
+                      <th>Status</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -50,6 +51,7 @@
                     <tr>
                       <td>{{ $key+1}}</td>
                       <td>{{ $branch['title']}}</td>
+                      <td><input class="branch_status" data-id="<?php echo $branch['id'] ?>" <?php if($branch['status']==1){ echo "checked";} ?> type="checkbox" name="status"></td>
                       <td class="d-flex">
                         <a href="{{ route('admin.branch.edit', $branch->id) }}" class="btn btn-info">Edit</a>
                         <a href="{{ route('admin.branch.destroy', $branch->id) }}" class="btn btn-danger ml-2">Delete</a>

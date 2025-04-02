@@ -19,6 +19,7 @@ class CreateUserExamsTable extends Migration
             $table->string('exam_id');
             $table->string('std_status');
             $table->string('exam_joined');
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

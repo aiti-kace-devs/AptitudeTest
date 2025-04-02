@@ -15,13 +15,13 @@ class UserSeeder extends Seeder
     public function run()
     {
         //
-        $user = [
-            'name' => 'student',
-            'email' => 'student@gmail.com',
-            'password' => bcrypt('password'),
-            'userId' => 'siouas879',
-        ];
+        // $user = [
+        //     'name' => 'student',
+        //     'email' => 'student@gmail.com',
+        //     'password' => bcrypt('password'),
+        //     'userId' => 'siouas879',
+        // ];
 
-        User::create($user);
+        // User::create($user);
     }
 }

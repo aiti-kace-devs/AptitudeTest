@@ -10,7 +10,8 @@ class Branch extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title'
+        'title',
+        'status'
     ];
 
     public function centre(){
