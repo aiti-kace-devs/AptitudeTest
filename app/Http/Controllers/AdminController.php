@@ -213,13 +213,14 @@ class AdminController extends Controller
         $data['exam'] = Oex_exam_master::all();
         $data['exams'] = Oex_exam_master::where('status', '1')->get()->toArray();
 
-        $data['courses'] = Course::pluck('course_name')->toArray();
+        $data['courses'] = Course::pluck('course_name', 'id')->toArray();
+
         if ($request->ajax()) {
             $baseQuery = user_exam::with('result')
                 ->join('users', 'users.id', '=', 'user_exams.user_id')
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
-                ->leftJoin('courses', 'users.registered_course', '=', 'course_id')
-                ->select(['user_exams.id', 'users.name', 'users.email', 'users.age', 'courses.course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined']);
+                ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
+                ->select(['user_exams.id', 'users.name', 'users.email', 'users.age', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined']);
 
             if ($request->has('filter.ex_name')) {
                 $baseQuery->where('oex_exam_masters.title', 'like', '%' . $request->input('filter.ex_name') . '%');
@@ -239,27 +240,31 @@ class AdminController extends Controller
                     $baseQuery->whereNull('submitted');
                 }
             }
+
             if ($request->has('filter.age_range')) {
                 $ageRange = $request->input('filter.age_range');
-                if ($ageRange === '15-19') {
-                    $baseQuery->whereBetween('users.age', [15, 19]);
-                } elseif ($ageRange === '20-24') {
-                    $baseQuery->whereBetween('users.age', [20, 24]);
-                }
-                elseif ($ageRange === '25-35') {
-                    $baseQuery->whereBetween('users.age', [25, 35]);
-                }
-                elseif ($ageRange === '36-45') {
-                    $baseQuery->whereBetween('users.age', [36, 45]);
-                }
-                elseif ($ageRange === '45+') {
-                    $baseQuery->where('users.age', '>=', 46);
+                switch ($ageRange) {
+                    case '15-19':
+                        $baseQuery->whereBetween('users.age', [15, 19]);
+                        break;
+                    case '20-24':
+                        $baseQuery->whereBetween('users.age', [20, 24]);
+                        break;
+                    case '25-35':
+                        $baseQuery->whereBetween('users.age', [25, 35]);
+                        break;
+                    case '36-45':
+                        $baseQuery->whereBetween('users.age', [36, 45]);
+                        break;
+                    case '45+':
+                        $baseQuery->where('users.age', '>=', 45);
+                        break;
                 }
             }
 
             if ($request->has('filter.course')) {
-                $courseName = $request->input('filter.course');
-                $baseQuery->where('users.registered_course', 'like', '%' . $courseName . '%');
+                $courseId = $request->input('filter.course');
+                $baseQuery->where('users.registered_course', $courseId);
             }
 
             if ($request->has('filter.search_term')) {
@@ -268,9 +273,16 @@ class AdminController extends Controller
                     $query->where('users.name', 'like', '%' . $searchTerm . '%')->orWhere('users.email', 'like', '%' . $searchTerm . '%');
                 });
             }
+
             return DataTables::of($baseQuery)
                 ->addColumn('checkbox', function ($std) {
                     return '<input type="checkbox" class="student-checkbox" value="' . $std->id . '">';
+                })
+                ->addColumn('age', function ($std) {
+                    return $std->age ?? 'N/A';
+                })
+                ->addColumn('course_name', function ($std) {
+                    return $std->course_name ?? 'N/A';
                 })
                 ->addColumn('score', function ($std) {
                     return optional($std->result)->yes_ans ?? 'N/A';

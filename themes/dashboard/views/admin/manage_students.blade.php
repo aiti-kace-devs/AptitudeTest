@@ -47,6 +47,15 @@
                                             </select>
                                         </div>
                                         <div class="col-md-2">
+                                            <select class="form-control filter-select" data-filter="course">
+                                                <option value="">All Courses</option>
+                                                @foreach ($courses as $id => $name)
+                                                    <option value="{{ $id }}">{{ $name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-2">
                                             <select class="form-control filter-select" data-column="6" data-filter="status">
                                                 <option value="">All Statuses</option>
                                                 <option value="passed">Passed</option>
@@ -56,19 +65,12 @@
                                         </div>
                                         <div class="col-md-2">
                                             <select class="form-control filter-select" data-filter="age_range">
+                                                <option value="">All Ages</option>
                                                 <option value="15-19">15-19</option>
                                                 <option value="20-24">20-24</option>
                                                 <option value="25-35">25-35</option>
                                                 <option value="36-45">36-45</option>
                                                 <option value="45+">45+</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <select class="form-control filter-select" data-filter="course">
-                                                <option value="">All Courses</option>
-                                                @foreach ($courses as $course)
-                                                    <option value="{{ $course }}">{{ $course }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                         <div class="col-md-3">
@@ -90,7 +92,7 @@
                                                 <th>Name</th>
                                                 <th>Email</th>
                                                 <th>Age</th>
-                                                <th>Courses</th>
+                                                <th>Course</th>
                                                 <th>Exam</th>
                                                 <th>Score</th>
                                                 <th>Result</th>
@@ -184,9 +186,9 @@
 
             <script>
                 $(document).ready(function() {
-                    var allFilteredIds = []; // Stores all IDs from current filter
-                    var manuallySelectedIds = []; // Stores manually selected IDs
-                    var isFilterApplied = false; // Tracks if any filter is active
+                    var allFilteredIds = [];
+                    var manuallySelectedIds = [];
+                    var isFilterApplied = false;
                     var debounceTimer;
 
                     var table = $('#studentsTable').DataTable({
@@ -200,7 +202,6 @@
                                 d.start = d.start;
                                 d.length = d.length;
 
-                                // Reset filter tracking when no filters are active
                                 isFilterApplied = false;
 
                                 if ($('select[data-filter="ex_name"]').val()) {
@@ -220,13 +221,11 @@
                                     isFilterApplied = true;
                                 }
                                 if ($('#studentSearch').val()) {
-                                    // Combined name/email search
                                     d['filter[search_term]'] = $('#studentSearch').val();
                                     isFilterApplied = true;
                                 }
                             },
                             dataSrc: function(json) {
-                                // Store all IDs from current filtered results
                                 allFilteredIds = json.all_filtered_ids || [];
                                 return json.data;
                             },
@@ -237,29 +236,59 @@
                                 );
                             }
                         },
-                        columns: [
-                            {
+                        columns: [{
                                 data: 'checkbox',
                                 name: 'checkbox',
                                 orderable: false,
                                 searchable: false,
                                 render: function(data, type, row) {
-                                    return '<input type="checkbox" class="student-checkbox" value="' + row.id + '" ' +
+                                    return '<input type="checkbox" class="student-checkbox" value="' + row
+                                        .id + '" ' +
                                         (isFilterApplied ? 'checked' : '') + '>';
                                 }
                             },
-                            { data: 'name', name: 'users.name' },
-                            { data: 'email', name: 'users.email' },
-                            { data: 'age', name: 'users.age' },
-                            { data: 'registered_course', name: 'users.registered_course' },
-                            { data: 'ex_name', name: 'oex_exam_masters.title' },
-                            { data: 'score', name: 'score', orderable: false },
-                            { data: 'result', name: 'result', orderable: false },
-                            { data: 'status', name: 'status', orderable: false },
-                            { data: 'actions', name: 'actions', orderable: false }
-                        ],
-                        columnDefs: [
                             {
+                                data: 'name',
+                                name: 'users.name'
+                            },
+                            {
+                                data: 'email',
+                                name: 'users.email'
+                            },
+                            {
+                                data: 'age',
+                                name: 'users.age'
+                            },
+                            {
+                                data: 'course_name',
+                                name: 'course_name'
+                            },
+                            {
+                                data: 'ex_name',
+                                name: 'oex_exam_masters.title'
+                            },
+                            {
+                                data: 'score',
+                                name: 'score',
+                                orderable: false
+                            },
+                            {
+                                data: 'result',
+                                name: 'result',
+                                orderable: false
+                            },
+                            {
+                                data: 'status',
+                                name: 'status',
+                                orderable: false
+                            },
+                            {
+                                data: 'actions',
+                                name: 'actions',
+                                orderable: false
+                            }
+                        ],
+                        columnDefs: [{
                                 targets: 0,
                                 width: "5%"
                             },
@@ -272,21 +301,17 @@
                             [1, 'asc']
                         ],
                         drawCallback: function(settings) {
-                            // Auto-check all checkboxes when filters are applied
                             if (isFilterApplied) {
                                 $('.student-checkbox').prop('checked', true);
-                                manuallySelectedIds = [...allFilteredIds]; // Copy all filtered IDs
-                            } else {
-                                manuallySelectedIds = []; // Reset when no filters
+                                manuallySelectedIds = [...allFilteredIds];
+                                manuallySelectedIds = [];
                             }
 
-                            // Update select all checkbox state
                             var allChecked = $('.student-checkbox:not(:checked)').length === 0;
                             $('#select-all').prop('checked', allChecked);
                         }
                     });
 
-                    // Combined search handler for name/email with debounce
                     $('#studentSearch').on('keyup', function() {
                         clearTimeout(debounceTimer);
                         debounceTimer = setTimeout(function() {
@@ -294,15 +319,27 @@
                         }, 500);
                     });
 
-                    // Exam, status, age range, and course filter handlers
-                    $('select[data-filter="ex_name"], select[data-filter="status"], select[data-filter="age_range"], select[data-filter="course"]').on('change', function() {
+                    $('select[data-filter="ex_name"], select[data-filter="status"], select[data-filter="course"]').on(
+                        'change',
+                        function() {
+                            clearTimeout(debounceTimer);
+                            debounceTimer = setTimeout(function() {
+                                table.ajax.reload();
+                            }, 300);
+                        });
+
+                    $('select[data-filter="age_range"]').on('change', function() {
                         clearTimeout(debounceTimer);
                         debounceTimer = setTimeout(function() {
                             table.ajax.reload();
                         }, 300);
                     });
 
-                    // Handle manual checkbox changes
+                    $('#clear-age-filter').click(function() {
+                        $('input[name="age_range"]').prop('checked', false);
+                        table.ajax.reload();
+                    });
+
                     $(document).on('change', '.student-checkbox', function() {
                         var studentId = $(this).val();
                         if ($(this).is(':checked')) {
@@ -313,24 +350,21 @@
                             manuallySelectedIds = manuallySelectedIds.filter(id => id != studentId);
                         }
 
-                        // Update select all checkbox state
                         var allChecked = $('.student-checkbox:not(:checked)').length === 0;
                         $('#select-all').prop('checked', allChecked);
                     });
 
-                    // Select all checkbox functionality
                     $('#select-all').change(function() {
                         var isChecked = $(this).prop('checked');
                         $('.student-checkbox').prop('checked', isChecked);
 
                         if (isChecked) {
-                            manuallySelectedIds = [...allFilteredIds]; // Copy all filtered IDs
+                            manuallySelectedIds = [...allFilteredIds];
                         } else {
-                            manuallySelectedIds = []; // Clear manual selections
+                            manuallySelectedIds = [];
                         }
                     });
 
-                    // Admit selected students - will use either manual selection or all filtered
                     $('#admit-selected').click(function() {
                         var selected = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
 
@@ -339,7 +373,6 @@
                             return;
                         }
 
-                        // Show loading state
                         var btn = $(this);
                         btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
 
@@ -364,7 +397,7 @@
                                     success: function(response) {
                                         toastr.success(response.message);
                                         table.ajax.reload();
-                                        manuallySelectedIds = []; // Reset after admission
+                                        manuallySelectedIds = [];
                                     },
                                     error: function(xhr) {
                                         toastr.error(xhr.responseJSON?.message ||
@@ -381,4 +414,5 @@
                         });
                     });
                 });
-            </script>        @endsection
+            </script>
+        @endsection
