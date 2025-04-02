@@ -71,4 +71,9 @@ class User extends Authenticatable
     {
         return $this->is_super;
     }
+
+    public function formResponse()
+    {
+        return $this->belongsTo(FormResponse::class, 'form_response_id');
+    }
 }

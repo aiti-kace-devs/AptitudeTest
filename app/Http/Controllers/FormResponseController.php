@@ -238,7 +238,7 @@ class FormResponseController extends Controller
         // Log::info($validated['response_data']);
         // Log::info($fieldName);
 
-        FormSubmittedEvent::dispatch($validated['response_data'], $fieldName);
+        FormSubmittedEvent::dispatch($validated['response_data'], $response->id, $fieldName);
     }
 
 
