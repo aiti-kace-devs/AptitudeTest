@@ -16,14 +16,16 @@ class FormSubmittedEvent
 
 
     public $submissionData;
+    public $formResponseId;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(mixed $submissionData, $fieldName)
+    public function __construct(mixed $submissionData, $formResponseId, $fieldName)
     {
         $this->submissionData = $submissionData;
         $this->submissionData['phone_number_field'] = $fieldName;
+        $this->formResponseId = $formResponseId;
     }
 
     /**
