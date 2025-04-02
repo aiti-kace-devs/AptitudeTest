@@ -185,6 +185,14 @@
                             </a>
                         </li>
 
+
+                        <li class="nav-item">
+                             <a href="{{ route('admin.admins.index') }}" class="nav-link @if (isset($activePage) && $activePage == 'manageAdmin') active @endif">
+                                  <i class="fas fa-user-shield nav-icon"></i>
+                                  <p>Manage Admin</p>
+                            </a>
+                        </li>
+
                         <li class="nav-item">
                             <a href="{{ url('admin/manage_students') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>

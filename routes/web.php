@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentOperation;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\RegisteredUserController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BranchController;
@@ -69,6 +70,30 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         Route::post('/{response}/destroy', [FormResponseController::class, 'destroy'])->name('destroy');
     });
 });
+
+
+
+
+
+
+Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
+    // Admin management routes (for managing other admins)
+    Route::get('/admins', [RegisteredUserController::class, 'index'])->name('admins.index');
+    Route::get('/admins/create', [RegisteredUserController::class, 'create'])->name('admins.create');
+    Route::post('/admins/store', [RegisteredUserController::class, 'store'])->name('admins.store');
+    Route::get('/admins/{id}/edit', [RegisteredUserController::class, 'edit'])->name('admins.edit');
+    Route::put('/admins/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update');
+    Route::delete('/admins/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete');
+    
+    // Dashboard route
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    
+    // Other admin routes...
+});
+
+
+
+
 
 
 
