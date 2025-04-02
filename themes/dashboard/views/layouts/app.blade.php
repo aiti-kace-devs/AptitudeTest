@@ -187,7 +187,7 @@
 
 
                         <li class="nav-item">
-                             <a href="{{ route('admin.admins.index') }}" class="nav-link @if (isset($activePage) && $activePage == 'manageAdmin') active @endif">
+                             <a href="{{ url('admin/manage_admins') }}" class="nav-link @if (isset($activePage) && $activePage == 'manageAdmin') active @endif">
                                   <i class="fas fa-user-shield nav-icon"></i>
                                   <p>Manage Admin</p>
                             </a>

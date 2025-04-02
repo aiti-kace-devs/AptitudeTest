@@ -63,7 +63,7 @@ class RegisteredUserController extends Controller
     public function index()
     {
         $admins =  $admins = Admin::all(); 
-        return view('admin.admins.index', compact('admins'));
+        return view('admin.index', compact('admins'));
     }
 
     /**
@@ -73,7 +73,7 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
-        return view('admin.admins.create');
+        return view('admin.create');
     }
 
     /**
@@ -98,12 +98,16 @@ class RegisteredUserController extends Controller
         $admin->name = $request->name;
         $admin->email = $request->email;
         $admin->password = Hash::make($request->password);
+        $admin->is_super = $request->has('is_super') ? true : false;
         $admin->save();
 
-        return redirect()->route('admin.admins.index')->with([
-            'flash' => 'Admin created successfully!',
-            'key' => 'success'
-        ]);
+        // $redirectPath = $admin->is_super ? 'admin.dashboard' : 'admin.dashboard';
+    
+        // return redirect()->route($redirectPath)->with([
+        //     'flash' => 'Admin created successfully!',
+        //     'key' => 'success'
+        // ]);
+        echo json_encode(['status' => 'true', 'message' => 'Admin created successfully!', 'reload' => url('admin/manage_admins')]);
     }
 
     /**
@@ -114,9 +118,9 @@ class RegisteredUserController extends Controller
      */
     public function edit($id)
     {
-        // dd($id, Admin::find($id));
+        //dd($id, Admin::find($id));
         $admin = Admin::findOrFail($id);
-        return view('admin.admins.edit', compact('admin'));
+        return view('admin.edit', compact('admin'));
     }
 
     /**
@@ -148,14 +152,18 @@ class RegisteredUserController extends Controller
 
         $admin->name = $request->name;
         $admin->email = $request->email;
+        //$admin->is_super = $request->has('is_super') ? true : false;
         
         if ($request->filled('password')) {
             $admin->password = Hash::make($request->password);
         }
         
         $admin->save();
+        // echo json_encode(['status' => 'true', 'message' => 'Admin updated successfully!', 'reload' => url('admin/manage_admins')]);
 
-        return redirect()->route('admin.admins.index')->with([
+        $redirectPath = $admin->is_super ? 'admin.manage_admins' : 'admin.manage_admins';
+
+        return redirect()->route($redirectPath)->with([
             'flash' => 'Admin updated successfully!',
             'key' => 'success'
         ]);
@@ -172,9 +180,28 @@ class RegisteredUserController extends Controller
         $admin = Admin::findOrFail($id);
         $admin->delete();
 
-        return redirect()->route('admin.admins.index')->with([
+        return redirect()->route('admin.manage_admins')->with([
             'flash' => 'Admin deleted successfully!',
             'key' => 'success'
         ]);
+    }
+
+
+
+
+    //Editing is_super admin status
+    public function is_super_admin_status($id)
+    {
+        $admin = Admin::where('id', $id)->get()->first();
+
+        if ($admin->is_super == 1) {
+            $is_super = 0;
+        } else {
+            $is_super = 1;
+        }
+
+        $admin1 = Admin::where('id', $id)->get()->first();
+        $admin1->is_super = $is_super;
+        $admin1->update();
     }
 }

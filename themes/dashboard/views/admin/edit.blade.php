@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Create Admin')
+@section('title', 'Edit Admin')
 @section('content')
 
     <!-- Content Wrapper. Contains page content -->
@@ -9,13 +9,13 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Create New Admin</h1>
+                        <h1 class="m-0">Edit Admin</h1>
                     </div><!-- /.col -->
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.admins.index') }}">Manage Admins</a></li>
-                            <li class="breadcrumb-item active">Create Admin</li>
+                            <li class="breadcrumb-item"><a href="{{ url('admin/manage_admins') }}">Manage Admins</a></li>
+                            <li class="breadcrumb-item active">Edit Admin</li>
                         </ol>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
@@ -42,43 +42,48 @@
                                         </div>
                                     @endif
 
-                                    <form method="POST" action="{{ route('admin.admins.store') }}">
+                                    <form method="POST" action="{{ route('admin.admins.update', $admin->id) }}">
                                         @csrf
+                                        @method('PUT')
                                         
                                         <div class="form-group row">
                                             <label for="name" class="col-md-4 col-form-label text-md-right">Name</label>
                                             <div class="col-md-6">
-                                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
+                                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', $admin->name) }}" required autocomplete="name" autofocus>
                                             </div>
                                         </div>
 
                                         <div class="form-group row">
                                             <label for="email" class="col-md-4 col-form-label text-md-right">Email Address</label>
                                             <div class="col-md-6">
-                                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
+                                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email', $admin->email) }}" required autocomplete="email">
                                             </div>
                                         </div>
 
                                         <div class="form-group row">
                                             <label for="password" class="col-md-4 col-form-label text-md-right">Password</label>
                                             <div class="col-md-6">
-                                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+                                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" autocomplete="new-password">
+                                                <small class="form-text text-muted">Leave blank to keep current password</small>
                                             </div>
                                         </div>
 
                                         <div class="form-group row">
                                             <label for="password-confirm" class="col-md-4 col-form-label text-md-right">Confirm Password</label>
                                             <div class="col-md-6">
-                                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" autocomplete="new-password">
                                             </div>
                                         </div>
+
+
+
 
                                         <div class="form-group row mb-0">
                                             <div class="col-md-6 offset-md-4">
                                                 <button type="submit" class="btn btn-primary">
-                                                    Create Admin
+                                                    Update Admin
                                                 </button>
-                                                <a href="{{ route('admin.admins.index') }}" class="btn btn-secondary">Cancel</a>
+                                                <a href="{{ url('admin/manage_admins') }}" class="btn btn-secondary">Cancel</a>
                                             </div>
                                         </div>
                                     </form>

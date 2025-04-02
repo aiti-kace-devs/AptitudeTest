@@ -62,6 +62,16 @@ $(document).on('click','.category_status',function(){
 })
 
 
+
+
+$(document).on('click','.is_super_admin_status',function(){
+    var id=$(this).attr('data-id');
+    $.get(BASE_URL+'/admin/is_super_admin_status/'+id,function(fb){
+        sAlert("status successsfully changed");
+    })
+})
+
+
 $(document).on('click','.exam_status',function(){
     var id=$(this).attr('data-id');
     $.get(BASE_URL+'/admin/exam_status/'+id,function(fb){

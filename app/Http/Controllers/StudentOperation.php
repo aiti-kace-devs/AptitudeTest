@@ -50,6 +50,7 @@ class StudentOperation extends Controller
     // application status
     public function application_status()
     {
+        
         $user_exam = user_exam::where(
             'user_id',
             Session::get('id')
