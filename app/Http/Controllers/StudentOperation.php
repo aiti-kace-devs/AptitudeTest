@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Jobs\AdmitStudentJob;
+use App\Jobs\TestSubmittedJob;
 
 class StudentOperation extends Controller
 {
@@ -45,6 +46,21 @@ class StudentOperation extends Controller
         //     ->join('oex_categories', 'oex_exam_masters.category', '=', 'oex_categories.id')
         //     ->orderBy('id', 'desc')->where('oex_exam_masters.status', '1')->get()->toArray();
         return view('student.dashboard', $data);
+    }
+    public function profile()
+    {
+        // Get the current authenticated user
+        $user = Auth::user();
+        
+        // Get course details if available in user's record
+        $course = null;
+        if (!empty($user->exam)) {
+            // Assuming 'exam' field in users table holds the course_id
+            $course = Course::find($user->registered_course);
+        }
+        
+
+        return view('student.profile', compact('user', 'course'));
     }
 
     // application status
@@ -215,11 +231,12 @@ class StudentOperation extends Controller
         $res->result_json = json_encode($result);
         $total = $yes_ans + $no_ans;
         $percentage = round(($yes_ans / $total) * 100);
-        // echo $res->save();
+        $res->save();
         // $storedResult = Oex_result::where('user_id', $user->id)
         //     ->where('exam_id', $request->exam_id)
         //     ->first();
         // GoogleSheets::updateGoogleSheets($userId, ['result' => $storedResult->yes_ans]);
+        TestSubmittedJob::dispatch($user, $res);
 
         return redirect(url('student/exam'))->with([
             // 'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
@@ -365,6 +382,48 @@ class StudentOperation extends Controller
             ]);
         }
     }
+
+    //Display change course form
+
+    public function change_course()
+    {
+        $user = Auth::user();
+        $courses = Course::all();
+        
+        // Current course (if any)
+        $currentCourse = null;
+        if (!empty($user->registered_course)) {
+            $currentCourse = Course::find($user->registered_course);
+        }
+        
+        return view('student.change-course', compact('user', 'courses', 'currentCourse'));
+    }
+    
+
+   // Update course selection
+
+   public function update_course(Request $request)
+{
+    $request->validate([
+        'course_id' => 'required|exists:courses,id'
+    ]);
+    
+    $user = Auth::user();
+    
+    // Get course information
+    $course = Course::find($request->course_id);
+    
+    if (!$course) {
+        return redirect()->back()->with('error', 'Selected course not found.');
+    }
+    
+    // Update user record with course and session information
+    $user->registered_course = $request->course_id; // Store course_id in exam field
+    $user->save();
+    
+    return redirect()->route('student.profile')->with('success', 'Course changed successfully.');
+}
+    
 
     public function admit_student(Request $request)
     {
