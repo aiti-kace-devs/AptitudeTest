@@ -59,7 +59,7 @@ class StudentOperation extends Controller
         $course = null;
         if (!empty($user->exam)) {
             // Assuming 'exam' field in users table holds the course_id
-            $course = Course::find($user->exam);
+            $course = Course::find($user->registered_course);
         }
         
         // Get session information from user record if available
@@ -383,7 +383,7 @@ class StudentOperation extends Controller
             $currentCourse = Course::find($user->exam);
         }
         
-        return view('student.change_course', compact('user', 'courses', 'currentCourse'));
+        return view('student.change-course', compact('user', 'courses', 'currentCourse'));
     }
     
 
@@ -406,7 +406,7 @@ class StudentOperation extends Controller
     }
     
     // Update user record with course and session information
-    $user->exam = $request->course_id; // Store course_id in exam field
+    $user->registered_course = $request->course_id; // Store course_id in exam field
     $user->status = $request->session; // Store session in status field
     $user->save();
     
