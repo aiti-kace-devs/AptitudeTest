@@ -16,10 +16,6 @@ return new class extends Migration
         Schema::create('programmes', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('duration')->nullable();
-            $table->date('start_date')->nullable();
-            $table->date('end_date')->nullable();
-            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

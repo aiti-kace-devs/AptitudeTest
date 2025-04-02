@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->integer('branch_id');
-            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

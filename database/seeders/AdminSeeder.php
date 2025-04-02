@@ -21,9 +21,7 @@ class AdminSeeder extends Seeder
             'is_super'=> 1
         ];
     
-        foreach ($admins as $admin) {
-            Admin::create($admin);
-        }
+        Admin::create($admin);
     }
     
 }

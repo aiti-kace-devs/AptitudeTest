@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('course_id');
             $table->string('location');
             $table->date('date');
-            $table->string('status')->nullable();
             $table->timestamps();
         });
     }
