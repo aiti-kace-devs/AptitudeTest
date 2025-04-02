@@ -34,7 +34,7 @@ class SmsTemplateController extends Controller
         if ($request->ajax()) {
 
             $validation = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
+                'name' => 'required|string|max:255|unique:sms_templates,name',
                 'content' => 'required|string',
             ]);
 
@@ -46,6 +46,11 @@ class SmsTemplateController extends Controller
             }
 
             $input = $request->all();
+            $input = [
+                'name' => strtoupper($input['name']),
+                'content' => $input['content'],
+            ];
+
             SmsTemplate::create($input);
 
             return response()->json([
@@ -82,9 +87,14 @@ class SmsTemplateController extends Controller
         if ($request->ajax()) {
 
             $validation = Validator::make($request->all(), [
-               'name' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
                 'content' => 'required|string',
             ]);
+
+            $name = $request->input('name');
+            $input = $request->all();
+
+
 
             if ($validation->fails()) {
                 return response()->json([
@@ -92,13 +102,25 @@ class SmsTemplateController extends Controller
                     'errors' => $validation->errors()->toArray(),
                 ], 422);
             }
+            $nameMaintained = false;
+            if (in_array($template->name, NOT_TO_REMOVE)) {
 
-            $input = $request->all();
-            $template->fill($input)->save();
+                $nameMaintained = true;
+
+                $template->fill([
+                    'content' => $input['content'],
+                    'name' => $template->name,
+                ])->save();
+            } else {
+                $template->fill([
+                    'content' => $input['content'],
+                    'name' => strtoupper($input['name']),
+                ])->save();
+            }
 
             return response()->json([
                 'status' => true,
-                'message' => 'Template updated successfully!',
+                'message' => 'Template updated successfully! ' . $nameMaintained ? 'Name not changed.' : '',
                 'reload'  => route('admin.sms.template.index')
             ], 200);
         }
@@ -110,6 +132,12 @@ class SmsTemplateController extends Controller
     public function destroy($id)
     {
         $template = SmsTemplate::find($id);
+        if (in_array($template->name, NOT_TO_REMOVE)) {
+            return redirect()->route('admin.sms.template.index')->with([
+                'flash' => 'Unable to delete a required template',
+                'key' => 'error'
+            ]);
+        }
         $template->delete();
 
         return redirect()->route('admin.sms.template.index');

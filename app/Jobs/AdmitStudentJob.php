@@ -13,6 +13,7 @@ use App\Models\UserAdmission;
 use App\Models\User;
 use App\Models\CourseSession;
 use App\Helpers\GoogleSheets;
+use App\Helpers\SmsHelper;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
@@ -49,7 +50,20 @@ class AdmitStudentJob implements ShouldQueue
         if (!$user || !$session) {
             return;
         }
-        Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))->queue(new ConfirmationSuccessful($user->name, $session->name, $session->course_time));
+
+        Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
+            ->queue(new ConfirmationSuccessful($user->name, $session->name, $session->course_time));
+
+        $smsContent = SmsHelper::getTemplate(AFTER_ADMISSION_CONFIRMATION_SMS, [
+            'name' => $user->name,
+            'course' => $session->name,
+        ]) ?? '';
+
+        // send sms
+        $details['message'] = $smsContent;
+        $details['phonenumber'] = $user->mobile_no;
+        SendSMSAfterRegistrationJob::dispatch($details);
+
         // GoogleSheets::updateGoogleSheets($this->admission->user_id, [
         //     "confirmed" => true,
         //     "session" => $session->session,

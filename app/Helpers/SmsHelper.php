@@ -6,7 +6,7 @@ use App\Models\SmsTemplate;
 
 class SmsHelper
 {
-    public function getTemplate($name, $variables = [])
+    public static function getTemplate($name, $variables = [])
     {
         $template = SmsTemplate::where('name', $name)->first();
 

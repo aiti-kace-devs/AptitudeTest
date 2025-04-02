@@ -4,7 +4,9 @@ namespace App\Jobs;
 
 use App\Events\UserRegistered;
 use App\Helpers\GoogleSheets;
+use App\Helpers\SmsHelper;
 use App\Models\Oex_exam_master;
+use App\Models\SmsTemplate;
 use App\Models\User;
 use App\Models\user_exam;
 use Illuminate\Bus\Queueable;
@@ -114,7 +116,10 @@ class AddNewStudentsJob implements ShouldQueue
                 // $userId = $std->userId;
                 // GoogleSheets::updateGoogleSheets($userId, ["registered" => true, "result" => "N/A"]);
                 event(new UserRegistered($std, $plainPassword));
-                $details['message'] = "Hi " . $student['name'] . ", \nYour information has been successfully registered. Check your email for instructions on how to take the aptitude test. Goodluck";
+                $smsContent = SmsHelper::getTemplate(AFTER_REGISTRATION_SMS, [
+                    'name' => $student['name'],
+                ]) ?? '';;
+                $details['message'] = $smsContent;
                 $details['phonenumber'] = $student['mobile_no'];
 
                 SendSMSAfterRegistrationJob::dispatch($details);
