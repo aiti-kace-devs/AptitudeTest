@@ -220,60 +220,80 @@ class AdminController extends Controller
                 ->join('users', 'users.id', '=', 'user_exams.user_id')
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
                 ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
-                ->select(['user_exams.id', 'users.name', 'users.email', 'users.age', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined']);
+                ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
+                ->select(['user_exams.id', 'users.name', 'users.email', 'users.age', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
 
-            if ($request->has('filter.ex_name')) {
-                $baseQuery->where('oex_exam_masters.title', 'like', '%' . $request->input('filter.ex_name') . '%');
-            }
+            // if ($request->has('ex_name')) {
+            //     $baseQuery->whereIn('oex_exam_masters.title', (array) $request->ex_name);
+            // }
 
-            if ($request->has('filter.status')) {
-                $status = $request->input('filter.status');
-                if ($status === 'passed') {
-                    $baseQuery->whereHas('result', function ($q) {
-                        $q->whereColumn('yes_ans', '>=', 'oex_exam_masters.passmark');
-                    });
-                } elseif ($status === 'failed') {
-                    $baseQuery->whereHas('result', function ($q) {
-                        $q->whereColumn('yes_ans', '<', 'oex_exam_masters.passmark');
-                    });
-                } elseif ($status === 'not_taken') {
-                    $baseQuery->whereNull('submitted');
-                }
-            }
-
-            if ($request->has('filter.age_range')) {
-                $ageRange = $request->input('filter.age_range');
-                switch ($ageRange) {
-                    case '15-19':
-                        $baseQuery->whereBetween('users.age', [15, 19]);
-                        break;
-                    case '20-24':
-                        $baseQuery->whereBetween('users.age', [20, 24]);
-                        break;
-                    case '25-35':
-                        $baseQuery->whereBetween('users.age', [25, 35]);
-                        break;
-                    case '36-45':
-                        $baseQuery->whereBetween('users.age', [36, 45]);
-                        break;
-                    case '45+':
-                        $baseQuery->where('users.age', '>=', 45);
-                        break;
-                }
-            }
-
-            if ($request->has('filter.course')) {
-                $courseId = $request->input('filter.course');
-                $baseQuery->where('users.registered_course', $courseId);
-            }
-
-            if ($request->has('filter.search_term')) {
-                $searchTerm = $request->input('filter.search_term');
-                $baseQuery->where(function ($query) use ($searchTerm) {
-                    $query->where('users.name', 'like', '%' . $searchTerm . '%')->orWhere('users.email', 'like', '%' . $searchTerm . '%');
+            if ($request->has('admission_status')) {
+                $admissionStatuses = (array)$request->admission_status;
+                $baseQuery->where(function($query) use ($admissionStatuses) {
+                    foreach ($admissionStatuses as $status) {
+                        if ($status === 'Admitted') {
+                            $query->orWhereNotNull('user_admission.user_id');
+                        } elseif ($status === 'Not Admitted') {
+                            $query->orWhereNull('user_admission.user_id');
+                        }
+                    }
                 });
             }
 
+            if ($request->has('status')) {
+                $statuses = (array) $request->status;
+                $baseQuery->where(function ($query) use ($statuses) {
+                    foreach ($statuses as $status) {
+                        if ($status === 'passed') {
+                            $query->orWhereHas('result', function ($q) {
+                                $q->whereColumn('yes_ans', '>=', 'oex_exam_masters.passmark');
+                            });
+                        } elseif ($status === 'failed') {
+                            $query->orWhereHas('result', function ($q) {
+                                $q->whereColumn('yes_ans', '<', 'oex_exam_masters.passmark');
+                            });
+                        } elseif ($status === 'not_taken') {
+                            $query->orWhereNull('submitted');
+                        }
+                    }
+                });
+            }
+
+            if ($request->has('age_range')) {
+                $ageRanges = (array) $request->age_range;
+                $baseQuery->where(function ($query) use ($ageRanges) {
+                    foreach ($ageRanges as $ageRange) {
+                        switch ($ageRange) {
+                            case '15-19':
+                                $query->orWhereBetween('users.age', [15, 19]);
+                                break;
+                            case '20-24':
+                                $query->orWhereBetween('users.age', [20, 24]);
+                                break;
+                            case '25-35':
+                                $query->orWhereBetween('users.age', [25, 35]);
+                                break;
+                            case '36-45':
+                                $query->orWhereBetween('users.age', [36, 45]);
+                                break;
+                            case '45+':
+                                $query->orWhere('users.age', '>=', 45);
+                                break;
+                        }
+                    }
+                });
+            }
+
+            if ($request->has('course')) {
+                $baseQuery->whereIn('users.registered_course', (array) $request->course);
+            }
+
+            if ($request->has('search_term')) {
+                $searchTerm = $request->search_term;
+                $baseQuery->where(function ($query) use ($searchTerm) {
+                    $query->where('users.name', 'like', "%$searchTerm%")->orWhere('users.email', 'like', "%$searchTerm%");
+                });
+            }
             return DataTables::of($baseQuery)
                 ->addColumn('checkbox', function ($std) {
                     return '<input type="checkbox" class="student-checkbox" value="' . $std->id . '">';
