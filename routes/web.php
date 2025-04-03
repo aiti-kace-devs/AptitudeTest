@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentOperation;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\RegisteredUserController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BranchController;
@@ -73,6 +74,13 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
 
 
 
+
+
+
+
+
+
+
 Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(function () {
 
     Route::middleware(['auth:admin'])->group(function () {
@@ -82,6 +90,10 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/exam_category', [AdminController::class, 'exam_category'])->middleware('admin.super');
         Route::get('/edit_category/{id}', [AdminController::class, 'edit_category'])->middleware('admin.super');
         Route::get('/category_status/{id}', [AdminController::class, 'category_status'])->middleware('admin.super');
+        Route::get('/branch_status/{id}', [AdminController::class, 'branch_status'])->middleware('admin.super');
+        Route::get('/centre_status/{id}', [AdminController::class, 'centre_status'])->middleware('admin.super');
+        Route::get('/programme_status/{id}', [AdminController::class, 'programme_status'])->middleware('admin.super');
+        Route::get('/course_status/{id}', [AdminController::class, 'course_status'])->middleware('admin.super');
         Route::get('/manage_exam', [AdminController::class, 'manage_exam'])->middleware('admin.super');
         Route::get('/exam_status/{id}', [AdminController::class, 'exam_status'])->middleware('admin.super');
         Route::get('/delete_exam/{id}', [AdminController::class, 'delete_exam'])->middleware('admin.super');
@@ -117,6 +129,16 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/view_attendance', [AdminController::class, 'viewAttendanceByDate'])->name('viewAttendanceByDate');
         Route::get('/reports', [AdminController::class, 'getReportView'])->name('getReportView');
         Route::post('/reports', [AdminController::class, 'generateReport'])->name('generateReport');
+
+
+        Route::get('/manage_admins', [RegisteredUserController::class, 'index'])->name('manage_admins')->middleware('admin.super');
+        Route::get('/create', [RegisteredUserController::class, 'create'])->name('admins.create')->middleware('admin.super');
+        Route::post('/add_new_admin', [RegisteredUserController::class, 'store'])->middleware('admin.super');
+        Route::get('/edit_admin/{id}/edit', [RegisteredUserController::class, 'edit'])->name('admins.edit')->middleware('admin.super');
+        Route::put('/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update')->middleware('admin.super');
+        Route::delete('/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete')->middleware('admin.super');
+        Route::get('/is_super_admin_status/{id}', [RegisteredUserController::class, 'is_super_admin_status'])->middleware('admin.super');
+        
 
         Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])->name('remove-attendance');
 
@@ -162,6 +184,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::get('/fetch/centre', [CourseController::class, 'fetchCentre'])->name('course.fetch.centre');
             Route::put('/{course}/update', [CourseController::class, 'update'])->name('course.update');
             Route::get('/{course}/delete', [CourseController::class, 'destroy'])->name('course.destroy');
+            Route::get('/fetch-programme', [CourseController::class, 'fetchProgrammeDetails'])->name('course.fetch.programme');
+
         });
         // end of manage course routes
 

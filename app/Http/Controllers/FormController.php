@@ -158,10 +158,10 @@ class FormController extends Controller
         $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
         $withLayout = false;
 
-        $courses = Course::orderBy('course_name')->get();
-        $centres = Centre::orderBy('title')->get();
+        $courses = Course::where('status', 1)->orderBy('course_name')->get();
+        $centres = Centre::where('status', 1)->orderBy('title')->get();
 
-        $branches = Branch::orderBy('title')->get();
+        $branches = Branch::where('status', 1)->orderBy('title')->get();
 
         return Inertia::render('Form/Preview', compact('admissionForm', 'courses', 'branches', 'centres', 'withLayout'));
     }

@@ -20,7 +20,8 @@ class AdminSeeder extends Seeder
             'password'=>bcrypt('password'),
             'is_super'=> 1
         ];
-
+    
         Admin::create($admin);
     }
+    
 }

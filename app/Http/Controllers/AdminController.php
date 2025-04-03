@@ -36,6 +36,9 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Helpers\GoogleSheets;
 use App\Models\Course;
+use App\Models\Branch;
+use App\Models\Centre;
+use App\Models\Programme;
 use App\Helpers\Common as CommonHelper;
 
 use Carbon\Carbon;
@@ -106,7 +109,7 @@ class AdminController extends Controller
     //Editing categories status
     public function category_status($id)
     {
-        $cat = Oex_category::where('id', $id)->get()->first();
+        $cat = User::where('id', $id)->get()->first();
 
         if ($cat->status == 1) {
             $status = 0;
@@ -114,10 +117,89 @@ class AdminController extends Controller
             $status = 1;
         }
 
-        $cat1 = Oex_category::where('id', $id)->get()->first();
+        $cat1 = User::where('id', $id)->get()->first();
         $cat1->status = $status;
         $cat1->update();
     }
+
+
+
+
+    //Editing branch status
+    public function branch_status($id)
+    {
+        $branch = Branch::where('id', $id)->get()->first();
+
+        if ($branch->status == 1) {
+            $status = 0;
+        } else {
+            $status = 1;
+        }
+
+        $branch1 = Branch::where('id', $id)->get()->first();
+        $branch1->status = $status;
+        $branch1->update();
+    }
+
+
+
+    //Editing centre status
+    public function centre_status($id)
+    {
+        $centre = Centre::where('id', $id)->get()->first();
+
+        if ($centre->status == 1) {
+            $status = 0;
+        } else {
+            $status = 1;
+        }
+
+        $centre1 = Centre::where('id', $id)->get()->first();
+        $centre1->status = $status;
+        $centre1->update();
+    }
+
+
+
+
+    //Editing programme status
+    public function programme_status($id)
+    {
+        $programme = Programme::where('id', $id)->get()->first();
+
+        if ($programme->status == 1) {
+            $status = 0;
+        } else {
+            $status = 1;
+        }
+
+        $programme1 = Programme::where('id', $id)->get()->first();
+        $programme1->status = $status;
+        $programme1->update();
+    }
+
+
+
+
+    //Editing course status
+    public function course_status($id)
+    {
+        $course = Course::where('id', $id)->get()->first();
+
+        if ($course->status == 1) {
+            $status = 0;
+        } else {
+            $status = 1;
+        }
+
+        $course1 = Course::where('id', $id)->get()->first();
+        $course1->status = $status;
+        $course1->update();
+    }
+
+
+
+
 
     //Manage exam page
     public function manage_exam()

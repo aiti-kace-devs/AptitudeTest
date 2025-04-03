@@ -24,8 +24,11 @@
         @include('layouts.navigation')
 
         <main class="py-4">
-            {{ $slot }}
+            @yield('content')
         </main>
     </div>
+
+    <!-- Stack for additional scripts -->
+    @stack('scripts')
 </body>
 </html>

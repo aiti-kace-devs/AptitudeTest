@@ -56,6 +56,7 @@ class AddNewStudentsJob implements ShouldQueue
                 'userId' => 'required',
                 'password' => 'sometimes',
                 'exam_name' => 'sometimes',
+                'form_response_id' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -97,6 +98,7 @@ class AddNewStudentsJob implements ShouldQueue
                 $std->age  = $student['age'];
                 $std->gender = $student['gender'];
                 $std->status = 1;
+                $std->form_response_id = $student['form_response_id'];
                 $std->save();
             }
 

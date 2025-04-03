@@ -12,7 +12,8 @@ class FormResponse extends Model
 
     protected $fillable = [
         'form_id',
-        'response_data'
+        'response_data',
+        'status'
     ];
 
     protected $casts = [
@@ -34,5 +35,10 @@ class FormResponse extends Model
     public function form()
     {
         return $this->belongsTo(Form::class);
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'form_response_id');
     }
 }

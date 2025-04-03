@@ -43,6 +43,9 @@ public function store(Request $request)
         
         $validation = Validator::make($request->all(), [
             'title' => 'required',
+            'duration' => 'required',
+            'start_date' => 'sometimes',
+            'end_date' => 'sometimes',
         ]);
 
         if ($validation->fails()) {
@@ -52,8 +55,16 @@ public function store(Request $request)
             ], 422);
         }
 
-        $input = $request->all();
-        Programme::create($input);
+        $input = new Programme();
+        $input->title = $request->title;
+        $input->duration = $request->duration;
+        $input->start_date = $request->start_date;
+        $input->end_date = $request->end_date;
+        $input->status = 1;
+        $input->save();
+        // $input = $request->all();
+        // $input->status = 1;
+        // Programme::create($input);
 
         return response()->json([
             'status' => true,

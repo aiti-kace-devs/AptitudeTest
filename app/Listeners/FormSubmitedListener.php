@@ -38,6 +38,7 @@ class FormSubmitedListener implements ShouldQueue
         $student['age'] = $event->submissionData['age'];
         $student['gender'] = $event->submissionData['gender'];
         $student['exam_name'] = 'random';
+        $student['form_response_id'] = $event->formResponseId;
 
         AddNewStudentsJob::dispatch([$student]);
     }

@@ -13,7 +13,11 @@ class Course extends Model
         'centre_id',
         'programme_id',
         'course_name',
-        'location'
+        'location',
+        'duration',
+        'start_date',
+        'end_date',
+        'status',
     ];
 
     public function centre()
