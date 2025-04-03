@@ -410,15 +410,18 @@
                             [1, 'asc']
                         ],
                         drawCallback: function(settings) {
-                            if (isFilterApplied) {
-                                $('.student-checkbox').prop('checked', true);
-                                manuallySelectedIds = [...allFilteredIds];
-                            } else {
-                                manuallySelectedIds = [];
-                            }
+                            var api = this.api();
+                            allFilteredIds = api.rows({
+                                search: 'applied'
+                            }).data().pluck('id').toArray();
 
-                            var allChecked = $('.student-checkbox:not(:checked)').length === 0;
-                            $('#select-all').prop('checked', allChecked);
+                            $('.student-checkbox').each(function() {
+                                var id = $(this).val();
+                                $(this).prop('checked', manuallySelectedIds.includes(id));
+                            });
+
+                            var allChecked = $('.student-checkbox:visible:not(:checked)').length === 0;
+                            $('#select-all').prop('checked', allChecked && manuallySelectedIds.length > 0);
                         }
                     });
 
@@ -470,26 +473,34 @@
                             manuallySelectedIds = manuallySelectedIds.filter(id => id != studentId);
                         }
 
-                        var allChecked = $('.student-checkbox:not(:checked)').length === 0;
-                        $('#select-all').prop('checked', allChecked);
+                        $('#select-all').prop('checked',
+                            manuallySelectedIds.length > 0 &&
+                            manuallySelectedIds.length === allFilteredIds.length
+                        );
                     });
-
                     $('#select-all').change(function() {
                         var isChecked = $(this).prop('checked');
                         $('.student-checkbox').prop('checked', isChecked);
 
                         if (isChecked) {
-                            manuallySelectedIds = [...allFilteredIds];
+                            $('.student-checkbox:visible').each(function() {
+                                var id = $(this).val();
+                                if (!manuallySelectedIds.includes(id)) {
+                                    manuallySelectedIds.push(id);
+                                }
+                            });
                         } else {
-                            manuallySelectedIds = [];
+                            $('.student-checkbox:visible').each(function() {
+                                var id = $(this).val();
+                                manuallySelectedIds = manuallySelectedIds.filter(i => i != id);
+                            });
                         }
                     });
-
                     $('#admit-selected').click(function() {
-                        var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
+                        var selectedIds = manuallySelectedIds;
 
-                        if (!selectedIds || selectedIds.length === 0) {
-                            toastr.warning('No students selected or no students match your filters');
+                        if (selectedIds.length === 0) {
+                            toastr.warning('Please select at least one student to admit');
                             return;
                         }
 
@@ -497,8 +508,8 @@
                         btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
 
                         Swal.fire({
-                            title: 'Admit Students?',
-                            text: `You are about to admit ${selectedIds.length} students. Continue?`,
+                            title: 'Admit Selected Students?',
+                            text: `You are about to admit ${selectedIds.length} selected students. Continue?`,
                             icon: 'question',
                             showCancelButton: true,
                             confirmButtonText: 'Yes, admit them',
@@ -509,17 +520,18 @@
                                     url: "{{ route('admin.admit_student') }}",
                                     type: 'POST',
                                     headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
-                                            'content'),
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
                                     data: {
                                         student_ids: selectedIds
                                     },
                                     success: function(response) {
                                         toastr.success(response.message ||
-                                            'Students admitted successfully!');
+                                            `${selectedIds.length} students admitted successfully!`
+                                        );
                                         table.ajax.reload();
-                                        manuallySelectedIds = [];
+                                        manuallySelectedIds
+                                            = [];
                                     },
                                     error: function(xhr) {
                                         toastr.error(xhr.responseJSON?.message ||
