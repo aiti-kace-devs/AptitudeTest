@@ -150,7 +150,7 @@ div[data-widget-item="baseinput"].border-red-600 div[data-children="inputcore"] 
   <div class="py-12 bg-gray-200" v-if="showForm && formIsActive">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
       <div>
-        <div class="flex-col lg:flex">
+        <div class="lg:flex">
           <div
             v-if="admissionForm.image"
             class="order-1 lg:order-2 flex-none w-full lg:w-1/2 relative"
