@@ -145,201 +145,213 @@ input[data-children="htmlInput"]:focus {
 div[data-widget-item="baseinput"].border-red-600 div[data-children="inputcore"] {
   border-color: rgb(220 38 38 / var(--tw-border-opacity, 1));
 }
+
+input#phone {
+    border: 0 !important;
+}
 </style>
 <template>
-  <div class="py-12" v-if="showForm && formIsActive">
+  <Head title="Registration" />
+  <div class="py-12 bg-gray-200" v-if="showForm && formIsActive">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-      <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-        <div v-if="admissionForm.image" class="shadow-sm w-full h-44">
-          <img
-            :src="admissionForm.image"
-            alt=""
-            class="inset-0 w-full h-full object-contain"
-          />
-        </div>
-        <div class="p-6">
-          <div>
-            <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
-            <p v-if="admissionForm.description" class="text-sm text-gray-600">
-              {{ admissionForm.description }}
-            </p>
+      <div>
+        <div class="flex flex-col lg:flex-row">
+          <!-- Image Section -->
+          <div v-if="admissionForm.image" class="lg:order-2 w-full lg:w-1/2 relative">
+            <img
+              :src="admissionForm.image"
+              alt=""
+              class="w-full h-56 md:h-64 lg:h-full object-cover"
+              loading="lazy"
+            />
           </div>
 
-          <div class="mt-4">
-            <form @submit.prevent="submit">
-              <div class="space-y-5">
-                <div v-for="(question, index) in admissionForm.schema" :key="index">
-                  <div>
-                    <InputLabel
-                      v-if="question.type != 'select_course'"
-                      :for="`field-${index}`"
-                      :value="question.title"
-                      :required="question.validators.required"
-                    />
-                    <TextInput
-                      v-if="
-                        ['text', 'number', 'email', 'password'].includes(question.type)
-                      "
-                      :id="`field-${index}`"
-                      :type="question.type"
-                      class="mt-1 w-full"
-                      v-model="form.response_data[question.field_name]"
-                      :required="question.validators.required"
-                      :placeholder="question.title"
-                      :class="{
-                        'block w-full mt-2 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100':
-                          question.type == 'file',
-                        'file:bg-red-600 hover:file:bg-red-500 file:text-white':
-                          question.type == 'file',
-                        'border-red-600':
-                          form.errors[`response_data.${question.field_name}`],
-                      }"
-                    />
+          <!-- Form Section -->
+          <div class="lg:order-1 bg-white rounded-sm p-6 w-full lg:w-1/2">
+            <div>
+              <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
+              <p v-if="admissionForm.description" class="text-sm text-gray-600">
+                {{ admissionForm.description }}
+              </p>
+            </div>
 
-                    <!-- File Input -->
-                    <div v-else-if="question.type === 'file'">
-                      <FileInput
-                        class="mt-1"
+            <div class="mt-4">
+              <form @submit.prevent="submit">
+                <div class="space-y-5">
+                  <div v-for="(question, index) in admissionForm.schema" :key="index">
+                    <div>
+                      <InputLabel
+                        v-if="question.type != 'select_course'"
+                        :for="`field-${index}`"
+                        :value="question.title"
                         :required="question.validators.required"
-                        @input="
-                          form.response_data[question.field_name] = $event.target.files[0]
-                        "
-                        :maxSize="2 * 1024"
-                        :accept="
-                          question.options
-                            ? question.options.split(',').map((type) => '.' + type.trim())
-                            : []
-                        "
-                        :class="{
-                          'file:bg-red-600 hover:file:bg-red-500 file:text-white':
-                            form.errors[`response_data.${question.field_name}`],
-                        }"
                       />
-                    </div>
-
-                    <!-- Select Input -->
-                    <div v-else-if="question.type === 'select'">
-                      <SelectInput
-                        :id="question.field_name"
-                        v-model="form.response_data[question.field_name]"
+                      <TextInput
+                        v-if="
+                          ['text', 'number', 'email', 'password'].includes(question.type)
+                        "
+                        :id="`field-${index}`"
+                        :type="question.type"
                         class="mt-1 w-full"
-                        :required="question.validators.required"
-                        :class="{
-                          'border-red-600':
-                            form.errors[`response_data.${question.field_name}`],
-                        }"
-                      >
-                        <option value="" disabled selected>-- Select an option --</option>
-                        <option
-                          v-for="option in question.options.split(',')"
-                          :key="option.trim()"
-                          :value="option.trim()"
-                        >
-                          {{ option.trim() }}
-                        </option>
-                      </SelectInput>
-                    </div>
-
-                    <!-- Phone Input -->
-                    <div v-else-if="question.type === 'phonenumber'">
-                      <phone-input
-                        :has-error="phoneError"
-                        :errorMessage="
-                          phoneError ? 'You have entered an invalid phone number' : ''
-                        "
-                        :defaultCountry="'GH'"
-                        :required="question.validators.required"
-                        :id="question.field_name"
-                        :name="question.field_name"
                         v-model="form.response_data[question.field_name]"
+                        :required="question.validators.required"
                         :placeholder="question.title"
-                        @phoneData="validatePhone($event, question.field_name)"
-                        :listHeight="250"
-                        :allowed="['GH']"
-                        class="mt-1"
                         :class="{
                           'border-red-600':
                             form.errors[`response_data.${question.field_name}`],
                         }"
                       />
-                    </div>
 
-                    <!-- Select Location and Course  -->
-                    <div v-else-if="question.type === 'select_course'">
-                      <CourseSelect
-                        :branches="this.branches"
-                        :courses="this.courses"
-                        :centres="this.centres"
-                        :form="form"
-                        :id="question.field_name"
-                        :required="true"
-                      ></CourseSelect>
-                    </div>
-
-                    <div
-                      class="flex items-center space-x-4"
-                      v-else-if="question.type === 'checkbox'"
-                    >
-                      <div
-                        class="mt-1 flex items-center space-x-2"
-                        v-for="(option, idx) in question.options.split(',')"
-                        :key="idx"
-                      >
-                        <Checkbox
-                          :id="`field-${index}-option-${idx}`"
+                      <!-- File Input -->
+                      <div v-else-if="question.type === 'file'">
+                        <FileInput
+                          class="mt-1"
                           :required="question.validators.required"
-                          v-model:checked="form.response_data[question.field_name]"
-                          :value="option.trim()"
-                        />
-                        <InputLabel
-                          :for="`field-${index}-option-${idx}`"
-                          :value="option.trim()"
+                          @input="
+                            form.response_data[question.field_name] =
+                              $event.target.files[0]
+                          "
+                          :maxSize="2 * 1024"
+                          :accept="
+                            question.options
+                              ? question.options
+                                  .split(',')
+                                  .map((type) => '.' + type.trim())
+                              : []
+                          "
+                          :class="{
+                            'file:bg-red-600 hover:file:bg-red-500 file:text-white':
+                              form.errors[`response_data.${question.field_name}`],
+                          }"
                         />
                       </div>
-                    </div>
 
-                    <div
-                      class="flex items-center gap-4"
-                      v-else-if="question.type == 'radio'"
-                    >
-                      <div
-                        class="mt-1 flex items-center space-x-2"
-                        v-for="(option, idx) in question.options.split(',')"
-                        :key="idx"
-                      >
-                        <RadioInput
-                          :id="`field-${index}-option-${idx}`"
-                          v-model:checked="form.response_data[question.field_name]"
+                      <!-- Select Input -->
+                      <div v-else-if="question.type === 'select'">
+                        <SelectInput
+                          :id="question.field_name"
+                          v-model="form.response_data[question.field_name]"
+                          class="mt-1 w-full"
                           :required="question.validators.required"
-                          :value="option.trim()"
-                        />
-                        <InputLabel
-                          :for="`field-${index}-option-${idx}`"
-                          :value="option.trim()"
+                          :class="{
+                            'border-red-600':
+                              form.errors[`response_data.${question.field_name}`],
+                          }"
+                        >
+                          <option value="" disabled selected>
+                            -- Select an option --
+                          </option>
+                          <option
+                            v-for="option in question.options.split(',')"
+                            :key="option.trim()"
+                            :value="option.trim()"
+                          >
+                            {{ option.trim() }}
+                          </option>
+                        </SelectInput>
+                      </div>
+
+                      <!-- Phone Input -->
+                      <div v-else-if="question.type === 'phonenumber'">
+                        <phone-input
+                          :has-error="phoneError"
+                          :errorMessage="
+                            phoneError ? 'You have entered an invalid phone number' : ''
+                          "
+                          :defaultCountry="'GH'"
+                          :required="question.validators.required"
+                          :id="question.field_name"
+                          :name="question.field_name"
+                          v-model="form.response_data[question.field_name]"
+                          :placeholder="question.title"
+                          @phoneData="validatePhone($event, question.field_name)"
+                          :listHeight="250"
+                          :allowed="['GH']"
+                          class="mt-1"
+                          :class="{
+                            'border-red-600':
+                              form.errors[`response_data.${question.field_name}`],
+                          }"
                         />
                       </div>
+
+                      <!-- Select Location and Course  -->
+                      <div v-else-if="question.type === 'select_course'">
+                        <CourseSelect
+                          :branches="this.branches"
+                          :courses="this.courses"
+                          :centres="this.centres"
+                          :form="form"
+                          :id="question.field_name"
+                          :required="true"
+                        ></CourseSelect>
+                      </div>
+
+                      <div
+                        class="flex items-center space-x-4"
+                        v-else-if="question.type === 'checkbox'"
+                      >
+                        <div
+                          class="mt-1 flex items-center space-x-2"
+                          v-for="(option, idx) in question.options.split(',')"
+                          :key="idx"
+                        >
+                          <Checkbox
+                            :id="`field-${index}-option-${idx}`"
+                            :required="question.validators.required"
+                            v-model:checked="form.response_data[question.field_name]"
+                            :value="option.trim()"
+                          />
+                          <InputLabel
+                            :for="`field-${index}-option-${idx}`"
+                            :value="option.trim()"
+                          />
+                        </div>
+                      </div>
+
+                      <div
+                        class="flex items-center gap-4"
+                        v-else-if="question.type == 'radio'"
+                      >
+                        <div
+                          class="mt-1 flex items-center space-x-2"
+                          v-for="(option, idx) in question.options.split(',')"
+                          :key="idx"
+                        >
+                          <RadioInput
+                            :id="`field-${index}-option-${idx}`"
+                            v-model:checked="form.response_data[question.field_name]"
+                            :required="question.validators.required"
+                            :value="option.trim()"
+                          />
+                          <InputLabel
+                            :for="`field-${index}-option-${idx}`"
+                            :value="option.trim()"
+                          />
+                        </div>
+                      </div>
+                      <div v-if="question.description" class="mt-1">
+                        <p class="text-xs text-blue-400">{{ question.description }}</p>
+                      </div>
+                      <InputError
+                        :message="form.errors[`response_data.${question.field_name}`]"
+                      />
                     </div>
-                    <div v-if="question.description" class="mt-1">
-                      <p class="text-xs text-blue-400">{{ question.description }}</p>
-                    </div>
-                    <InputError
-                      :message="form.errors[`response_data.${question.field_name}`]"
-                    />
+                  </div>
+
+                  <div>
+                    <PrimaryButton
+                      v-if="!admin"
+                      type="submit"
+                      :disabled="form.processing || phoneError"
+                      :class="{ 'opacity-25': form.processing }"
+                    >
+                      Submit
+                    </PrimaryButton>
                   </div>
                 </div>
-
-                <div>
-                  <PrimaryButton
-                    v-if="!admin"
-                    type="submit"
-                    :disabled="form.processing || phoneError"
-                    :class="{ 'opacity-25': form.processing }"
-                  >
-                    Submit
-                  </PrimaryButton>
-                </div>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>
