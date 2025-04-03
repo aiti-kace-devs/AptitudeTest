@@ -283,7 +283,8 @@
                             protection risks and breaches, respond to data incidents and ensure regulatory
                             compliance.
                         </p>
-                        <a href="{{ route('dynamic-course', ['course' => 'dpf-course']) }}" class="course-button">Read
+                        <a href="{{ route('dynamic-course', ['course' => 'certified-dpf-course']) }}"
+                            class="course-button">Read
                             More</a>
                     </div>
                 </div>
@@ -370,7 +371,7 @@
                             Monitor compliance with data protection laws and policies, detect and assess data protection
                             risks and breaches, respond to data incidents and ensure regulatory compliance.
                         </p>
-                        <a href="{{ route('dynamic-course', ['course' => 'dpf-course']) }}"
+                        <a href="{{ route('dynamic-course', ['course' => 'certified-dpf-course']) }}"
                             class="course-button">Read More</a>
                     </div>
                 </div>

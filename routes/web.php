@@ -59,34 +59,6 @@ Route::get('/{course}', function ($course) {
 })->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
   ->name('dynamic-course');
 
-// Route::get('/cybersecurity-course', function () {
-//     return view('landing-page.cybersecurity');
-// })->name('cybersecurity-course');
-
-// Route::get('/ai-course', function () {
-//     return view('landing-page.ai');
-// })->name('ai-course');
-
-// Route::get('/data-protection-course', function () {
-//     return view('landing-page.data-protection');
-// })->name('data-protection-course');
-
-// Route::get('/protection-expert-course', function () {
-//     return view('landing-page.protection-expert');
-// })->name('pro-expert-course');
-
-// Route::get('/protection-sup-course', function () {
-//     return view('landing-page.protection-sup');
-// })->name('pro-sup-course');
-
-// Route::get('/certified-dpf-course', function () {
-//     return view('landing-page.certified-dpf');
-// })->name('dpf-course');
-
-// Route::get('/cnst-course', function () {
-//     return view('landing-page.cnst');
-// })->name('cnst-course');
-
 
 Route::get('/home', function () {
     return view('home');
