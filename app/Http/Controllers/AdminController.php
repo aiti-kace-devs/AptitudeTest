@@ -340,7 +340,7 @@ class AdminController extends Controller
                 $selectedAges = (array) $request->age_range;
                 $baseQuery->where(function ($query) use ($selectedAges) {
                     foreach ($selectedAges as $age) {
-                        if ($age === '0') continue; // Skip "All Ages" option
+                        if ($age === '0') continue;
                         $query->orWhere('users.age', $age);
                     }
                 });
