@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('apikey.check')->group(function () {
     Route::post('/student/register', [AdminController::class, 'add_new_students']);
-    Route::post('/student/admit', [StudentOperation::class, 'admit_student'])->name('admit_student');
+    // Route::post('/student/admit', [StudentOperation::class, 'admit_student'])->name('admit_student');
     Route::get('/generate_qrcode', [AdminController::class, 'generate_qrcode_page']);
 });
 

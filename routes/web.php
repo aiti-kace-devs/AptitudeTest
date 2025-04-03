@@ -112,6 +112,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer'])->middleware('admin.super');
         Route::post('/edit_question_inner', [AdminController::class, 'edit_question_inner'])->middleware('admin.super');
         Route::post('/add_new_question', [AdminController::class, 'add_new_question'])->middleware('admin.super');
+        Route::post('/student/admit', [StudentOperation::class, 'admit_student'])->name('admit_student')->middleware('admin.super');
         Route::post('/edit_students_final', [AdminController::class, 'edit_students_final'])->middleware('admin.super');
         Route::post('/add_new_exam', [AdminController::class, 'add_new_exam'])->middleware('admin.super');
         Route::post('/add_new_category', [AdminController::class, 'add_new_category'])->middleware('admin.super');
