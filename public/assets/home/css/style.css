@@ -28,6 +28,32 @@
       margin: 2rem auto;
     }
 
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+                /* grid-template-columns: 1fr !important; */
+                display: flex !important;
+                flex-direction: column !important;
+                /* // reverse  */
+                flex-direction: column-reverse !important;
+                height: 100% !important;
+
+            }
+
+            .container > .image-content {
+               height: 15rem !important;
+                width: 100% !important;
+                object-fit: fill !important;
+            }
+             .container > .image-content > img {
+               height: 100% !important;
+            }
+
+
+            .container > .text-content {
+                width: 100% !important;
+            }
+        }
     /* Grid layout for courses */
     .course-grid {
       display: grid;
@@ -46,7 +72,7 @@
       transition: transform 0.3s ease;
       width: 100%;
 
-    
+
     border-radius: 20px 20px 0px 0px;
 
     }
@@ -105,7 +131,7 @@
         font-size: 0.85rem;
       }
     }
-  
+
 
     /* cyber security */
     /* Container in vertical layout */

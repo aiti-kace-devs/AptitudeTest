@@ -32,6 +32,7 @@
             position: relative;
         }
 
+
         .image-section::before {
             content: "";
             position: absolute;
@@ -107,6 +108,47 @@
 
             .text-section p {
                 font-size: 18px;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+            .logo-container {
+                display: flex !important;
+                justify-content: space-between !important;
+            }
+
+            .logo-container>img {
+                height: 60px !important;
+            }
+
+            .logo-container>h1 {
+                margin-top: 50px !important;
+            }
+
+
+            .container {
+                flex-direction: column;
+            }
+
+            .image-section {
+                height: 35vh !important;
+                display: block !important;
+                flex: unset !important;
+            }
+
+            .text-section {
+                height: 65vh;
+                padding: 10px !important;
+                overflow-y: auto;
+            }
+
+            .text-section h1 {
+                font-size: 30px;
+            }
+
+            .text-section p {
+                line-height: unset !important;
             }
         }
 
