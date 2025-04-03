@@ -312,7 +312,7 @@ class AdminController extends Controller
 
             if ($request->has('admission_status')) {
                 $admissionStatuses = (array)$request->admission_status;
-                $baseQuery->where(function($query) use ($admissionStatuses) {
+                $baseQuery->where(function ($query) use ($admissionStatuses) {
                     foreach ($admissionStatuses as $status) {
                         if ($status === 'Admitted') {
                             $query->orWhereNotNull('user_admission.user_id');
@@ -336,7 +336,7 @@ class AdminController extends Controller
                                 $q->whereColumn('yes_ans', '<', 'oex_exam_masters.passmark');
                             });
                         } elseif ($status === 'not_taken') {
-                            $query->orWhereNull('submitted');
+                            $query->orWhereNull('user_exams.submitted');
                         }
                     }
                 });
