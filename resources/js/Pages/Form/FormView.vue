@@ -147,6 +147,7 @@ div[data-widget-item="baseinput"].border-red-600 div[data-children="inputcore"] 
 }
 </style>
 <template>
+  <Head title="Registration" />
   <div class="py-12 bg-gray-200" v-if="showForm && formIsActive">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
       <div>
