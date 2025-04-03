@@ -13,6 +13,7 @@ use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormResponseController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
@@ -29,17 +30,16 @@ use App\Http\Controllers\SmsTemplateController;
 |
 */
 
-Route::redirect('/', '/login');
+// Route::redirect('/', '/login');
 
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', [LandingPageController::class, 'index']);
 
+Route::get('/available-courses', [LandingPageController::class, 'availableCourses'])->name('available-courses');
 
-Route::get('/home', function () {
-    return view('home');
-})->middleware(['auth'])->name('home');
+Route::get('/{course}', [LandingPageController::class, 'courseView'])->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
+    ->name('dynamic-course');
+
 
 Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
 Route::post('form-responses/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
@@ -138,7 +138,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::put('/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update')->middleware('admin.super');
         Route::delete('/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete')->middleware('admin.super');
         Route::get('/is_super_admin_status/{id}', [RegisteredUserController::class, 'is_super_admin_status'])->middleware('admin.super');
-        
+
 
         Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])->name('remove-attendance');
 
@@ -185,7 +185,6 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::put('/{course}/update', [CourseController::class, 'update'])->name('course.update');
             Route::get('/{course}/delete', [CourseController::class, 'destroy'])->name('course.destroy');
             Route::get('/fetch-programme', [CourseController::class, 'fetchProgrammeDetails'])->name('course.fetch.programme');
-
         });
         // end of manage course routes
 
@@ -235,7 +234,7 @@ Route::prefix('student')
 
         Route::middleware(['auth:web'])->group(function () {
             Route::get('/dashboard', [StudentOperation::class, 'dashboard'])->name('dashboard');
-            Route::get('/application-status', [StudentOperation::class, 'application_status'])->name('dashboard');
+            Route::get('/application-status', [StudentOperation::class, 'application_status'])->name('application-status');
             Route::get('/profile', [StudentOperation::class, 'profile'])->name('profile');
             Route::get('/change-course', [StudentOperation::class, 'change_course'])->name('change-course');
             Route::post('/update-course', [StudentOperation::class, 'update_course'])->name('update-course');

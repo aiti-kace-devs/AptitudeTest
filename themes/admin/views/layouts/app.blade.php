@@ -6,6 +6,8 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets') }}/images/logo.png">
+    <link rel="icon" type="image/png" href="{{ asset('assets') }}/images/logo.png">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 

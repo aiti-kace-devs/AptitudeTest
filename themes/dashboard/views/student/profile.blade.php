@@ -69,7 +69,7 @@
                                     <span class="badge badge-warning">Pending</span>
                                 </div>
                             </div>
-                           
+
                         </div>
                     </div>
                 </div>
@@ -95,9 +95,9 @@
                 <div class="col-md-3 font-weight-bold">Session:</div>
                 <div class="col-md-9">{{ $user->status }}</div>
             </div> -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <a href="{{ route('student.change-course') }}" class="btn btn-warning">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <a href="{{ route('student.change-course') }}" class="btn btn-primary">
                         <i class="fas fa-exchange-alt"></i> Change Course
                     </a>
                 </div>
