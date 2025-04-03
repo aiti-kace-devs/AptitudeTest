@@ -29,12 +29,63 @@ use App\Http\Controllers\SmsTemplateController;
 |
 */
 
-Route::redirect('/', '/login');
+// Route::redirect('/', '/login');
 
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return view('landing-page.index');
+});
+
+Route::get('/available-courses', function () {
+    return view('landing-page.home');
+})->name('available-courses');
+
+Route::get('/{course}', function ($course) {
+    $validCourses = [
+        'cybersecurity-course' => 'landing-page.cybersecurity',
+        'ai-course' => 'landing-page.ai',
+        'data-protection-course' => 'landing-page.data-protection',
+        'protection-expert-course' => 'landing-page.protection-expert',
+        'protection-sup-course' => 'landing-page.protection-sup',
+        'certified-dpf-course' => 'landing-page.certified-dpf',
+        'cnst-course' => 'landing-page.cnst',
+    ];
+
+    if (!array_key_exists($course, $validCourses)) {
+        abort(404);
+    }
+
+    return view($validCourses[$course]);
+})->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
+  ->name('dynamic-course');
+
+// Route::get('/cybersecurity-course', function () {
+//     return view('landing-page.cybersecurity');
+// })->name('cybersecurity-course');
+
+// Route::get('/ai-course', function () {
+//     return view('landing-page.ai');
+// })->name('ai-course');
+
+// Route::get('/data-protection-course', function () {
+//     return view('landing-page.data-protection');
+// })->name('data-protection-course');
+
+// Route::get('/protection-expert-course', function () {
+//     return view('landing-page.protection-expert');
+// })->name('pro-expert-course');
+
+// Route::get('/protection-sup-course', function () {
+//     return view('landing-page.protection-sup');
+// })->name('pro-sup-course');
+
+// Route::get('/certified-dpf-course', function () {
+//     return view('landing-page.certified-dpf');
+// })->name('dpf-course');
+
+// Route::get('/cnst-course', function () {
+//     return view('landing-page.cnst');
+// })->name('cnst-course');
 
 
 Route::get('/home', function () {
@@ -138,7 +189,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::put('/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update')->middleware('admin.super');
         Route::delete('/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete')->middleware('admin.super');
         Route::get('/is_super_admin_status/{id}', [RegisteredUserController::class, 'is_super_admin_status'])->middleware('admin.super');
-        
+
 
         Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])->name('remove-attendance');
 
