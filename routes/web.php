@@ -29,12 +29,35 @@ use App\Http\Controllers\SmsTemplateController;
 |
 */
 
-Route::redirect('/', '/login');
+// Route::redirect('/', '/login');
 
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return view('landing-page.index');
+});
+
+Route::get('/available-courses', function () {
+    return view('landing-page.home');
+})->name('available-courses');
+
+Route::get('/{course}', function ($course) {
+    $validCourses = [
+        'cybersecurity-course' => 'landing-page.cybersecurity',
+        'ai-course' => 'landing-page.ai',
+        'data-protection-course' => 'landing-page.data-protection',
+        'protection-expert-course' => 'landing-page.protection-expert',
+        'protection-sup-course' => 'landing-page.protection-sup',
+        'certified-dpf-course' => 'landing-page.certified-dpf',
+        'cnst-course' => 'landing-page.cnst',
+    ];
+
+    if (!array_key_exists($course, $validCourses)) {
+        abort(404);
+    }
+
+    return view($validCourses[$course]);
+})->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
+  ->name('dynamic-course');
 
 
 Route::get('/home', function () {
@@ -138,7 +161,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::put('/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update')->middleware('admin.super');
         Route::delete('/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete')->middleware('admin.super');
         Route::get('/is_super_admin_status/{id}', [RegisteredUserController::class, 'is_super_admin_status'])->middleware('admin.super');
-        
+
 
         Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])->name('remove-attendance');
 
