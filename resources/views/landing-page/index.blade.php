@@ -98,6 +98,7 @@
             .text-section {
                 height: 50vh;
                 padding: 30px;
+                overflow-y: auto;
             }
 
             .text-section h1 {
