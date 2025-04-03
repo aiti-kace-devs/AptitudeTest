@@ -13,6 +13,7 @@ use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormResponseController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
@@ -32,37 +33,13 @@ use App\Http\Controllers\SmsTemplateController;
 // Route::redirect('/', '/login');
 
 
-Route::get('/', function () {
-    return view('landing-page.index');
-});
+Route::get('/', [LandingPageController::class, 'index']);
 
-Route::get('/available-courses', function () {
-    return view('landing-page.home');
-})->name('available-courses');
+Route::get('/available-courses', [LandingPageController::class, 'availableCourses'])->name('available-courses');
 
-Route::get('/{course}', function ($course) {
-    $validCourses = [
-        'cybersecurity-course' => 'landing-page.cybersecurity',
-        'ai-course' => 'landing-page.ai',
-        'data-protection-course' => 'landing-page.data-protection',
-        'protection-expert-course' => 'landing-page.protection-expert',
-        'protection-sup-course' => 'landing-page.protection-sup',
-        'certified-dpf-course' => 'landing-page.certified-dpf',
-        'cnst-course' => 'landing-page.cnst',
-    ];
+Route::get('/{course}', [LandingPageController::class, 'courseView'])->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
+    ->name('dynamic-course');
 
-    if (!array_key_exists($course, $validCourses)) {
-        abort(404);
-    }
-
-    return view($validCourses[$course]);
-})->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
-  ->name('dynamic-course');
-
-
-Route::get('/home', function () {
-    return view('home');
-})->middleware(['auth'])->name('home');
 
 Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
 Route::post('form-responses/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
@@ -208,7 +185,6 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::put('/{course}/update', [CourseController::class, 'update'])->name('course.update');
             Route::get('/{course}/delete', [CourseController::class, 'destroy'])->name('course.destroy');
             Route::get('/fetch-programme', [CourseController::class, 'fetchProgrammeDetails'])->name('course.fetch.programme');
-
         });
         // end of manage course routes
 

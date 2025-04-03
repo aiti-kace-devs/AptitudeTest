@@ -150,7 +150,7 @@
             </p>
             <div class="button-container">
                 <!-- <a href="https://coders.gikace.org/login" class="btn">Log in</a> -->
-                <a href="{{ route('available-courses') }}" class="btn">Register</a>
+                <a href="{{ route('available-courses') }}" class="btn">Register Now</a>
 
             </div>
         </div>
