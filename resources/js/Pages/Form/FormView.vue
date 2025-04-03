@@ -150,20 +150,19 @@ div[data-widget-item="baseinput"].border-red-600 div[data-children="inputcore"] 
   <div class="py-12 bg-gray-200" v-if="showForm && formIsActive">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
       <div>
-        <div class="lg:flex">
-          <div
-            v-if="admissionForm.image"
-            class="order-1 lg:order-2 flex-none w-full lg:w-1/2 relative"
-          >
+        <div class="flex flex-col lg:flex-row">
+          <!-- Image Section -->
+          <div v-if="admissionForm.image" class="lg:order-2 w-full lg:w-1/2 relative">
             <img
               :src="admissionForm.image"
               alt=""
-              class="absolute inset-0 w-full h-full object-cover"
+              class="w-full h-56 md:h-64 lg:h-full object-cover"
               loading="lazy"
             />
           </div>
 
-          <div class="bg-white rounded-sm p-6">
+          <!-- Form Section -->
+          <div class="lg:order-1 bg-white rounded-sm p-6 w-full lg:w-1/2">
             <div>
               <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
               <p v-if="admissionForm.description" class="text-sm text-gray-600">
