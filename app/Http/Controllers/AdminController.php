@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\user_exam;
 use App\Models\Admin;
+use App\Models\FormResponse;
 use App\Models\Oex_result;
 use App\Models\UserAdmission;
 use App\Mail\ExamLoginCredentials;
@@ -413,6 +414,8 @@ class AdminController extends Controller
     {
         $std = User::where('id', $id)->get()->first();
         $std->delete();
+        $std_form_response = FormResponse::where('id', $std->form_response_id)->get()->first();
+        $std_form_response->delete();
         return redirect('admin/registered_students');
     }
 
