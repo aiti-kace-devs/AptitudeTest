@@ -176,11 +176,9 @@
                                             <select multiple name="age_range[]" id="age_range" class="form-control"
                                                 data-filter="age_range" aria-hidden="true">
                                                 <option value="0">All Ages</option>
-                                                <option value="15-19">15-19</option>
-                                                <option value="20-24">20-24</option>
-                                                <option value="25-35">25-35</option>
-                                                <option value="36-45">36-45</option>
-                                                <option value="45+">45+</option>
+                                                @foreach ($availableAges as $age)
+                                                    <option value="{{ $age }}">{{ $age }} years</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                         <div class="col-md-3">

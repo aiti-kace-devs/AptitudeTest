@@ -122,9 +122,6 @@ class AdminController extends Controller
         $cat1->update();
     }
 
-
-
-
     //Editing branch status
     public function branch_status($id)
     {
@@ -140,8 +137,6 @@ class AdminController extends Controller
         $branch1->status = $status;
         $branch1->update();
     }
-
-
 
     //Editing centre status
     public function centre_status($id)
@@ -159,9 +154,6 @@ class AdminController extends Controller
         $centre1->update();
     }
 
-
-
-
     //Editing programme status
     public function programme_status($id)
     {
@@ -178,9 +170,6 @@ class AdminController extends Controller
         $programme1->update();
     }
 
-
-
-
     //Editing course status
     public function course_status($id)
     {
@@ -196,10 +185,6 @@ class AdminController extends Controller
         $course1->status = $status;
         $course1->update();
     }
-
-
-
-
 
     //Manage exam page
     public function manage_exam()
@@ -297,6 +282,15 @@ class AdminController extends Controller
 
         $data['courses'] = Course::pluck('course_name', 'id')->toArray();
 
+        $distinctAges = User::select('age')->whereNotNull('age')->distinct()->orderBy('age')->pluck('age')->toArray();
+
+        $data['availableAges'] = User::whereNotNull('age')
+        ->select('age')
+        ->distinct()
+        ->orderBy('age')
+        ->pluck('age')
+        ->toArray();
+
         if ($request->ajax()) {
             $baseQuery = user_exam::with('result')
                 ->join('users', 'users.id', '=', 'user_exams.user_id')
@@ -310,8 +304,8 @@ class AdminController extends Controller
             // }
 
             if ($request->has('admission_status')) {
-                $admissionStatuses = (array)$request->admission_status;
-                $baseQuery->where(function($query) use ($admissionStatuses) {
+                $admissionStatuses = (array) $request->admission_status;
+                $baseQuery->where(function ($query) use ($admissionStatuses) {
                     foreach ($admissionStatuses as $status) {
                         if ($status === 'Admitted') {
                             $query->orWhereNotNull('user_admission.user_id');
@@ -342,26 +336,11 @@ class AdminController extends Controller
             }
 
             if ($request->has('age_range')) {
-                $ageRanges = (array) $request->age_range;
-                $baseQuery->where(function ($query) use ($ageRanges) {
-                    foreach ($ageRanges as $ageRange) {
-                        switch ($ageRange) {
-                            case '15-19':
-                                $query->orWhereBetween('users.age', [15, 19]);
-                                break;
-                            case '20-24':
-                                $query->orWhereBetween('users.age', [20, 24]);
-                                break;
-                            case '25-35':
-                                $query->orWhereBetween('users.age', [25, 35]);
-                                break;
-                            case '36-45':
-                                $query->orWhereBetween('users.age', [36, 45]);
-                                break;
-                            case '45+':
-                                $query->orWhere('users.age', '>=', 45);
-                                break;
-                        }
+                $selectedAges = (array) $request->age_range;
+                $baseQuery->where(function ($query) use ($selectedAges) {
+                    foreach ($selectedAges as $age) {
+                        if ($age === '0') continue; // Skip "All Ages" option
+                        $query->orWhere('users.age', $age);
                     }
                 });
             }
