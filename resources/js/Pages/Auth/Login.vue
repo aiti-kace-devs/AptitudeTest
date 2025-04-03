@@ -38,6 +38,7 @@ const submit = () => {
         </div>
 
         <form @submit.prevent="submit">
+            <p class="text-lg font-bold text-gray-900 mb-4">Welcome Back. Log in to continue</p>
             <div>
                 <InputLabel for="email" value="Email" />
 

@@ -10,6 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title> @yield('title')</title>
 
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets') }}/images/logo.png">
+    <link rel="icon" type="image/png" href="{{ asset('assets') }}/images/logo.png">
+
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -122,10 +125,11 @@
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                             data-accordion="false">
                             <!-- Add icons to the links using the .nav-icon class
-                                                                                                                                           with font-awesome or any other icon font library -->
+                                                                                                                                                   with font-awesome or any other icon font library -->
                             @if (!Auth::user()->isAdmitted())
                                 <li class="nav-item">
-                                    <a href="{{ url('student/dashboard') }}" class="nav-link">
+                                    <a href="{{ url('student/dashboard') }}"
+                                        class="nav-link {{ request()->is('student/dashboard') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-tachometer-alt"></i>
                                         <p>
                                             Dashboard
@@ -133,7 +137,8 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ url('student/exam') }}" class="nav-link">
+                                    <a href="{{ url('student/exam') }}"
+                                        class="nav-link {{ request()->is('student/exam') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-book"></i>
                                         <p>
                                             Exam
@@ -141,7 +146,8 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('student.profile') }}" class="nav-link {{ request()->is('student/profile') ? 'active' : '' }}">
+                                    <a href="{{ route('student.profile') }}"
+                                        class="nav-link {{ request()->is('student/profile') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-user"></i>
                                         <p>
                                             My Profile
@@ -151,7 +157,8 @@
                             @endif
                             @if (!Auth::user()->isAdmitted() && Auth::user()->admissionEmailSent())
                                 <li class="nav-item">
-                                    <a href="{{ url('student/select-session/' . Auth::user()->userId) }}" class="nav-link">
+                                    <a href="{{ url('student/select-session/' . Auth::user()->userId) }}"
+                                        class="nav-link {{ request()->is('student/select-session*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-check"></i>
                                         <p>
                                             Choose Session
@@ -161,7 +168,8 @@
                             @endif
                             @if (!Auth::user()->isAdmitted())
                                 <li class="nav-item">
-                                    <a href="{{ url('student/application-status') }}" class="nav-link">
+                                    <a href="{{ url('student/application-status') }}"
+                                        class="nav-link {{ request()->is('student/application-status') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-clipboard"></i>
                                         <p>
                                             Application Status
@@ -189,7 +197,8 @@
                                 </li> --}}
 
                                 <li class="nav-item">
-                                    <a href="{{ url('student/attendance') }}" class="nav-link">
+                                    <a href="{{ url('student/attendance') }}"
+                                        class="nav-link {{ request()->is('student/attendance') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-calendar"></i>
                                         <p>
                                             Attendance
@@ -198,7 +207,8 @@
                                 </li>
                             @endif
                             <li class="nav-item">
-                                <a href="{{ url('student/logout') }}" class="nav-link">
+                                <a href="{{ url('student/logout') }}"
+                                    class="nav-link {{ request()->is('student/logout') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-user"></i>
                                     <p>
                                         Logout
@@ -208,9 +218,9 @@
                             <!--
 
 
-                                                                                                                                    </ul>
-                                                                                                                                  </nav>
-                                                                                                                                  <! /.sidebar-menu -->
+                                                                                                                                            </ul>
+                                                                                                                                          </nav>
+                                                                                                                                          <! /.sidebar-menu -->
                 </div>
                 <!-- /.sidebar -->
             </aside>
@@ -276,6 +286,11 @@
                 ev.preventDefault();
                 return false;
             }, false);
+
+            const title = document.title;
+            if (!title.includes("{{ config('app.name') }}")) {
+                document.title = document.title + " - {{ config('app.name') }}"
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

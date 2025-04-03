@@ -6,10 +6,7 @@
                     {{-- <div class="card-header">{{ __('Login') }}</div> --}}
 
                     <div class="card-body">
-                        <h1 class="text-center">Student Login</h1>
-                        <div class="alert alert-info text-center col-12" role="alert">
-                            <strong>Check your email for your password</strong>
-                        </div>
+                        <h1 class="text-center"><b>Student Login</b> </h1>
                         <form method="POST" action="{{ route('login') }}" class="mt-4">
                             @csrf
 
@@ -47,17 +44,18 @@
                                 </div>
                             </div>
 
-                            {{-- <div class="form-group row">
+                            <div class="form-group row">
                                 <div class="col-md-6 offset-md-4">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="checkbox" name="remember" id="remember"
+                                            {{ old('remember') ? 'checked' : '' }}>
 
                                         <label class="form-check-label" for="remember">
                                             {{ __('Remember Me') }}
                                         </label>
                                     </div>
                                 </div>
-                            </div> --}}
+                            </div>
 
                             <div class="mb-0 form-group row">
                                 <div class="col-md-8 offset-md-4">
@@ -65,11 +63,11 @@
                                         {{ __('Login') }}
                                     </button>
 
-                                    @if (Route::has('password.request'))
+                                    {{-- @if (Route::has('password.request'))
                                         <a class="btn btn-link" href="{{ route('password.request') }}">
                                             {{ __('Forgot Your Password?') }}
                                         </a>
-                                    @endif
+                                    @endif --}}
                                 </div>
                             </div>
                         </form>
