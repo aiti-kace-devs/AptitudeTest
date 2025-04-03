@@ -234,7 +234,7 @@ Route::prefix('student')
 
         Route::middleware(['auth:web'])->group(function () {
             Route::get('/dashboard', [StudentOperation::class, 'dashboard'])->name('dashboard');
-            Route::get('/application-status', [StudentOperation::class, 'application_status'])->name('dashboard');
+            Route::get('/application-status', [StudentOperation::class, 'application_status'])->name('application-status');
             Route::get('/profile', [StudentOperation::class, 'profile'])->name('profile');
             Route::get('/change-course', [StudentOperation::class, 'change_course'])->name('change-course');
             Route::post('/update-course', [StudentOperation::class, 'update_course'])->name('update-course');
