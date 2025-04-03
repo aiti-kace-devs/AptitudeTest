@@ -488,9 +488,9 @@
                     });
 
                     $('#admit-selected').click(function() {
-                        var selected = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
+                        var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
 
-                        if (selected.length === 0) {
+                        if (!selectedIds || selectedIds.length === 0) {
                             toastr.warning('No students selected or no students match your filters');
                             return;
                         }
@@ -500,7 +500,7 @@
 
                         Swal.fire({
                             title: 'Admit Students?',
-                            text: 'You are about to admit ' + selected.length + ' students. Continue?',
+                            text: `You are about to admit ${selectedIds.length} students. Continue?`,
                             icon: 'question',
                             showCancelButton: true,
                             confirmButtonText: 'Yes, admit them',
@@ -508,31 +508,32 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "{{ route('admit_student') }}",
+                                    url: "{{ route('admin.admit_student') }}",
                                     type: 'POST',
                                     headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                                        'Accept': 'application/json'
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
+                                            'content'),
                                     },
                                     data: {
-                                        student_ids: selected
+                                        student_ids: selectedIds
                                     },
                                     success: function(response) {
-                                        toastr.success(response.message);
+                                        toastr.success(response.message ||
+                                            'Students admitted successfully!');
                                         table.ajax.reload();
                                         manuallySelectedIds = [];
                                     },
                                     error: function(xhr) {
                                         toastr.error(xhr.responseJSON?.message ||
-                                            'An error occurred');
+                                            'Failed to admit students.');
+                                        console.error(xhr.responseText);
                                     },
                                     complete: function() {
-                                        btn.prop('disabled', false).html(
-                                            'Admit Selected Students');
+                                        btn.prop('disabled', false).html('Admit Students');
                                     }
                                 });
                             } else {
-                                btn.prop('disabled', false).html('Admit Selected Students');
+                                btn.prop('disabled', false).html('Admit Students');
                             }
                         });
                     });

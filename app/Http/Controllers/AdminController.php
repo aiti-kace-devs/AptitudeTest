@@ -335,7 +335,7 @@ class AdminController extends Controller
                                 $q->whereColumn('yes_ans', '<', 'oex_exam_masters.passmark');
                             });
                         } elseif ($status === 'not_taken') {
-                            $query->orWhereNull('submitted');
+                            $query->orWhereNull('user_exams.submitted');
                         }
                     }
                 });

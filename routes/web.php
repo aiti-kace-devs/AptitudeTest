@@ -112,6 +112,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer'])->middleware('admin.super');
         Route::post('/edit_question_inner', [AdminController::class, 'edit_question_inner'])->middleware('admin.super');
         Route::post('/add_new_question', [AdminController::class, 'add_new_question'])->middleware('admin.super');
+        Route::post('/student/admit', [StudentOperation::class, 'admit_student'])->name('admit_student')->middleware('admin.super');
         Route::post('/edit_students_final', [AdminController::class, 'edit_students_final'])->middleware('admin.super');
         Route::post('/add_new_exam', [AdminController::class, 'add_new_exam'])->middleware('admin.super');
         Route::post('/add_new_category', [AdminController::class, 'add_new_category'])->middleware('admin.super');
@@ -138,7 +139,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::put('/{id}/update', [RegisteredUserController::class, 'update'])->name('admins.update')->middleware('admin.super');
         Route::delete('/{id}/delete', [RegisteredUserController::class, 'destroy'])->name('admins.delete')->middleware('admin.super');
         Route::get('/is_super_admin_status/{id}', [RegisteredUserController::class, 'is_super_admin_status'])->middleware('admin.super');
-        
+
 
         Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])->name('remove-attendance');
 
