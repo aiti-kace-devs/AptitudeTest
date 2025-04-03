@@ -145,6 +145,10 @@ input[data-children="htmlInput"]:focus {
 div[data-widget-item="baseinput"].border-red-600 div[data-children="inputcore"] {
   border-color: rgb(220 38 38 / var(--tw-border-opacity, 1));
 }
+
+input#phone {
+    border: 0 !important;
+}
 </style>
 <template>
   <Head title="Registration" />
