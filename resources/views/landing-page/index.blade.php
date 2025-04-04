@@ -17,7 +17,7 @@
         html {
             height: 100%;
             width: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         .container {
@@ -90,6 +90,7 @@
             color: yellow;
             font-size: 23px;
         }
+
         /* Responsive Design */
         @media (max-width: 900px) {
             .container {
@@ -101,9 +102,9 @@
             }
 
             .text-section {
-                height: 50vh;
-                padding: 30px;
-                overflow-y: auto;
+                height: auto;
+                padding: 20px;
+                overflow-y: visible;
             }
 
             .text-section h1 {
@@ -142,10 +143,11 @@
             }
 
             .text-section {
-                height: 65vh;
-                padding: 10px !important;
-                overflow-y: auto;
+                height: auto;
+                padding: 10px;
+                overflow-y: visible;
             }
+
 
             .text-section h1 {
                 font-size: 30px;
