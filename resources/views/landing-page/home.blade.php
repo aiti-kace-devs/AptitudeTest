@@ -165,7 +165,7 @@
             <div class="course-grid">
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="cybersecurity.jpg" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/{{ url('assets/home/images/cybersecurity.jpg') }}') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Cybersecurity Professional</h2>
@@ -177,7 +177,7 @@
                 </div>
               <div class="course-card">
                     <div class="course-image">
-                        <img src="cybersecurity.jpg" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Network Support Technician (CNST)</h2>
@@ -189,7 +189,7 @@
                 </div>
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="data.jpg" alt="Data Protection Course Image" />
+                        <img src="{{ url('assets/home/images/{{ url('assets/home/images/data.jpg') }}') }}" alt="Data Protection Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Data Analyst Associate</h2>
@@ -202,7 +202,7 @@
 
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="data.jpg" alt="Data Protection Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Expert</h2>
@@ -227,7 +227,7 @@
                 </div>
                  <div class="course-card">
                     <div class="course-image">
-                        <img src="cybersecurity.jpg" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Supervisor</h2>
@@ -240,7 +240,7 @@
 
                  <div class="course-card">
                     <div class="course-image">
-                        <img src="cybersecurity.jpg" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Practioner</h2>
@@ -253,7 +253,7 @@
                 <div class="course-card">
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="data.jpg" alt="Data Protection Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Officer</h2>
@@ -270,7 +270,7 @@
             <div class="course-grid">
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="cybersecurity.jpg" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Cybersecurity Professional</h2>
@@ -282,7 +282,7 @@
                 </div>
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="cybersecurity.jpg" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Network Support Technician (CNST)</h2>
@@ -301,7 +301,7 @@
                
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="cybersecurity.jpg" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Supervisor</h2>
@@ -313,7 +313,7 @@
                 </div>
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="data.jpg" alt="Data Protection Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Expert</h2>
@@ -325,7 +325,7 @@
                 </div>
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="data.jpg" alt="Data Protection Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Officer</h2>
@@ -337,7 +337,7 @@
                 </div>
                  <div class="course-card">
                     <div class="course-image">
-                        <img src="cybersecurity.jpg" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Practioner</h2>
