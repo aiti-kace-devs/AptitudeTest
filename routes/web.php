@@ -57,6 +57,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
         Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
         Route::get('/{form}/responses', [FormController::class, 'show'])->name('show');
+        Route::get('/{form}/export', [FormController::class, 'export'])->name('export');
         Route::post('/{form}/destroy', [FormController::class, 'destroy'])->name('destroy');
     });
 
