@@ -103,11 +103,11 @@
             }
 
             .text-section h1 {
-                font-size: 32px;
+                font-size: 28px;
             }
 
             .text-section p {
-                font-size: 18px;
+                font-size: 12px;
             }
         }
 
@@ -190,6 +190,8 @@
             The Ghana government's One Million Coders initiative is empowering Ghanaians with the skills of the future.
             Whether you're a student, professional, or simply curious, this program offers a pathway to a brighter
             future.
+
+            <a href="{{ route('application') }}">Click to read Application process</a>
             </p>
             <div class="button-container">
                 <!-- <a href="https://coders.gikace.org/login" class="btn">Log in</a> -->
