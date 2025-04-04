@@ -262,6 +262,15 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="{{ url('admin/reports') }}"
+                                class="nav-link @if (request()->is('admin/reports')) active @endif">
+                                <i class="fas fa-file-alt nav-icon"></i>
+                                <p>Generate Report</p>
+                            </a>
+                        </li>
+
+
 
                         <li class="nav-item">
                             <a href="{{ route('admin.form.index') }}" class="nav-link">

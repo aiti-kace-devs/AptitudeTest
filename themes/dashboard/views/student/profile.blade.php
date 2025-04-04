@@ -91,6 +91,21 @@
                 <div class="col-md-3 font-weight-bold">Location:</div>
                 <div class="col-md-9">{{ $course->location }}</div>
             </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Course Duration:</div>
+                <div class="col-md-9">{{ $course->duration }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Start Date:</div>
+                <div class="col-md-9">{{ $course->start_date }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">End Date:</div>
+                <div class="col-md-9">{{ $course->end_date }}</div>
+            </div>
+   
             <!-- <div class="row mb-3">
                 <div class="col-md-3 font-weight-bold">Session:</div>
                 <div class="col-md-9">{{ $user->status }}</div>
