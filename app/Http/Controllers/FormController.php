@@ -158,7 +158,11 @@ class FormController extends Controller
         $admissionForm->image = $admissionForm->image ? asset('storage/form/banner/' . $admissionForm->image) : null;
         $withLayout = false;
 
-        $courses = Course::where('status', 1)->orderBy('course_name')->get();
+        $courses = Course::join('programmes', 'programmes.id', '=', 'courses.programme_id')
+            ->where('courses.status', 1)
+            ->where('programmes.status', 1)
+            ->orderBy('course_name')->get();
+
         $centres = Centre::where('status', 1)->orderBy('title')->get();
 
         $branches = Branch::where('status', 1)->orderBy('title')->get();
