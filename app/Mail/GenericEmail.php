@@ -8,21 +8,26 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use League\CommonMark\CommonMarkConverter;
 
 class GenericEmail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $data;
+    public $markdownContent;
+    public $subjectLine;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($data = null)
+    public function __construct($markdownContent, $subjectLine)
     {
-        $this->data = $data;
-        //
+        $this->markdownContent = $markdownContent;
+        $this->subjectLine = $subjectLine;
+
+        $converter = new CommonMarkConverter();
+        $this->markdownContent = $converter->convert($markdownContent)->getContent();
     }
 
     /**
@@ -33,7 +38,7 @@ class GenericEmail extends Mailable implements ShouldQueue
     public function envelope()
     {
         return new Envelope(
-            subject: 'eSkills4Jobs Meeting Link',
+            subject: $this->subjectLine,
         );
     }
 
@@ -58,4 +63,15 @@ class GenericEmail extends Mailable implements ShouldQueue
     {
         return [];
     }
+
+    // public function build()
+    // {
+    //     $combinedMarkdown = "\n\n" . $this->markdownContent; // Concatenate with newlines for separation
+
+    //     $converter = new CommonMarkConverter();
+    //     $htmlContent = $converter->convert($combinedMarkdown)->getContent();
+
+    //     return $this->subject($this->subjectLine)
+    //         ->html($htmlContent);
+    // }
 }

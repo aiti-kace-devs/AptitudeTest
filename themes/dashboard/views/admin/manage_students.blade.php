@@ -132,18 +132,31 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <!-- Default box -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Title</h3>
-
-                                    <div class="card-tools">
-                                        <a class="btn btn-info btn-sm" href="javascript:;" data-toggle="modal"
-                                            data-target="#myModal">Add new student</a>
+                    {{-- <x-wysiwyg></x-wysiwyg> --}}
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <span class="d-flex flex-column flex-md-row justify-content-between">
+                                    <div class="mb-0 dropdown-toggle" style="cursor: pointer;" data-toggle="collapse"
+                                        data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        FILTER DATA
                                     </div>
-                                </div>
+                                    <div class="row">
+                                        <div class="col-md-12 d-flex justify-content-end pr-3 mb-2">
+                                            <a class="btn btn-info mr-2" href="javascript:;" data-toggle="modal"
+                                                data-target="#myModal">Add new student</a>
+                                            <button class="btn btn-secondary mr-2" data-toggle="modal"
+                                                data-target="#bulk-email-modal">Send Email</button>
+                                            <button class="btn btn-success mr-2" id="clear-filters">Send SMS</button>
+                                            <button class="btn btn-primary mr-2" id="admit-selected">Admit Students</button>
+                                        </div>
+                                    </div>
+                                </span>
+                            </div>
+
+                            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                                data-parent="#accordion" style="">
+                                {{-- <div class="card-body"> --}}
                                 <div class="card-body">
                                     <div class="row mb-3">
                                         <div class="col-md-2">
@@ -187,15 +200,27 @@
                                         </div>
 
                                     </div>
+                                    {{-- </div> --}}
                                 </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                <div class="row mb-3">
-                                    <div class="col-md-12 d-flex justify-content-end pr-3 mb-2">
-                                        <button class="btn btn-info mr-2" id="clear-filters">Send Email</button>
-                                        <button class="btn btn-success mr-2" id="clear-filters">Send SMS</button>
-                                        <button class="btn btn-primary mr-2" id="admit-selected">Admit Students</button>
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- Default box -->
+                            <div class="card">
+                                {{-- <div class="card-header">
+                                    <h3 class="card-title">Title</h3>
+
+                                    <div class="card-tools">
+                                        <a class="btn btn-info btn-sm" href="javascript:;" data-toggle="modal"
+                                            data-target="#myModal">Add new student</a>
                                     </div>
-                                </div>
+                                </div> --}}
+
+
+
                                 <table id="studentsTable" class="table table-striped table-bordered table-hover">
                                     <thead>
                                         <tr>
@@ -222,6 +247,8 @@
     </div>
 
     <!-- Modal -->
+    @include('admin.send-bulk-email')
+
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog">
 
@@ -287,10 +314,18 @@
 
             </div>
         </div>
+
+
+
         @push('scripts')
             <script type="text/javascript" src="{{ url('assets/js/jquery-multiselect.min.js') }}"></script>
 
             <script>
+                var allFilteredIds = [];
+                var manuallySelectedIds = [];
+                var isFilterApplied = false;
+                var debounceTimer;
+
                 $(document).ready(function() {
                     $('select[multiple][data-filter]').multiSelect({
                         selectableHeader: "<div class='multi-select-legend'>Available Options</div>",
@@ -303,10 +338,6 @@
                         }
                     });
 
-                    var allFilteredIds = [];
-                    var manuallySelectedIds = [];
-                    var isFilterApplied = false;
-                    var debounceTimer;
 
                     var table = $('#studentsTable').DataTable({
                         processing: true,
@@ -445,6 +476,7 @@
                         $('#studentSearch').val('');
                         updateDataTable();
                     });
+
                     $('#clear-filters').click(function() {
                         $('select[multiple][data-filter]').each(function() {
                             $(this).val(['0']);
@@ -460,6 +492,7 @@
                         $('#select-all').prop('checked', false);
                         manuallySelectedIds = [];
                     });
+
                     $(document).on('change', '.student-checkbox', function() {
                         var studentId = $(this).val();
                         if ($(this).is(':checked')) {
@@ -535,6 +568,52 @@
                             }
                         });
                     });
+                });
+
+
+
+                var modal = $('#bulk-email-modal');
+
+
+                $(modal).on('modalAction', function(event) {
+                    const message = event.detail.message;
+                    const subject = event.detail.subject;
+                    const template = event.detail.template;
+
+
+                    if (!subject || (!message && !template)) {
+                        toastr.error('Your need a message/template and a subject');
+                        return;
+                    }
+                    var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
+                    $.ajax({
+                        url: "{{ route('admin.send_bulk_email') }}",
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
+                                'content'),
+                        },
+                        data: {
+                            student_ids: selectedIds,
+                            subject,
+                            message,
+                            template
+                        },
+                        success: function(response) {
+                            toastr.success(response.message ||
+                                'Emails transfer initiated successfully!');
+                            $(modal).modal('hide')
+                        },
+                        error: function(xhr) {
+                            toastr.error(xhr.responseJSON?.message ||
+                                'Failed to admit students.');
+                            console.error(xhr.responseText);
+                        },
+                        complete: function() {
+                            btn.prop('disabled', false).html('Admit Students');
+                        }
+                    });
+
                 });
             </script>
         @endpush

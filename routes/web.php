@@ -130,6 +130,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/view_attendance', [AdminController::class, 'viewAttendanceByDate'])->name('viewAttendanceByDate');
         Route::get('/reports', [AdminController::class, 'getReportView'])->name('getReportView');
         Route::post('/reports', [AdminController::class, 'generateReport'])->name('generateReport');
+        Route::post('/send-bulk-email', [AdminController::class, 'sendBulkEmail'])->name('send_bulk_email');
 
 
         Route::get('/manage_admins', [RegisteredUserController::class, 'index'])->name('manage_admins')->middleware('admin.super');
