@@ -222,6 +222,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::get('/{template}/delete', [SmsTemplateController::class, 'destroy'])->name('sms.template.destroy');
         });
         // end of manage sms_template routes
+
+        Route::get('app-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['admin.super']);
     });
 });
 

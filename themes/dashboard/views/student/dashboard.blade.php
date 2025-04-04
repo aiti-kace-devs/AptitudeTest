@@ -9,7 +9,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">My Exams</h1>
+                        <h1 class="m-0">Aptitude Test</h1>
                     </div><!-- /.col -->
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -32,7 +32,7 @@
                 <div class="row">
                     @foreach ($portal_exams as $key => $exam)
                         <?php
-                        
+
                         if (strtotime(date('Y-m-d')) > strtotime($exam['exam_date'])) {
                             $cls = 'bg-danger';
                         } else {
@@ -43,7 +43,7 @@
                                 $cls = 'bg-info';
                             }
                         }
-                        
+
                         ?>
                         {{-- <div class="col-lg-8 col-12 mx-auto">
                             <div class="small-box {{ $cls }} text-center">
@@ -79,11 +79,11 @@
 
                                     <!-- Exam Details -->
                                     <div class="exam-details py-3">
-                                        <p class="exam-detail"><strong>Exam Deadline:</strong><x-exam-deadline
+                                        <p class="exam-detail"><strong>Test Deadline:</strong><x-exam-deadline
                                                 :date="$exam['exam_date']"></x-exam-deadline></p>
                                         <p class="exam-detail"><strong>Duration:</strong> {{ $exam['exam_duration'] }} mins
                                         </p>
-                                        <p class="exam-detail"><strong>Pass Mark:</strong> {{ $exam['passmark'] }}</p>
+                                        {{-- <p class="exam-detail"><strong>Pass Mark:</strong> {{ $exam['passmark'] }}</p> --}}
                                         <p class="exam-detail"><strong>Total Questions:</strong>
                                             {{ $exam['question_count'] }}</p>
                                     </div>
@@ -91,7 +91,7 @@
 
                                 <!-- Icon -->
                                 <div class="icon my-3">
-                                    <i class="ion ion-bag exam-icon"></i>
+                                    <i class="fas fa-book exam-icon"></i>
                                 </div>
 
                                 <!-- Call to Action Button -->

@@ -21,7 +21,7 @@ class GenericEmail extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($markdownContent, $subjectLine)
+    public function __construct($markdownContent = '', $subjectLine = '')
     {
         $this->markdownContent = $markdownContent;
         $this->subjectLine = $subjectLine;

@@ -65,7 +65,6 @@ export default {
     });
 
     const form = useForm(formFields);
-
     return {
       form,
       showFormMessage,
@@ -77,7 +76,7 @@ export default {
   methods: {
     submit() {
       this.form.post(route("admin.form_responses.store"), {
-        onSuccess: () => {
+        onFinish: () => {
           toastr.success("Entry successfully submitted");
           this.resetForm();
           this.showMessage();
@@ -359,7 +358,7 @@ input#phone {
   </div>
 
   <div class="p-6" v-if="showFormMessage && formIsActive">
-    <div>
+    <div class="p-6 bg-white rounded-sm">
       <p class="text-2xl font-bold capitalize">
         {{ admissionForm.message_after_registration }}
       </p>
@@ -367,7 +366,7 @@ input#phone {
   </div>
 
   <div class="p-6" v-if="!formIsActive">
-    <div>
+    <div class="p-6 bg-white rounded-sm">
       <p class="text-2xl font-bold capitalize">
         {{ admissionForm.message_when_inactive }}
       </p>

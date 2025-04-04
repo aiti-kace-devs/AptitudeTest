@@ -161,6 +161,7 @@ class FormController extends Controller
         $courses = Course::join('programmes', 'programmes.id', '=', 'courses.programme_id')
             ->where('courses.status', 1)
             ->where('programmes.status', 1)
+            ->select('courses.*')
             ->orderBy('course_name')->get();
 
         $centres = Centre::where('status', 1)->orderBy('title')->get();
