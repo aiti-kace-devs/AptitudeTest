@@ -25,14 +25,25 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      *
      * This gate determines who can access Horizon in non-local environments.
      */
-    protected function gate(): void
-    {
-        Gate::define('viewHorizon', function ($user) {
-            return true;
-            // return in_array($user->email, [
+    // protected function gate(): void
+    // {
+    //     Gate::define('viewHorizon', function ($user) {
+    //         dd($user);
+    //         // return true;
+    //         // return in_array($user->email, [
 
-            //     'email' => 'admin@gmail.com',
-            // ]);
+    //         //     'email' => 'admin@gmail.com',
+    //         // ]);
+    //     });
+    // }
+
+    protected function authorization()
+    {
+        Horizon::auth(function ($request) {
+            if (auth('admin')->check()) {
+                return auth('admin')->user()->isSuper();
+            }
+            return false;
         });
     }
 }
