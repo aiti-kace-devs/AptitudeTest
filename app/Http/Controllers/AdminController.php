@@ -654,7 +654,7 @@ class AdminController extends Controller
         // match with ghana card format
         $correctFormat = preg_match('/GHA-[0-9]{9}-[0-9]{1}$/', $student->ghcard);
         if (($student && $correctFormat) || ($student && $student->ghcard && $student->card_type !== 'ghcard')) {
-            $adminId = Auth::id();
+            $adminId = Auth::guard('admin')->id();
             $student->verification_date = now();
             $student->verified_by = $adminId;
             $student->save();

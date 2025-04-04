@@ -17,7 +17,8 @@ class SuperAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::user()->isSuper()) {
+
+        if (Auth::guard('admin')->user()?->isSuper()) {
             return $next($request);
         }
         return redirect()->back()->with([

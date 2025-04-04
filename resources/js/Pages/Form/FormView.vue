@@ -65,21 +65,30 @@ export default {
     });
 
     const form = useForm(formFields);
+
+
+    const admissionInstructionUrl = route("application");
+
     return {
       form,
       showFormMessage,
       showForm,
       formIsActive,
       phoneError: false,
+      admissionInstructionUrl,
     };
   },
   methods: {
     submit() {
       this.form.post(route("admin.form_responses.store"), {
-        onFinish: () => {
+        onSuccess: () => {
           toastr.success("Entry successfully submitted");
           this.resetForm();
           this.showMessage();
+
+          setTimeout(() => {
+            window.location.href = route("application");
+          }, 5000);
         },
         onError: () => {
           toastr.error("Something went wrong");
@@ -357,16 +366,17 @@ input#phone {
     </div>
   </div>
 
-  <div class="p-6" v-if="showFormMessage && formIsActive">
-    <div class="p-6 bg-white rounded-sm">
-      <p class="text-2xl font-bold capitalize">
+  <div v-if="showFormMessage && formIsActive">
+    <div class="p-6">
+      <p class="text-2xl font-bold capitalize text-green-500">
         {{ admissionForm.message_after_registration }}
       </p>
     </div>
+    <iframe style="display: block; height: 98vh; width: 100vw;" :src="admissionInstructionUrl">Your browser isn't compatible</iframe>
   </div>
 
   <div class="p-6" v-if="!formIsActive">
-    <div class="p-6 bg-white rounded-sm">
+    <div>
       <p class="text-2xl font-bold capitalize">
         {{ admissionForm.message_when_inactive }}
       </p>
