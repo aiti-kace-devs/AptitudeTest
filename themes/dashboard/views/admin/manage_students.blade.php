@@ -145,8 +145,10 @@
                                         <div class="col-md-12 d-flex justify-content-end pr-3 mb-2">
                                             <a class="btn btn-info mr-2" href="javascript:;" data-toggle="modal"
                                                 data-target="#myModal">Add new student</a>
-                                            <button class="btn btn-secondary mr-2" data-toggle="modal"
-                                                data-target="#bulk-email-modal">Send Email</button>
+                                            <button class="btn btn-warning mr-2" data-toggle="modal"
+                                                data-target="#bulk-email-modal">Send Emails
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
                                             <button class="btn btn-success mr-2" id="clear-filters">Send SMS</button>
                                             <button class="btn btn-primary mr-2" id="admit-selected">Admit Students</button>
                                         </div>
