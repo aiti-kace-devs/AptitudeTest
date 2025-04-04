@@ -103,7 +103,7 @@
 
             .text-section {
                 height: auto;
-                padding: 30px;
+                padding: 20px;
                 overflow-y: visible;
             }
 
@@ -143,10 +143,11 @@
             }
 
             .text-section {
-                height: 65vh;
-                padding: 10px !important;
-                overflow-y: auto;
+                height: auto;
+                padding: 10px;
+                overflow-y: visible;
             }
+
 
             .text-section h1 {
                 font-size: 30px;
