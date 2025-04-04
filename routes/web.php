@@ -37,6 +37,8 @@ Route::get('/', [LandingPageController::class, 'index']);
 
 Route::get('/available-courses', [LandingPageController::class, 'availableCourses'])->name('available-courses');
 
+Route::get('/application', [LandingPageController::class, 'application'])->name('application');
+
 Route::get('/{course}', [LandingPageController::class, 'courseView'])->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
     ->name('dynamic-course');
 

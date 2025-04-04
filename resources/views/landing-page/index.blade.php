@@ -86,6 +86,10 @@
             color: white;
         }
 
+        a {
+            color: yellow;
+            font-size: 23px;
+        }
         /* Responsive Design */
         @media (max-width: 900px) {
             .container {
@@ -103,11 +107,11 @@
             }
 
             .text-section h1 {
-                font-size: 32px;
+                font-size: 28px;
             }
 
             .text-section p {
-                font-size: 18px;
+                font-size: 12px;
             }
         }
 
@@ -183,13 +187,15 @@
 
             </div>
             <h1>The One Million Coders Program - Ghana</h1>
-            <p>Empowering Ghanaian youth with coding skills for the future.</p>
+            <p style="font-size: 18px;">Empowering Ghanaian youth with coding skills for the future.</p>
             <p>
             <h2>Are you ready to unlock your digital potential?</h2>
 
             The Ghana government's One Million Coders initiative is empowering Ghanaians with the skills of the future.
             Whether you're a student, professional, or simply curious, this program offers a pathway to a brighter
             future.
+
+            <a href="{{ route('application') }}">Click to read Application process</a>
             </p>
             <div class="button-container">
                 <!-- <a href="https://coders.gikace.org/login" class="btn">Log in</a> -->

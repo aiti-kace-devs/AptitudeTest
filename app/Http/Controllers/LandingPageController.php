@@ -18,6 +18,11 @@ class LandingPageController extends Controller
         return view('landing-page.home');
     }
 
+    public function application()
+    {
+        return view('landing-page.application');
+    }
+
     public function courseView($course)
     {
         $validCourses = [
