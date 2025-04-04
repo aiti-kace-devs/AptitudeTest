@@ -111,30 +111,6 @@
             padding: 6px 12px;
         }
 
-        /* .attendance-style.yes.emoji::before {
-                                                                                                content: '✅'
-                                                                                            }
-
-                                                                                            .attendance-style.yes.emoji>.content {
-                                                                                                    display: none
-                                                                                                }
-
-                                                                                                .attendance-style.yes>.content {
-                                                                                                    display: inline-block
-                                                                                                }
-
-
-                                                                                                .attendance-style.no.emoji::before {
-                                                                                                    content: '❌'
-                                                                                                }
-
-                                                                                                .attendance-style.no.emoji>.content {
-                                                                                                    display: none
-                                                                                                }
-
-                                                                                                .attendance-style.no>.content {
-                                                                                                    display: inline-block
-                                                                                                } */
     </style>
     <!-- /.content-header -->
     <!-- Content Wrapper. Contains page content -->

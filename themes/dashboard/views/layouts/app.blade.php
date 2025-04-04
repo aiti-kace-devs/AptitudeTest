@@ -46,7 +46,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
         integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -262,6 +261,15 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="{{ url('admin/reports') }}"
+                                class="nav-link @if (request()->is('admin/reports')) active @endif">
+                                <i class="fas fa-file-alt nav-icon"></i>
+                                <p>Generate Report</p>
+                            </a>
+                        </li>
+
+
 
                         <li class="nav-item">
                             <a href="{{ route('admin.form.index') }}" class="nav-link">
@@ -343,7 +351,6 @@
     <!-- ./wrapper -->
 
     <!-- jQuery -->
-    <script src="{{ url('assets/plugins/jquery/jquery.min.js') }}"></script>
     <!-- jQuery UI 1.11.4 -->
     <script src="{{ url('assets/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
@@ -409,6 +416,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+            if ($.fn.DataTable.isDataTable('.datatable')) {
+                $('.datatable').DataTable().destroy();
+            }
             $('.datatable').DataTable({
                 columnDefs: [{
                     width: "15%",
