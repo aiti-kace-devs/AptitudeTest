@@ -184,7 +184,7 @@
                         <p class="course-description">
                             Provide technical support with a focus on networking. Assist in network device management.
                         </p>
-                        <a href="{{ route('dynamic-course', 'cybersecurity-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('dynamic-course', 'cnst-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
                 <div class="course-card">
