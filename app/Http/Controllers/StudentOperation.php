@@ -388,16 +388,21 @@ class StudentOperation extends Controller
     public function change_course()
     {
         $user = Auth::user();
-        $courses = Course::all();
 
-        // Current course (if any)
+        $currentCourseId = $user->registered_course;
+
+        $courses = Course::where('status', 1)
+                         ->where('id', '!=', $currentCourseId)
+                         ->get();
+
         $currentCourse = null;
-        if (!empty($user->registered_course)) {
-            $currentCourse = Course::find($user->registered_course);
+        if (!empty($currentCourseId)) {
+            $currentCourse = Course::find($currentCourseId);
         }
 
         return view('student.change-course', compact('user', 'courses', 'currentCourse'));
     }
+
 
 
    // Update course selection
