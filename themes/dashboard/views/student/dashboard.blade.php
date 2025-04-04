@@ -68,8 +68,8 @@
                             </div>
                         </div> --}}
 
-                        <div class="col-lg-8 col-12 mx-auto">
-                            <div class="small-box text-center custom-card p-4">
+                        <div class="col-12 col-md-8 mx-auto px-0 px-md-2">
+                            <div class="small-box text-center custom-card p-4 mobile-full-card">
                                 <div class="inner">
                                     <!-- Exam Title -->
                                     <h2 class="exam-title">{{ $exam['title'] }}</h2>
@@ -118,6 +118,73 @@
     </div>
     <!-- /.content-wrapper -->
 
+    <style>
+
+        @media (max-width: 767.98px) {
+            .content-wrapper {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .content {
+                padding: 0 !important;
+            }
+
+            .container-fluid {
+                padding: 0 !important;
+            }
+
+            .row {
+                margin: 0 !important;
+            }
+
+            .col-12 {
+                padding: 0 !important;
+            }
+
+            .custom-card, .mobile-full-card {
+                border-radius: 0 !important;
+                margin-bottom: 10px !important;
+                width: 100% !important;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+
+            .mobile-heading {
+                font-size: 3.5rem !important;
+                margin-bottom: 1rem !important;
+            }
+
+            .mobile-text {
+                font-size: 1.9rem !important;
+                line-height: 2rem !important;
+                margin-bottom: 1rem !important;
+            }
+
+            .mobile-text strong {
+                font-size: 1.4rem !important;
+                font-weight: 600 !important;
+            }
+
+            .exam-icon {
+                font-size: 2.5rem !important;
+            }
+
+            .mobile-btn {
+                font-size: 1.4rem !important;
+                padding: 0.75rem 1.5rem !important;
+                width: 80% !important;
+                margin: 0 auto !important;
+            }
+
+            .content-header {
+                display: none;
+            }
+        }
+    </style>
 
 
 @endsection
