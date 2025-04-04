@@ -1,7 +1,7 @@
 @component('mail::message')
 # Welcome, {{ $name }} !
 
-We are excited to have you. Here are your exam login details:
+We are excited to have you. Here are your participant login details:
 @component('mail::panel')
 - **Email:** {{ $email }}
 - **Password:** {{ $password }}

@@ -59,6 +59,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
         Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
         Route::get('/{form}/responses', [FormController::class, 'show'])->name('show');
+        Route::get('/{form}/export', [FormController::class, 'export'])->name('export');
         Route::post('/{form}/destroy', [FormController::class, 'destroy'])->name('destroy');
     });
 
@@ -132,6 +133,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/view_attendance', [AdminController::class, 'viewAttendanceByDate'])->name('viewAttendanceByDate');
         Route::get('/reports', [AdminController::class, 'getReportView'])->name('getReportView');
         Route::post('/reports', [AdminController::class, 'generateReport'])->name('generateReport');
+        Route::post('/send-bulk-email', [AdminController::class, 'sendBulkEmail'])->name('send_bulk_email');
 
 
         Route::get('/manage_admins', [RegisteredUserController::class, 'index'])->name('manage_admins')->middleware('admin.super');
@@ -222,6 +224,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::get('/{template}/delete', [SmsTemplateController::class, 'destroy'])->name('sms.template.destroy');
         });
         // end of manage sms_template routes
+
+        Route::get('app-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['admin.super']);
     });
 });
 

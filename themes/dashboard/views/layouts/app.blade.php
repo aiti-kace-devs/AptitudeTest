@@ -42,6 +42,7 @@
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/buttons.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets@11.4.0/styles/default.min.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
         integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="

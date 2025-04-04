@@ -52,12 +52,14 @@ class StudentOperation extends Controller
         // Get the current authenticated user
         $user = Auth::user();
 
+
         // Get course details if available in user's record
         $course = null;
         if (!empty($user->exam)) {
             // Assuming 'exam' field in users table holds the course_id
             $course = Course::find($user->registered_course);
         }
+
 
 
         return view('student.profile', compact('user', 'course'));
@@ -392,8 +394,8 @@ class StudentOperation extends Controller
         $currentCourseId = $user->registered_course;
 
         $courses = Course::where('status', 1)
-                         ->where('id', '!=', $currentCourseId)
-                         ->get();
+            ->where('id', '!=', $currentCourseId)
+            ->get();
 
         $currentCourse = null;
         if (!empty($currentCourseId)) {
@@ -404,94 +406,99 @@ class StudentOperation extends Controller
     }
 
 
+    // Update course selection
 
-   // Update course selection
-
-   public function update_course(Request $request)
-{
-    $request->validate([
-        'course_id' => 'required|exists:courses,id'
-    ]);
-
-    $user = Auth::user();
-
-    // Get course information
-    $course = Course::find($request->course_id);
-
-    if (!$course) {
-        return redirect()->back()->with('error', 'Selected course not found.');
-    }
-
-    // Update user record with course and session information
-    $user->registered_course = $request->course_id; // Store course_id in exam field
-    $user->save();
-
-    return redirect()->route('student.profile')->with('success', 'Course changed successfully.');
-}
-
-
-public function admit_student(Request $request)
-{
-    $count = 0;
-    $studentIds = $request->student_ids;
-
-    if (empty($studentIds)) {
-        return response()->json(['success' => false, 'message' => 'No students selected.'], 400);
-    }
-
-    try {
-        foreach ($studentIds as $studentId) {
-            $user = User::find($studentId);
-            if (!$user) continue;
-
-            $course = Course::find($user->registered_course);
-            if (!$course) continue;
-
-            $existingAdmission = UserAdmission::where('user_id', $studentId)->first();
-            if ($existingAdmission) {
-                if (!$existingAdmission->email_sent) {
-                    Mail::to($user->email)->send(new StudentAdmitted(
-                        $user->name,
-                        $course->course_name,
-                        $course->location,
-                        url: url('student/select-session/' . $user->id)
-                    ));
-                    $existingAdmission->update(['email_sent' => now()]);
-                    $count++;
-                }
-                continue;
-            }
-
-            UserAdmission::create([
-                'user_id' => $studentId,
-                'course_id' => $course->id,
-                'email_sent' => now(),
-            ]);
-
-            Mail::to($user->email)
-                ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))
-                ->send(new StudentAdmitted(
-                    name: $user->name,
-                    course: $course->course_name,
-                    location: $course->location,
-                    url: url('student/select-session/' . $user->id)
-                ));
-
-            $count++;
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => "Admitted {$count} students successfully!"
+    public function update_course(Request $request)
+    {
+        $request->validate([
+            'course_id' => 'required|exists:courses,id'
         ]);
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error: ' . $e->getMessage()
-        ], 500);
+
+        $user = Auth::user();
+
+
+        // Get course information
+        $course = Course::find($request->course_id);
+
+
+        if (!$course) {
+            return redirect()->back()->with('error', 'Selected course not found.');
+        }
+
+
+        // Update user record with course and session information
+        $user->registered_course = $request->course_id; // Store course_id in exam field
+        $user->save();
+
+
+        return redirect()->route('student.profile')->with('success', 'Course changed successfully.');
     }
-}
+
+
+
+    public function admit_student(Request $request)
+    {
+        $count = 0;
+        $studentIds = $request->student_ids;
+
+        if (empty($studentIds)) {
+            return response()->json(['success' => false, 'message' => 'No students selected.'], 400);
+        }
+
+        try {
+            foreach ($studentIds as $studentId) {
+                $user = User::find($studentId);
+                if (!$user) continue;
+
+                $course = Course::find($user->registered_course);
+                if (!$course) continue;
+
+                $existingAdmission = UserAdmission::where('user_id', $studentId)->first();
+                if ($existingAdmission) {
+                    if (!$existingAdmission->email_sent) {
+                        Mail::to($user->email)->send(new StudentAdmitted(
+                            $user->name,
+                            $course->course_name,
+                            $course->location,
+                            url: url('student/select-session/' . $user->id)
+                        ));
+                        $existingAdmission->update(['email_sent' => now()]);
+                        $count++;
+                    }
+                    continue;
+                }
+
+                UserAdmission::create([
+                    'user_id' => $studentId,
+                    'course_id' => $course->id,
+                    'email_sent' => now(),
+                ]);
+
+                Mail::to($user->email)
+                    ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))
+                    ->send(new StudentAdmitted(
+                        name: $user->name,
+                        course: $course->course_name,
+                        location: $course->location,
+                        url: url('student/select-session/' . $user->id)
+                    ));
+
+                $count++;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Admitted {$count} students successfully!"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function get_attendance_page()
     {
         return view('student.attendance');

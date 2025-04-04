@@ -10,12 +10,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Exams</h1>
+                        <h1 class="m-0">Aptitude Test</h1>
                     </div><!-- /.col -->
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">Home</a></li>
-                            <li class="breadcrumb-item active">Exam</li>
+                            <li class="breadcrumb-item active">Aptitude Test</li>
                         </ol>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
@@ -33,8 +33,8 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Exam title</th>
-                                                <th>Exam deadline</th>
+                                                <th>Test title</th>
+                                                <th>Test deadline</th>
                                                 <th>Status</th>
                                                 {{-- <th>Result</th> --}}
                                                 <th>Actions</th>
@@ -80,7 +80,7 @@
                                                         <x-can-take-exam :date="$std_info['exam_date']">
                                                             @if ($std_info['exam_joined'] == 0)
                                                                 <a href="{{ url('student/join_exam/' . $std_info['exam_id']) }}"
-                                                                    class="btn btn-primary btn-sm">Join Exam</a>
+                                                                    class="btn btn-primary btn-sm">Take Test Now</a>
                                                                 {{-- @else
                                                           <a href="{{ url('student/view_answer/' . $std_info['exam_id']) }}"
                                                           class="btn btn-primary btn-sm">View Answers</a> --}}

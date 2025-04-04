@@ -101,6 +101,8 @@
             <aside class="main-sidebar sidebar-dark-primary elevation-4">
                 <!-- Brand Logo -->
                 <a href="/" class="brand-link">
+                    <img height="50" width="50" src="{{ asset('assets') }}/images/logo.png">
+
                     <span class="brand-text font-weight-light">{{ config('app.name') }}</span>
                 </a>
 
@@ -125,7 +127,7 @@
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                             data-accordion="false">
                             <!-- Add icons to the links using the .nav-icon class
-                                                                                                                                                   with font-awesome or any other icon font library -->
+                                                                                                                                                           with font-awesome or any other icon font library -->
                             @if (!Auth::user()->isAdmitted())
                                 <li class="nav-item">
                                     <a href="{{ url('student/dashboard') }}"
@@ -141,7 +143,7 @@
                                         class="nav-link {{ request()->is('student/exam') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-book"></i>
                                         <p>
-                                            Exam
+                                            Aptitude Test
                                         </p>
                                     </a>
                                 </li>
@@ -218,9 +220,9 @@
                             <!--
 
 
-                                                                                                                                            </ul>
-                                                                                                                                          </nav>
-                                                                                                                                          <! /.sidebar-menu -->
+                                                                                                                                                    </ul>
+                                                                                                                                                  </nav>
+                                                                                                                                                  <! /.sidebar-menu -->
                 </div>
                 <!-- /.sidebar -->
             </aside>

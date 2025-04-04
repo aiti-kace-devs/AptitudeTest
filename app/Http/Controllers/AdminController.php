@@ -41,7 +41,8 @@ use App\Models\Branch;
 use App\Models\Centre;
 use App\Models\Programme;
 use App\Helpers\Common as CommonHelper;
-
+use App\Helpers\MailerHelper;
+use App\Jobs\SendBulkEmailJob;
 use Carbon\Carbon;
 
 class AdminController extends Controller
@@ -286,11 +287,11 @@ class AdminController extends Controller
         $distinctAges = User::select('age')->whereNotNull('age')->distinct()->orderBy('age')->pluck('age')->toArray();
 
         $data['availableAges'] = User::whereNotNull('age')
-        ->select('age')
-        ->distinct()
-        ->orderBy('age')
-        ->pluck('age')
-        ->toArray();
+            ->select('age')
+            ->distinct()
+            ->orderBy('age')
+            ->pluck('age')
+            ->toArray();
 
         if ($request->ajax()) {
             $baseQuery = user_exam::with('result')
@@ -298,7 +299,7 @@ class AdminController extends Controller
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
                 ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
                 ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
-                ->select(['user_exams.id', 'users.name', 'users.email', 'users.age', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
+                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
 
             // if ($request->has('ex_name')) {
             //     $baseQuery->whereIn('oex_exam_masters.title', (array) $request->ex_name);
@@ -400,6 +401,11 @@ class AdminController extends Controller
                 ->rawColumns(['checkbox', 'result', 'status', 'actions'])
                 ->toJson();
         }
+
+        $data['mailable'] = MailerHelper::getMailableClasses();
+
+        // return view('mailables.index', ['mailables' => $mailables]);
+
 
         return view('admin.manage_students', $data);
     }
@@ -951,5 +957,27 @@ class AdminController extends Controller
         ];
         // dd($data);
         return view('admin.reports', $data);
+    }
+
+    public function sendBulkEmail(Request $request)
+    {
+        $validated = $request->validate([
+            'subject' => 'required',
+            'message' => 'sometimes',
+            'template' => 'required_if:message,null',
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:users,id',
+        ], [], [
+            'student_ids.*' => 'student'
+        ]);
+
+        SendBulkEmailJob::dispatch($validated);
+
+        return redirect()
+            ->back()
+            ->with([
+                'flash' => 'Email sent successfully',
+                'key' => 'success',
+            ]);
     }
 }
