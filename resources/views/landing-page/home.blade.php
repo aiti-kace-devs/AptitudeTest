@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Courses Page</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ asset('assets/home/css/style.css') }}"/>
    <style>
     body {
          
@@ -165,7 +165,7 @@
             <div class="course-grid">
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="{{ url('assets/home/images/{{ url('assets/home/images/cybersecurity.jpg') }}') }}" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Cybersecurity Professional</h2>
@@ -189,7 +189,7 @@
                 </div>
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="{{ url('assets/home/images/{{ url('assets/home/images/data.jpg') }}') }}" alt="Data Protection Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Data Analyst Associate</h2>
@@ -215,7 +215,7 @@
 
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="ai.jpeg" alt="Artificial Intelligence Course Image" />
+                        <img src="{{ url('assets/home/images/ai.jpeg') }} " alt="Artificial Intelligence Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Artificial Intelligence Training</h2>
@@ -354,7 +354,7 @@
             <div class="course-grid">
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="ai.jpeg" alt="Artificial Intelligence Course Image" />
+                        <img src="{{ url('assets/home/images/ai.jpeg') }}" alt="Artificial Intelligence Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Data Analyst Associate</h2>
