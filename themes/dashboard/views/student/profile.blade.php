@@ -12,7 +12,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ url('student/dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item active">Profile</li>
+                        <li class="breadcrumb-item active">My Profile</li>
                     </ol>
                 </div>
             </div>
@@ -105,7 +105,7 @@
                 <div class="col-md-3 font-weight-bold">End Date:</div>
                 <div class="col-md-9">{{ $course->end_date }}</div>
             </div>
-   
+
             <!-- <div class="row mb-3">
                 <div class="col-md-3 font-weight-bold">Session:</div>
                 <div class="col-md-9">{{ $user->status }}</div>

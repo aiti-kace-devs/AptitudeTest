@@ -60,20 +60,22 @@
                                                     <td>
 
                                                         @if ($std['submitted'] == null)
-                                                            <span class="badge badge-secondary">N/A</span>
-                                                        @else
-                                                            <span
-                                                                class="badge badge-{{ ($std->result->yes_ans <= 20 ? 'danger' : $std->result->yes_ans <= 25) ? 'primary' : 'success' }}">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
-                                                            {{-- <span class="badge badge-warning">{{ $std->result->yes_ans}}</span> --}}
-                                                        @endif
+                                                        <span class="badge badge-secondary">N/A</span>
+                                                    @elseif(isset($std->result) && $std->result)
+                                                        <span class="badge badge-{{ ($std->result->yes_ans <= 20 ? 'danger' : $std->result->yes_ans <= 25) ? 'primary' : 'success' }}">{{ round(($std->result->yes_ans / 30) * 100) }}%</span>
+                                                    @else
+                                                        <span class="badge badge-danger">No Result</span>
+                                                    @endif
 
                                                     </td>
                                                     <td>
                                                         @if ($std['submitted'] == null)
-                                                            <span class="badge badge-secondary">Not Taken</span>
-                                                        @elseif($std->result->yes_ans >= $std['passmark'])
-                                                            <span class="badge badge-success">PASS</span>
-                                                        @else
+                                                        <span class="badge badge-secondary">Not Taken</span>
+                                                    @elseif(isset($std->result) && $std->result && $std->result->yes_ans >= $std['passmark'])
+                                                        <span class="badge badge-success">PASS</span>
+                                                    @elseif(isset($std->result) && $std->result)
+                                                        <span class="badge badge-danger">FAIL</span>
+                                                    @else
                                                             <span class="badge badge-danger">FAIL</span>
                                                         @endif
                                                     </td>

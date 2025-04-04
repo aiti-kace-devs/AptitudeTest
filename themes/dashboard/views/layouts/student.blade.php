@@ -141,7 +141,7 @@
                                         class="nav-link {{ request()->is('student/exam') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-book"></i>
                                         <p>
-                                            Exam
+                                           Apptitude Test
                                         </p>
                                     </a>
                                 </li>
