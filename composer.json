@@ -22,8 +22,9 @@
         "qirolab/laravel-themer": "^2.0",
         "qoraiche/laravel-mail-editor": "^4.1@beta",
         "rbdwllr/reallysimplejwt": "^5.0",
+        "spatie/laravel-query-builder": "^6.3",
         "tightenco/ziggy": "^2.0",
-        "yajra/laravel-datatables-oracle": "^10.2"
+        "yajra/laravel-datatables-oracle": "^10.11"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

@@ -52,6 +52,7 @@ class AddNewStudentsJob implements ShouldQueue
                 'gender' => 'required',
                 'exam' => 'required_if:exam_name,null|exists:oex_exam_masters,id',
                 'registered_course' => 'required|exists:courses,id',
+                'age' => 'required',
                 'userId' => 'required',
                 'password' => 'sometimes',
                 'exam_name' => 'sometimes',
@@ -94,6 +95,7 @@ class AddNewStudentsJob implements ShouldQueue
                 $std->userId = $student['userId'];
                 $std->password = Hash::make($plainPassword);
                 $std->registered_course = $student['registered_course'];
+                $std->age  = $student['age'];
                 $std->gender = $student['gender'];
                 $std->status = 1;
                 $std->form_response_id = $student['form_response_id'];

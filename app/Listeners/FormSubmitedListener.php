@@ -35,6 +35,7 @@ class FormSubmitedListener implements ShouldQueue
         $student['mobile_no'] = $event->submissionData[$mobileNumberField];
         $student['userId'] = Str::uuid()->toString();
         $student['registered_course'] = $event->submissionData['course_id'];
+        $student['age'] = $event->submissionData['age'];
         $student['gender'] = $event->submissionData['gender'];
         $student['exam_name'] = 'random';
         $student['form_response_id'] = $event->formResponseId;
