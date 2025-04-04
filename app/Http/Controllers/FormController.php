@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\FormResponseExport;
 use App\Models\Branch;
 use App\Models\Course;
 use App\Http\Requests\DynamicFormRequest;
 use App\Models\Centre;
 use App\Models\Form;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class FormController extends Controller
@@ -196,6 +196,45 @@ class FormController extends Controller
         $form->fill($validated)->save();
 
         return redirect()->route('admin.form.index');
+    }
+
+    public function export($uuid)
+    {
+        $admissionForm = Form::where('uuid', $uuid)->with('responses')->first();
+        $schema = collect($admissionForm->schema);
+
+        $headers = $schema
+            ->pluck('title')
+            ->toArray();
+
+        $replacements = [
+            'course' => 'course_id'
+        ];
+
+        $fieldNames = $schema
+            ->pluck('field_name')
+            ->map(function ($field) use ($replacements) {
+                return $replacements[$field] ?? $field;
+            })
+            ->toArray();
+
+        $responses = $admissionForm->responses->map(function ($response) use ($fieldNames) {
+            return collect($fieldNames)
+                ->mapWithKeys(function ($field) use ($response) {
+                    $value = $response->response_data[$field]
+                        ?? $response->{$field}
+                        ?? null;
+
+                    if ($field === 'course_id' && $value) {
+                        $value = Course::find($value)->course_name ?? $value;
+                    }
+
+                    return [$field => $value];
+                })
+                ->toArray();
+        });
+
+        return Excel::download(new FormResponseExport($headers, $responses), $admissionForm->title . '_data.csv', \Maatwebsite\Excel\Excel::CSV);
     }
 
     /**

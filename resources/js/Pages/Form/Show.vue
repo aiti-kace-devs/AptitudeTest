@@ -5,6 +5,7 @@ import LinkButton from "@/Components/LinkButton.vue";
 import MenuDropdown from "@/Components/MenuDropdown.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import Modal from "@/Components/Modal.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 export default {
   components: {
@@ -14,6 +15,7 @@ export default {
     MenuDropdown,
     DangerButton,
     Modal,
+    PrimaryButton
   },
   props: {
     form: Object,
@@ -122,11 +124,14 @@ export default {
         ])
         .catch((error) => console.log(error));
     },
+    exportData(){
+      window.open(route("admin.form.export", { form: this.form.uuid }));
+    }
   },
 };
 </script>
 <template>
-  <Head title="Forms | Responses" />
+  <Head title="Forms | Form Responses" />
 
   <AuthenticatedLayout>
     <MenuDropdown ref="menuDropdown" />
@@ -144,6 +149,12 @@ export default {
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
           <div class="p-6">
+          <div class="flex justify-end">
+          <PrimaryButton @click="exportData">
+            <span class="material-symbols-outlined mr-2"> file_export </span>
+            export data
+          </PrimaryButton>
+          </div>
             <div class="flex flex-col mt-4">
               <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 inline-w-full sm:px-6 lg:px-8">
