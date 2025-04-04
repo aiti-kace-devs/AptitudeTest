@@ -86,6 +86,10 @@
             color: white;
         }
 
+        a {
+            color: yellow;
+            font-size: 23px;
+        }
         /* Responsive Design */
         @media (max-width: 900px) {
             .container {
@@ -183,7 +187,7 @@
 
             </div>
             <h1>The One Million Coders Program - Ghana</h1>
-            <p>Empowering Ghanaian youth with coding skills for the future.</p>
+            <p style="font-size: 18px;">Empowering Ghanaian youth with coding skills for the future.</p>
             <p>
             <h2>Are you ready to unlock your digital potential?</h2>
 

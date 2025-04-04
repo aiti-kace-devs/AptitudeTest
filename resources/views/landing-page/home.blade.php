@@ -189,14 +189,14 @@
                 </div>
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
+                        <img src="{{ url('assets/home/images/ai.jpeg') }}" alt="Data Protection Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Data Analyst Associate</h2>
                         <p class="course-description">
                             This course focuses on safeguarding sensitive and personal data in today's digital world. It covers key topics such as data privacy laws (including GDPR), encryption techniques, risk management, and best practices for mitigating data breaches.
                         </p>
-                        <a href="{{ route('dynamic-course', 'data-protection-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('dynamic-course', 'ai-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
 
@@ -213,7 +213,7 @@
                     </div>
                 </div>
 
-                <div class="course-card">
+                <!-- <div class="course-card">
                     <div class="course-image">
                         <img src="{{ url('assets/home/images/ai.jpeg') }} " alt="Artificial Intelligence Course Image" />
                     </div>
@@ -224,10 +224,10 @@
                         </p>
                         <a href="{{ route('dynamic-course', 'ai-course') }}" class="course-button">Read More</a>
                     </div>
-                </div>
+                </div> -->
                  <div class="course-card">
                     <div class="course-image">
-                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Supervisor</h2>
@@ -240,7 +240,7 @@
 
                  <div class="course-card">
                     <div class="course-image">
-                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Practioner</h2>
@@ -250,7 +250,6 @@
                         <a href="{{ route('dynamic-course', 'data-protection-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
-                <div class="course-card">
                 <div class="course-card">
                     <div class="course-image">
                         <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
@@ -301,7 +300,7 @@
                
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Supervisor</h2>
@@ -337,7 +336,7 @@
                 </div>
                  <div class="course-card">
                     <div class="course-image">
-                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
+                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
                         <h2 class="course-title">Certified Data Protection Practioner</h2>
