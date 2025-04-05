@@ -32,7 +32,7 @@
                 message,
                 subject,
                 template,
-                modalId: 'bulk-sms-modal',
+                modalId: 'bulk-email-modal',
             },
             bubbles: true, // Allow the event to bubble up the DOM
             cancelable: true,

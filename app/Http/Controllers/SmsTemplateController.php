@@ -17,6 +17,9 @@ class SmsTemplateController extends Controller
         return view('admin.manage_sms_template', compact('templates'));
     }
 
+    
+    
+
     /**
      * Show the form for creating a new resource.
      */
@@ -142,4 +145,10 @@ class SmsTemplateController extends Controller
 
         return redirect()->route('admin.sms.template.index');
     }
+
+
+
+
+
+
 }
