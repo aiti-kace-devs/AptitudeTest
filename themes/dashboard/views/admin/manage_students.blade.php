@@ -258,7 +258,15 @@
                                                 data-target="#bulk-email-modal">Send Emails
                                                 <i class="fas fa-envelope"></i>
                                             </button>
-                                            <button class="btn btn-success mr-2" id="clear-filters">Send SMS</button>
+
+                                            <button class="btn btn-success mr-2" data-toggle="modal"
+                                                data-target="#bulk-sms-modal">Send SMS
+                                                <i class="fas fa-sms"></i>
+                                            </button>
+
+
+
+                                            </button>
                                             <button class="btn btn-primary mr-2" id="admit-selected">Admit Students</button>
                                         </div>
                                     </div>
@@ -361,6 +369,8 @@
 
     <!-- Modal -->
     @include('admin.send-bulk-email')
+    @include('admin.send_bulk_sms')
+
 
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog">
@@ -728,6 +738,12 @@
                     });
 
                 });
+
             </script>
+
+
+
+
+
         @endpush
     @endsection
