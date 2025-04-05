@@ -1,5 +1,6 @@
 <?php
 
+use HansSchouten\LaravelPageBuilder\LaravelPageBuilder;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentOperation;
@@ -18,6 +19,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
 use App\Http\Controllers\SmsTemplateController;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -282,3 +284,4 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
+require __DIR__ . '/builder.php';
