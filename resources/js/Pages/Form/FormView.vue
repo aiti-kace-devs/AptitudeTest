@@ -12,7 +12,6 @@ import RadioInput from "@/Components/RadioInput.vue";
 import CourseSelect from "@/Components/CourseSelect.vue";
 import FileInput from "@/Components/FileInput.vue";
 import { PhoneInput } from "@lbgm/phone-number-input";
-
 export default {
   components: {
     Head,
@@ -69,6 +68,16 @@ export default {
 
     const admissionInstructionUrl = route("application");
 
+    // scrool to form in 4 seconds
+    setTimeout(() => {
+      const formElement = document.querySelector("#form-container");
+      // if small screen
+      const isSmallScreen = window.innerWidth < 1024;
+      if (formElement && isSmallScreen) {
+        this.smoothScrollToElement(formElement, 2000);
+      }
+    }, 1500);
+
     return {
       form,
       showFormMessage,
@@ -114,10 +123,36 @@ export default {
         this.phoneError = true;
       }
     },
+ smoothScrollToElement(element, duration) {
+    if (!element) return; // Exit if element is not found
+
+    const startTime = performance.now();
+    const startPosition = window.pageYOffset;
+    const targetPosition = element.getBoundingClientRect().top + window.pageYOffset;
+    const distance = targetPosition - startPosition;
+
+    function scrollStep(timestamp) {
+        const timeElapsed = timestamp - startTime;
+        const progress = Math.min(timeElapsed / duration, 1); // Ensure progress doesn't exceed 1
+
+        window.scrollTo(0, startPosition + distance * progress);
+
+        if (timeElapsed < duration) {
+        requestAnimationFrame(scrollStep);
+        }
+  }
+
+  requestAnimationFrame(scrollStep);
+}
   },
 };
 </script>
 <style>
+
+input:not(input[type="radio"]), select {
+    background-color: #e8ffec !important;
+}
+
 div[data-children="inputcore"] {
   background-color: transparent;
   padding-top: 0;
@@ -154,28 +189,46 @@ div[data-widget-item="baseinput"].border-red-600 div[data-children="inputcore"] 
   border-color: rgb(220 38 38 / var(--tw-border-opacity, 1));
 }
 
+div[data-children="inputcore"].baseinput-core{
+    /* padding-inline: 0px !important; */
+    background-color: #e8ffec !important;
+
+}
+
 input#phone {
     border: 0 !important;
+    background-color: #e8ffec !important;
+
+}
+
+.form-image {
+    height: 55rem;
+}
+
+@media (max-width: 1024px) {
+    .form-image {
+        height: 30rem;
+    }
 }
 </style>
 <template>
   <Head title="Registration" />
-  <div class="py-12 bg-gray-200" v-if="showForm && formIsActive">
+  <div class="lg:py-12  bg-gray-200" v-if="showForm && formIsActive">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
       <div>
         <div class="flex flex-col lg:flex-row">
           <!-- Image Section -->
-          <div v-if="admissionForm.image" class="lg:order-2 w-full lg:w-1/2 relative">
+          <div v-if="admissionForm.image" class="lg:order-2 w-full sticky top-0 lg:relative bg-white form-image">
             <img
               :src="admissionForm.image"
               alt=""
-              class="w-full h-56 md:h-64 lg:h-full object-cover"
+              class="object-contain w-full h-full"
               loading="lazy"
             />
           </div>
 
           <!-- Form Section -->
-          <div class="lg:order-1 bg-white rounded-sm p-6 w-full lg:w-1/2">
+          <div class="lg:order-1 bg-white rounded-sm p-6 w-full lg:w-1/2 z-10">
             <div>
               <p class="text-2xl font-bold capitalize">{{ admissionForm.title }}</p>
               <p v-if="admissionForm.description" class="text-sm text-gray-600">
@@ -183,8 +236,8 @@ input#phone {
               </p>
             </div>
 
-            <div class="mt-4">
-              <form @submit.prevent="submit">
+            <div id="form-container">
+              <form @submit.prevent="submit" class="mt-4">
                 <div class="space-y-5">
                   <div v-for="(question, index) in admissionForm.schema" :key="index">
                     <div>
@@ -352,7 +405,7 @@ input#phone {
                       v-if="!admin"
                       type="submit"
                       :disabled="form.processing || phoneError"
-                      :class="{ 'opacity-25': form.processing }"
+                      :class="{ 'opacity-25': form.processing, 'bg-green-800': true }"
                     >
                       Submit
                     </PrimaryButton>
