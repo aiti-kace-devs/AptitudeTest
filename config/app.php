@@ -176,6 +176,8 @@ return [
         App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
+        HansSchouten\LaravelPageBuilder\ServiceProvider::class,
+
 
     ],
 
