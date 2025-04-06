@@ -123,17 +123,17 @@
                         data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-                        @if (Auth::user()->isSuper())
-                            <li class="nav-item">
-                                <a href="{{ url('admin/dashboard') }}"
-                                    class="nav-link @if (request()->is('admin/dashboard')) active @endif">
-                                    <i class="nav-icon fas fa-tachometer-alt"></i>
-                                    <p>
-                                        Dashboard
-                                    </p>
-                                </a>
-                            </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/dashboard') }}"
+                                class="nav-link @if (request()->is('admin/dashboard')) active @endif">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    Dashboard
+                                </p>
+                            </a>
+                        </li>
 
+                        @can('category.read')
                             <li class="nav-item">
                                 <a href="{{ url('admin/exam_category') }}"
                                     class="nav-link @if (request()->is('admin/exam_category')) active @endif">
@@ -141,7 +141,9 @@
                                     <p>Category</p>
                                 </a>
                             </li>
+                        @endcan
 
+                        @can('branch.read')
                             <li class="nav-item">
                                 <a href="{{ route('admin.branch.index') }}"
                                     class="nav-link @if (isset($activePage) && $activePage == 'manageBranch') active @endif">
@@ -149,7 +151,9 @@
                                     <p>Manage Branch</p>
                                 </a>
                             </li>
+                        @endcan
 
+                        @can('centre.read')
                             <li class="nav-item">
                                 <a href="{{ route('admin.centre.index') }}"
                                     class="nav-link @if (isset($activePage) && $activePage == 'manageCentre') active @endif">
@@ -157,7 +161,9 @@
                                     <p>Manage Centre</p>
                                 </a>
                             </li>
+                        @endcan
 
+                        @can('course.read')
                             <li class="nav-item">
                                 <a href="{{ route('admin.programme.index') }}"
                                     class="nav-link @if (isset($activePage) && $activePage == 'manageProgramme') active @endif">
@@ -165,7 +171,9 @@
                                     <p>Manage Programme</p>
                                 </a>
                             </li>
+                        @endcan
 
+                        @can('course.read')
                             <li class="nav-item">
                                 <a href="{{ route('admin.course.index') }}"
                                     class="nav-link @if (isset($activePage) && $activePage == 'manageCourse') active @endif">
@@ -173,8 +181,8 @@
                                     <p>Manage Course</p>
                                 </a>
                             </li>
-
-                            {{-- <li class="nav-item">
+                        @endcan
+                        {{-- <li class="nav-item">
                             <a href="{{ route('admin.period.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'managePeriod') active @endif">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Manage Period</p>
@@ -187,7 +195,7 @@
                                 <p>Manage Class Schedule</p>
                             </a>
                         </li> --}}
-
+                        @can('exam.read')
                             <li class="nav-item">
                                 <a href="{{ url('admin/manage_exam') }}"
                                     class="nav-link @if (request()->is('admin/manage_exam')) active @endif">
@@ -195,8 +203,9 @@
                                     <p>Manage Exam</p>
                                 </a>
                             </li>
+                        @endcan
 
-
+                        @can('admin.read')
                             <li class="nav-item">
                                 <a href="{{ url('admin/manage_admins') }}"
                                     class="nav-link @if (request()->is('admin/manage_admins')) active @endif">
@@ -204,17 +213,18 @@
                                     <p>Manage Admin</p>
                                 </a>
                             </li>
+                        @endcan
 
-                            <li class="nav-item">
-                                <a href="{{ url('admin/manage_students') }}"
-                                    class="nav-link @if (request()->is('admin/manage_students')) active @endif">
+                        <li class="nav-item">
+                            <a href="{{ url('admin/manage_students') }}"
+                                class="nav-link @if (request()->is('admin/manage_students')) active @endif">
 
-                                    <i class="fas fa-user nav-icon"></i>
-                                    <p>Students</p>
-                                </a>
-                            </li>
+                                <i class="fas fa-user nav-icon"></i>
+                                <p>Students</p>
+                            </a>
+                        </li>
 
-
+                        @can('student.admit')
                             <li class="nav-item">
                                 <a href="{{ url('admin/registered_students') }}"
                                     class="nav-link @if (request()->is('admin/registered_students')) active @endif">
@@ -222,7 +232,9 @@
                                     <p>Registered students</p>
                                 </a>
                             </li>
+                        @endcan
 
+                        @can('sms-template.read')
                             <li class="nav-item">
                                 <a href="{{ url('admin/manage-sms-template') }}"
                                     class="nav-link @if (request()->is('admin/manage-sms-template')) active @endif">
@@ -230,54 +242,85 @@
                                     <p>SMS Templates</p>
                                 </a>
                             </li>
-                        @endif
+                        @endcan
                         {{-- <li class="nav-item">
                             <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">
                         <i class="fas fa-qrcode nav-icon"></i>
                         <p>Generate QR Code</p>
                         </a>
                         </li> --}}
+                        @can('attendance.read')
+                            <li class="nav-item">
+                                <a href="{{ url('admin/scan_qrcode') }}"
+                                    class="nav-link @if (request()->is('admin/scan_qrcode')) active @endif">
+                                    <i class="fas fa-camera nav-icon"></i>
+                                    <p>Scan/Generate QR Code</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/scan_qrcode') }}"
-                                class="nav-link @if (request()->is('admin/scan_qrcode')) active @endif">
-                                <i class="fas fa-camera nav-icon"></i>
-                                <p>Scan/Generate QR Code</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ url('admin/verification') }}"
+                                    class="nav-link @if (request()->is('admin/verification')) active @endif">
+                                    <i class="fas fa-id-card nav-icon"></i>
+                                    <p>Student Verification</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/verification') }}"
-                                class="nav-link @if (request()->is('admin/verification')) active @endif">
-                                <i class="fas fa-id-card nav-icon"></i>
-                                <p>Student Verification</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ url('admin/view_attendance') }}"
+                                    class="nav-link @if (request()->is('admin/view_attendance')) active @endif">
+                                    <i class="fas fa-clipboard-list nav-icon"></i>
+                                    <p>View Attendance</p>
+                                </a>
+                            </li>
+                        @endcan
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/view_attendance') }}"
-                                class="nav-link @if (request()->is('admin/view_attendance')) active @endif">
-                                <i class="fas fa-clipboard-list nav-icon"></i>
-                                <p>View Attendance</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="{{ url('admin/reports') }}"
-                                class="nav-link @if (request()->is('admin/reports')) active @endif">
-                                <i class="fas fa-file-alt nav-icon"></i>
-                                <p>Generate Report</p>
-                            </a>
-                        </li>
+                        @can('report.view')
+                            <li class="nav-item">
+                                <a href="{{ url('admin/reports') }}"
+                                    class="nav-link @if (request()->is('admin/reports')) active @endif">
+                                    <i class="fas fa-file-alt nav-icon"></i>
+                                    <p>Generate Report</p>
+                                </a>
+                            </li>
+                        @endcan
 
 
+                        @canany(['session.read', 'form.read', 'form-response.read'])
+                            <li class="nav-item">
+                                <a href="{{ route('admin.form.index') }}" class="nav-link">
+                                    <i class="fas fa-external-link-square-alt nav-icon"></i>
+                                    <p>Go To RVMP Portal</p>
+                                </a>
+                            </li>
+                        @endcanany
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.form.index') }}" class="nav-link">
-                                <i class="fas fa-external-link-square-alt nav-icon"></i>
-                                <p>Go To RVMP Portal</p>
-                            </a>
-                        </li>
+                        @can('manage.page-editor')
+                            <li class="nav-item">
+                                <a href="{{ url('/admin/builder/manage') }}" class="nav-link">
+                                    <i class="fas fa-external-link-square-alt nav-icon"></i>
+                                    <p>Manage Pages</p>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('manage.config')
+                            <li class="nav-item">
+                                <a href="{{ route(config('env-editor.route.name')) }}" class="nav-link">
+                                    <i class="fas fa-external-link-square-alt nav-icon"></i>
+                                    <p>Logs</p>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('manage.monitor')
+                            <li class="nav-item">
+                                <a href="{{ url(config('horizon.path', 'horizon')) }}" class="nav-link">
+                                    <i class="fas fa-external-link-square-alt nav-icon"></i>
+                                    <p>Monitor</p>
+                                </a>
+                            </li>
+                        @endcan
 
 
                         <li class="nav-item">

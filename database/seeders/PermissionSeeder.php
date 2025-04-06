@@ -30,8 +30,9 @@ class PermissionSeeder extends Seeder
             'admin',
             'attendance',
             'form',
-            'form-responses',
+            'form-response',
             'sms-template',
+            'report'
         ];
         $actions = [
             'create',
@@ -59,6 +60,7 @@ class PermissionSeeder extends Seeder
             'notification-officer',
             'administrator',
             'app-administrator',
+            'attendance-officer',
             'page-builder',
             'super-admin'
         ];
@@ -134,8 +136,9 @@ class PermissionSeeder extends Seeder
             'admin',
             'attendance',
             'form',
-            'form-responses',
+            'form-response',
             'sms-template',
+            'report'
         ], array_merge($actions, $specialStudentActions));
         $administratorRole->syncPermissions($administratorPermissions);
 
@@ -163,6 +166,13 @@ class PermissionSeeder extends Seeder
         // give permissions
         $superAdministratorPermissions = Permission::all();
         $superAdminRole->syncPermissions($superAdministratorPermissions);
+
+
+        //ATTENDANCE OFFICER ROLE
+        $attendanceOfficerRole = Role::findByName('attendance-officer', 'admin');
+        // give permissions
+        $attendanceOfficerPermissions = $this->findResourcePermissions(['attendance'], $actions);
+        $attendanceOfficerRole->syncPermissions($attendanceOfficerPermissions);
     }
 
 

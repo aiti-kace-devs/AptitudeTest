@@ -52,20 +52,20 @@ Route::post('form-responses/', [FormResponseController::class, 'store'])->name('
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
 
     // forms route
-    Route::prefix('/forms')->name('form.')->group(function () {
+    Route::prefix('/forms')->middleware('permission:form.read')->name('form.')->group(function () {
         Route::get('/', [FormController::class, 'index'])->name('index');
         Route::get('/fetch', [FormController::class, 'fetch'])->name('fetch');
-        Route::get('/create', [FormController::class, 'create'])->name('create');
-        Route::post('/', [FormController::class, 'store'])->name('store');
-        Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit');
-        Route::put('/{form}/update', [FormController::class, 'update'])->name('update');
+        Route::get('/create', [FormController::class, 'create'])->name('create')->middleware('permission:form.create');
+        Route::post('/', [FormController::class, 'store'])->name('store')->middleware('permission:form.create');
+        Route::get('/{form}/edit', [FormController::class, 'edit'])->name('edit')->middleware('permission:form.update');
+        Route::put('/{form}/update', [FormController::class, 'update'])->name('update')->middleware('permission:form.update');
         Route::get('/{form}/preview', [FormController::class, 'preview'])->name('preview');
         Route::get('/{form}/responses', [FormController::class, 'show'])->name('show');
-        Route::get('/{form}/export', [FormController::class, 'export'])->name('export');
-        Route::post('/{form}/destroy', [FormController::class, 'destroy'])->name('destroy');
+        Route::get('/{form}/export', [FormController::class, 'export'])->name('export')->middleware('permission:form.create');
+        Route::post('/{form}/destroy', [FormController::class, 'destroy'])->name('destroy')->middleware('permission:form.delete');
     });
 
-    Route::prefix('form-responses')->name('form_responses.')->group(function () {
+    Route::prefix('form-responses')->middleware('permission:form-response.read')->name('form_responses.')->group(function () {
         // form responses route
         Route::get('/', [FormController::class, 'index'])->name('index');
         Route::get('/fetch', [FormResponseController::class, 'fetch'])->name('fetch');
@@ -156,12 +156,12 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::post('/admit', [AdminController::class, 'admit_student'])->name('admit_user_ui')->middleware('admin.super');
 
         // manage branch routes
-        Route::prefix('manage-branch')->group(function () {
+        Route::prefix('manage-branch')->middleware('permission:branch.read')->group(function () {
             Route::get('/', [BranchController::class, 'index'])->name('branch.index');
-            Route::post('/', [BranchController::class, 'store'])->name('branch.store');
-            Route::get('/{id}/edit', [BranchController::class, 'edit'])->name('branch.edit');
-            Route::put('/{branch}/update', [BranchController::class, 'update'])->name('branch.update');
-            Route::get('/{branch}/delete', [BranchController::class, 'destroy'])->name('branch.destroy');
+            Route::post('/', [BranchController::class, 'store'])->name('branch.store')->middleware('permission:branch.create');
+            Route::get('/{id}/edit', [BranchController::class, 'edit'])->name('branch.edit')->middleware('permission:branch.update');
+            Route::put('/{branch}/update', [BranchController::class, 'update'])->name('branch.update')->middleware('permission:branch.update');
+            Route::get('/{branch}/delete', [BranchController::class, 'destroy'])->name('branch.destroy')->middleware('permission:branch.delete');
         });
         // end of manage branch routes
 
