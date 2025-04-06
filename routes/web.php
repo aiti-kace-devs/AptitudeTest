@@ -1,5 +1,6 @@
 <?php
 
+use HansSchouten\LaravelPageBuilder\LaravelPageBuilder;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentOperation;
@@ -18,6 +19,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
 use App\Http\Controllers\SmsTemplateController;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,6 +136,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/reports', [AdminController::class, 'getReportView'])->name('getReportView');
         Route::post('/reports', [AdminController::class, 'generateReport'])->name('generateReport');
         Route::post('/send-bulk-email', [AdminController::class, 'sendBulkEmail'])->name('send_bulk_email');
+        Route::get('/fetch_sms_template', [AdminController::class, 'fetch_sms_template'])->name('fetch.sms.template');
+        Route::post('/send_bulk_sms', [AdminController::class, 'sendBulkSMS'])->name('send_bulk_sms');
 
 
         Route::get('/manage_admins', [RegisteredUserController::class, 'index'])->name('manage_admins')->middleware('admin.super');
@@ -282,3 +286,4 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
+require __DIR__ . '/builder.php';

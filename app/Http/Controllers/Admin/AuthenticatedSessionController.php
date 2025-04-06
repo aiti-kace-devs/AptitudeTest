@@ -19,6 +19,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function create()
     {
+        if (request()->query('action') == 'logout') {
+            return redirect()->action('App\Http\Controllers\Admin\AuthenticatedSessionController@destroy');
+        }
         return view('auth.login');
     }
 
@@ -36,7 +39,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect(RouteServiceProvider::ADMIN_HOME);
+        return redirect()->intended(RouteServiceProvider::ADMIN_HOME);
     }
 
     /**
