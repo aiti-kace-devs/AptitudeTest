@@ -177,6 +177,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
         GeoSot\EnvEditor\ServiceProvider::class,
+        HansSchouten\LaravelPageBuilder\ServiceProvider::class,
+
 
     ],
 

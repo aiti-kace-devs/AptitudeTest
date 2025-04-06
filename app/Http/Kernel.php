@@ -33,12 +33,13 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            // \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\PageBuilderMiddleware::class
         ],
 
         'api' => [
@@ -68,6 +69,6 @@ class Kernel extends HttpKernel
         'theme' => \Qirolab\Theme\Middleware\ThemeMiddleware::class,
         'apikey.check' => \App\Http\Middleware\CheckAPIKey::class,
         'admin.super' => \App\Http\Middleware\SuperAdmin::class,
-
+        'page.builder' => \App\Http\Middleware\PageBuilderMiddleware::class,
     ];
 }

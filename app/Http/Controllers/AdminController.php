@@ -13,6 +13,7 @@ use App\Models\Attendance;
 use App\Models\CourseSession;
 use Illuminate\Http\Request;
 use App\Models\Oex_category;
+use App\Models\SmsTemplate;
 use App\Models\Oex_exam_master;
 use App\Models\Oex_student;
 use App\Models\Oex_portal;
@@ -43,6 +44,7 @@ use App\Models\Programme;
 use App\Helpers\Common as CommonHelper;
 use App\Helpers\MailerHelper;
 use App\Jobs\SendBulkEmailJob;
+use App\Jobs\SendBulkSMSJob;
 use Carbon\Carbon;
 
 class AdminController extends Controller
@@ -980,4 +982,73 @@ class AdminController extends Controller
                 'key' => 'success',
             ]);
     }
+
+
+
+    public function fetch_sms_template()
+    {    
+        // Fetch the templates
+        $templates = SmsTemplate::select('id', 'name', 'content')->get();
+    
+        return response()->json($templates);
+    }
+    
+    
+
+
+
+
+    public function sendBulkSMS(Request $request)
+    {
+        $validated = $request->validate([
+            'message' => 'required|string',
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:users,id',
+        ], [], [
+            'student_ids.*' => 'student'
+        ]);
+
+        // Fetch mobile numbers of selected students
+        $mobileNumbers = User::whereIn('id', $validated['student_ids'])
+            ->pluck('mobile_no')
+            ->filter() // Remove any null values
+            ->toArray();
+
+        if (empty($mobileNumbers)) {
+            return redirect()->back()->with([
+                'flash' => 'No valid mobile numbers found.',
+                'key' => 'error',
+            ]);
+        }
+
+
+        // Dispatch job for bulk SMS sending
+        $message = (string) $validated['message'];
+        $recipients = array_filter((array) $mobileNumbers);
+
+        SendBulkSMSJob::dispatch($message, $recipients);
+
+
+        return redirect()
+            ->back()
+            ->with([
+                'flash' => 'SMS sending initiated successfully!',
+                'key' => 'success',
+            ]);
+    }
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+

@@ -19,6 +19,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function create()
     {
+        if (request()->query('action') == 'logout') {
+            return redirect()->action('App\Http\Controllers\Admin\AuthenticatedSessionController@destroy');
+        }
         return view('auth.login');
     }
 

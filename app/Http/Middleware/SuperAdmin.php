@@ -18,6 +18,9 @@ class SuperAdmin
      */
     public function handle(Request $request, Closure $next)
     {
+        if (Auth::guard('admin')->user() == null) {
+            return redirect(route('admin.login'));
+        }
         if (Auth::guard('admin')->user()?->isSuper() || Auth::user()?->isSuper()) {
             return $next($request);
         }
