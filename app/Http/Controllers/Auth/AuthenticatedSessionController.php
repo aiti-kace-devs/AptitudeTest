@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->put('id', Auth::id());
 
-        $url = redirect()->intended(route(RouteServiceProvider::HOME))->getTargetUrl();
+        $url = redirect()->intended(RouteServiceProvider::HOME)->getTargetUrl();
 
         return Inertia::location($url);
     }
