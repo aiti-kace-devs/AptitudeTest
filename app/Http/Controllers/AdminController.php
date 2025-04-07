@@ -353,8 +353,17 @@ class AdminController extends Controller
                 $baseQuery->whereIn('users.registered_course', (array) $request->course);
             }
 
-            if ($request->has('search_term')) {
-                $searchTerm = $request->search_term;
+            // if($request->has('highest_education')){
+            //     $selectedEducations = (array) $request->highest_education;
+            //     $baseQuery->whereHas('formResponse', function($q) use ($selectedEducations) {
+            //         $q->where(function ($subQuery) use ($selectedEducations) {
+            //             foreach ($selectedEducations as $eduaction)
+            //         })
+            //     })
+            // }
+
+            if ($request->has('filter.search_term')) {
+                $searchTerm = $request->input('filter.search_term');
                 $baseQuery->where(function ($query) use ($searchTerm) {
                     $query->where('users.name', 'like', "%$searchTerm%")->orWhere('users.email', 'like', "%$searchTerm%");
                 });
@@ -986,14 +995,14 @@ class AdminController extends Controller
 
 
     public function fetch_sms_template()
-    {    
+    {
         // Fetch the templates
         $templates = SmsTemplate::select('id', 'name', 'content')->get();
-    
+
         return response()->json($templates);
     }
-    
-    
+
+
 
 
 
