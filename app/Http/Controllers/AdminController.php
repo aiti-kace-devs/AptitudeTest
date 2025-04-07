@@ -986,14 +986,14 @@ class AdminController extends Controller
 
 
     public function fetch_sms_template()
-    {    
+    {
         // Fetch the templates
         $templates = SmsTemplate::select('id', 'name', 'content')->get();
-    
+
         return response()->json($templates);
     }
-    
-    
+
+
 
 
 
@@ -1038,17 +1038,28 @@ class AdminController extends Controller
     }
 
 
+    public function shortlisted_students(Request $request)
+    {
+        $allCourses = Course::all();
+        $students = [];
 
+        $selectedCourse = $request->input('course_id');
 
+        if (isset($selectedCourse)) {
+            $students = User::select('users.*', 'user_admission.created_at as admission_created')
+                ->leftJoin('user_admission', 'users.userId', 'user_admission.user_id')
+                ->where('users.registered_course', $selectedCourse)
+                ->get();
+            $selectedCourse = Course::find($selectedCourse);
+        }
+        // dd($students);
 
+        return view('admin.shortlisted', [
+            'courses' => $allCourses,
+            'students' => $students,
+            'selectedCourse' => $selectedCourse,
+        ]);
+    }
 
+    public function shortlist_student() {}
 }
-
-
-
-
-
-
-
-
-

@@ -267,7 +267,9 @@
 
 
                                             </button>
-                                            <button class="btn btn-primary mr-2" id="admit-selected">Admit Students</button>
+                                            <button class="btn btn-primary mr-2" id="admit-selected">Shortlist Students
+                                                <i class="fas fa-paste"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </span>
@@ -738,12 +740,6 @@
                     });
 
                 });
-
             </script>
-
-
-
-
-
         @endpush
     @endsection

@@ -142,37 +142,53 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item">
-                                <a href="{{ route('admin.branch.index') }}"
-                                    class="nav-link @if (isset($activePage) && $activePage == 'manageBranch') active @endif">
-                                    <i class="fas fa-sitemap nav-icon"></i>
-                                    <p>Manage Branch</p>
-                                </a>
-                            </li>
 
                             <li class="nav-item">
-                                <a href="{{ route('admin.centre.index') }}"
-                                    class="nav-link @if (isset($activePage) && $activePage == 'manageCentre') active @endif">
-                                    <i class="fas fa-university nav-icon"></i>
-                                    <p>Manage Centre</p>
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>
+                                        Course Management
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
                                 </a>
+                                <ul class="nav nav-treeview" style="display: none;">
+
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.branch.index') }}"
+                                            class="nav-link @if (isset($activePage) && $activePage == 'manageBranch') active @endif">
+                                            <i class="fas fa-sitemap nav-icon"></i>
+                                            <p>Manage Branch</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.centre.index') }}"
+                                            class="nav-link @if (isset($activePage) && $activePage == 'manageCentre') active @endif">
+                                            <i class="fas fa-university nav-icon"></i>
+                                            <p>Manage Centre</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.programme.index') }}"
+                                            class="nav-link @if (isset($activePage) && $activePage == 'manageProgramme') active @endif">
+                                            <i class="fas fa-book-open nav-icon"></i>
+                                            <p>Manage Programme</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.course.index') }}"
+                                            class="nav-link @if (isset($activePage) && $activePage == 'manageCourse') active @endif">
+                                            <i class="fas fa-book nav-icon"></i>
+                                            <p>Manage Course</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
 
-                            <li class="nav-item">
-                                <a href="{{ route('admin.programme.index') }}"
-                                    class="nav-link @if (isset($activePage) && $activePage == 'manageProgramme') active @endif">
-                                    <i class="fas fa-book-open nav-icon"></i>
-                                    <p>Manage Programme</p>
-                                </a>
-                            </li>
 
-                            <li class="nav-item">
-                                <a href="{{ route('admin.course.index') }}"
-                                    class="nav-link @if (isset($activePage) && $activePage == 'manageCourse') active @endif">
-                                    <i class="fas fa-book nav-icon"></i>
-                                    <p>Manage Course</p>
-                                </a>
-                            </li>
+
 
                             {{-- <li class="nav-item">
                             <a href="{{ route('admin.period.index')}}" class="nav-link @if (isset($activePage) && $activePage == 'managePeriod') active @endif">
@@ -189,104 +205,109 @@
                         </li> --}}
 
                             <li class="nav-item">
-                                <a href="{{ url('admin/manage_exam') }}"
-                                    class="nav-link @if (request()->is('admin/manage_exam')) active @endif">
-                                    <i class="fas fa-file nav-icon"></i>
-                                    <p>Manage Exam</p>
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-file"></i>
+                                    <p>
+                                        Administration
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview" style="display: none;">
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/manage_admins') }}"
+                                            class="nav-link @if (request()->is('admin/manage_admins')) active @endif">
+                                            <i class="fas fa-user-shield nav-icon"></i>
+                                            <p>Manage Admin</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/manage_students') }}"
+                                            class="nav-link @if (request()->is('admin/manage_students')) active @endif">
+
+                                            <i class="fas fa-user nav-icon"></i>
+                                            <p>Students</p>
+                                        </a>
+                                    </li>
+
+
+                                    <li class="nav-item">
+                                        <a href="{{ url('admin/registered_students') }}"
+                                            class="nav-link @if (request()->is('admin/registered_students')) active @endif">
+                                            <i class="fas fa-user-check nav-icon"></i>
+                                            <p>Registered students</p>
+                                        </a>
+                                    </li>
+                                    <a href="{{ url('admin/scan_qrcode') }}"
+                                        class="nav-link @if (request()->is('admin/scan_qrcode')) active @endif">
+                                        <i class="fas fa-camera nav-icon"></i>
+                                        <p>Scan/Generate QR Code</p>
+                                    </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/verification') }}"
+                                    class="nav-link @if (request()->is('admin/verification')) active @endif">
+                                    <i class="fas fa-id-card nav-icon"></i>
+                                    <p>Student Verification</p>
                                 </a>
                             </li>
 
-
                             <li class="nav-item">
-                                <a href="{{ url('admin/manage_admins') }}"
-                                    class="nav-link @if (request()->is('admin/manage_admins')) active @endif">
-                                    <i class="fas fa-user-shield nav-icon"></i>
-                                    <p>Manage Admin</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/manage_students') }}"
-                                    class="nav-link @if (request()->is('admin/manage_students')) active @endif">
-
-                                    <i class="fas fa-user nav-icon"></i>
-                                    <p>Students</p>
-                                </a>
-                            </li>
-
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/registered_students') }}"
-                                    class="nav-link @if (request()->is('admin/registered_students')) active @endif">
-                                    <i class="fas fa-user-check nav-icon"></i>
-                                    <p>Registered students</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/manage-sms-template') }}"
-                                    class="nav-link @if (request()->is('admin/manage-sms-template')) active @endif">
+                                <a href="{{ url('admin/view_attendance') }}"
+                                    class="nav-link @if (request()->is('admin/view_attendance')) active @endif">
                                     <i class="fas fa-clipboard-list nav-icon"></i>
-                                    <p>SMS Templates</p>
+                                    <p>View Attendance</p>
                                 </a>
                             </li>
-                        @endif
-                        {{-- <li class="nav-item">
+                    </ul>
+                    </li>
+
+
+
+
+                    <li class="nav-item">
+                        <a href="{{ url('admin/manage-sms-template') }}"
+                            class="nav-link @if (request()->is('admin/manage-sms-template')) active @endif">
+                            <i class="fas fa-clipboard-list nav-icon"></i>
+                            <p>SMS Templates</p>
+                        </a>
+                    </li>
+                    @endif
+                    {{-- <li class="nav-item">
                             <a href="{{ url('admin/generate_qrcode') }}" class="nav-link">
                         <i class="fas fa-qrcode nav-icon"></i>
                         <p>Generate QR Code</p>
                         </a>
                         </li> --}}
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/scan_qrcode') }}"
-                                class="nav-link @if (request()->is('admin/scan_qrcode')) active @endif">
-                                <i class="fas fa-camera nav-icon"></i>
-                                <p>Scan/Generate QR Code</p>
-                            </a>
-                        </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/verification') }}"
-                                class="nav-link @if (request()->is('admin/verification')) active @endif">
-                                <i class="fas fa-id-card nav-icon"></i>
-                                <p>Student Verification</p>
-                            </a>
-                        </li>
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/view_attendance') }}"
-                                class="nav-link @if (request()->is('admin/view_attendance')) active @endif">
-                                <i class="fas fa-clipboard-list nav-icon"></i>
-                                <p>View Attendance</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="{{ url('admin/reports') }}"
-                                class="nav-link @if (request()->is('admin/reports')) active @endif">
-                                <i class="fas fa-file-alt nav-icon"></i>
-                                <p>Generate Report</p>
-                            </a>
-                        </li>
+                    <li class="nav-item">
+                        <a href="{{ url('admin/reports') }}"
+                            class="nav-link @if (request()->is('admin/reports')) active @endif">
+                            <i class="fas fa-file-alt nav-icon"></i>
+                            <p>Generate Report</p>
+                        </a>
+                    </li>
 
 
 
-                        <li class="nav-item">
-                            <a href="{{ route('admin.form.index') }}" class="nav-link">
-                                <i class="fas fa-external-link-square-alt nav-icon"></i>
-                                <p>Go To RVMP Portal</p>
-                            </a>
-                        </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.form.index') }}" class="nav-link">
+                            <i class="fas fa-external-link-square-alt nav-icon"></i>
+                            <p>Go To RVMP Portal</p>
+                        </a>
+                    </li>
 
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/logout') }}" class="nav-link">
-                                <i class="fas fa-sign-out-alt nav-icon"></i>
-                                <p>Logout</p>
-                            </a>
-                        </li>
-                        <!--
+                    <li class="nav-item">
+                        <a href="{{ url('admin/logout') }}" class="nav-link">
+                            <i class="fas fa-sign-out-alt nav-icon"></i>
+                            <p>Logout</p>
+                        </a>
+                    </li>
+                    <!--
           <li class="nav-item menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>

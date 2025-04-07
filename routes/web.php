@@ -230,6 +230,9 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         // end of manage sms_template routes
 
         Route::get('app-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['admin.super']);
+
+        Route::get('/shortlisted', [AdminController::class, 'shortlisted_students'])->name('shortlisted.get');
+        Route::post('/shortlisted', [AdminController::class, 'verification_page'])->name('shortlisted.create');
     });
 });
 
