@@ -32,7 +32,7 @@
                 <div class="row">
                     @foreach ($portal_exams as $key => $exam)
                         <?php
-
+                        
                         if (strtotime(date('Y-m-d')) > strtotime($exam['exam_date'])) {
                             $cls = 'bg-danger';
                         } else {
@@ -43,7 +43,7 @@
                                 $cls = 'bg-info';
                             }
                         }
-
+                        
                         ?>
                         {{-- <div class="col-lg-8 col-12 mx-auto">
                             <div class="small-box {{ $cls }} text-center">
@@ -79,8 +79,13 @@
 
                                     <!-- Exam Details -->
                                     <div class="exam-details py-3">
-                                        <p class="exam-detail"><strong>Test Deadline:</strong><x-exam-deadline
-                                                :date="$exam['exam_date']"></x-exam-deadline></p>
+                                        @if ($exam['submitted'] == null)
+                                            <p class="exam-detail"><strong>Test Deadline:</strong><x-exam-deadline
+                                                    :date="$exam['exam_date']"></x-exam-deadline></p>
+                                        @else
+                                            <p class="exam-detail"><strong>Test Submitted
+                                                    On:</strong>{{ $exam['submitted'] }}</p>
+                                        @endif
                                         <p class="exam-detail"><strong>Duration:</strong> {{ $exam['exam_duration'] }} mins
                                         </p>
                                         {{-- <p class="exam-detail"><strong>Pass Mark:</strong> {{ $exam['passmark'] }}</p> --}}

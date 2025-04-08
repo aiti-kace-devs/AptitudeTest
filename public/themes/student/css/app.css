@@ -10059,3 +10059,8 @@ h3 {
 .custom-btn:hover {
     background-color: #fb8c00;
 }
+
+table.table {
+            width: 100% !important;
+}
+

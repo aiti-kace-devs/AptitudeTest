@@ -413,7 +413,7 @@
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="{{ url('assets/dist/js/pages/dashboard.js') }}"></script>
     <script src="{{ url('assets/js/custom.js') }}"></script>
-    <script src="{{ asset('assets') }}/toastr/toastr.min.js"></script>
+    <script src="{{ asset('assets/toastr/toastr.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -434,6 +434,7 @@
                     pageSize: 'A3'
                 }]
             }).buttons().container().appendTo('.dataTables_wrapper .col-md-6:eq(0)');
+
             const title = document.title;
             if (!title.includes("{{ config('app.name') }}")) {
                 document.title = document.title + " - {{ config('app.name') }}"

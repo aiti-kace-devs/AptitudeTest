@@ -2,6 +2,7 @@
 @section('title', 'Exams')
 @section('content')
 
+
     <!-- /.content-header -->
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
@@ -22,14 +23,15 @@
             </div><!-- /.container-fluid -->
 
             <section class="content">
-                <div class="container-fluid">
+                <div class="container">
                     <div class="row">
                         <div class="col-12">
                             <!-- Default box -->
                             <div class="card">
 
                                 <div class="card-body">
-                                    <table class="table table-striped table-bordered table-hover datatable">
+                                    <table class="table table-striped table-bordered table-hover datatable"
+                                        style="width: max-100%">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
