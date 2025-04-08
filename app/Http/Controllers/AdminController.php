@@ -449,7 +449,7 @@ class AdminController extends Controller
     public function delete_students($id)
     {
         $std = user_exam::where('id', $id)->get()->first();
-        $std->delete();
+        $std?->delete();
         return redirect('admin/manage_students');
     }
 
@@ -1045,19 +1045,4 @@ class AdminController extends Controller
                 'key' => 'success',
             ]);
     }
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
