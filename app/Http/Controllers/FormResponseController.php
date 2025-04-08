@@ -8,6 +8,7 @@ use App\Models\FormResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -86,6 +87,7 @@ class FormResponseController extends Controller
         $form = Form::where('uuid', $request->form_uuid)->firstOrFail();
         $schema = $form->schema;
 
+        // $validationRules = $form->getValidationRules();
         $validationRules = [
             'response_data' => 'required|array',
         ];
@@ -207,8 +209,12 @@ class FormResponseController extends Controller
             }
 
             $validationRules[$fieldKey] = implode('|', $rules);
+            $additionRules = Str::length($field['rules']) > 0? '|'.$field['rules'] : '';
+            $validationRules[$fieldKey] =  $validationRules[$fieldKey].$additionRules;
+
         }
 
+        // dd($validationRules);
         $validated = $request->validate($validationRules, $customMessages);
 
         // Handle file uploads
