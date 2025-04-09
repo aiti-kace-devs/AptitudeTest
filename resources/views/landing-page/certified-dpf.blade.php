@@ -78,7 +78,7 @@
         <span class="detail-value">Certified Cybersecurity Professional</span>
       </div> -->
             <div class="detail-item">
-                <span class="detail-label">Core Modules</span>
+                <span class="detail-label">Core Modules:</span>
                 <ul class="detail-value">
                     <li>Introduction to Data Protection & Act 843</li>
                     <li>Data Protection Principles & Lawful Processing</li>
