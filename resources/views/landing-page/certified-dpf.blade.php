@@ -46,7 +46,7 @@
             display: block;
         }
 
-        /* .register-button {
+        /*  .register-button {
       display: inline-block;
       padding: 10px 20px;
       background-color: #007BFF;
@@ -62,14 +62,12 @@
     <div class="container">
         <div class="text-content">
             <div class="detail-item">
-                <h1> <span class="detail-label">Certified Data Protection Officer </span></h1>
+                <h1> <span class="detail-label">Certified Data Protection Officer (CDPO) – Foundational Level</span></h1>
                 <!-- <span class="detail-value">Cybersecurity Specialist</span> -->
             </div>
             <div class="detail-item">
-                <span class="detail-label">Job Responsibilities:</span>
-                <span class="detail-value">Monitor compliance with data protection laws and policies, detect and assess
-                    data protection risks and breaches, respond to data incidents and ensure regulatory
-                    compliance.</span>
+                <span class="detail-label">Objective:</span>
+                <span class="detail-value">Build foundational knowledge of Act 843 and data protection principles.</span>
             </div>
             <!-- <div class="detail-item">
         <span class="detail-label">No. of People to Train:</span>
@@ -80,32 +78,30 @@
         <span class="detail-value">Certified Cybersecurity Professional</span>
       </div> -->
             <div class="detail-item">
-                <span class="detail-label">Training Modules:</span>
+                <span class="detail-label">Core Modules</span>
                 <ul class="detail-value">
-                    <li>Introduction to Data Protection & Act 843
-                    </li>
+                    <li>Introduction to Data Protection & Act 843</li>
                     <li>Data Protection Principles & Lawful Processing</li>
                     <li>Rights of Data Subjects & Compliance Obligations</li>
-                    <li>Role of a Data Protection Officer (DPO</li>
-                    <li>Incident Response & Breach Management</li>
-
+                    <li>Role of a Data Protection Officer (DPO)</li>
                 </ul>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Training Duration:</span>
-                <span class="detail-value">40 hrs</span>
+                <span class="detail-label">Training Description:</span>
+                <span class="detail-value">5-day intensive course delivered by DPC-approved institutions.</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Training Providers:</span>
+                <span class="detail-value">Only training institutions approved by the Data Protection Commission (DPC) can offer CDPO courses.</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Training Prerequisite:</span>
-                <span class="detail-value">A minimum of a diploma or bachelor's degree in law, IT, data management,
-                    cybersecurity, business administration, or related fields.</span>
+                <span class="detail-label">Assessment:</span>
+                <span class="detail-value">An examination administered by the Commission. </span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Available Certifications:</span>
-                <span class="detail-value">
-                    <li> Certified Information Privacy Professional (CIPP)</li>
-                    <li> Certified Information Privacy Manager (CIPM)</li>
-                </span>
+                <span class="detail-label">Outcome:</span>
+                <span class="detail-value"><b>CDPO  Certification</b></span>
             </div>
             <a href="{{ url('/forms/register') }}" class="register-button">Register</a>
         </div>

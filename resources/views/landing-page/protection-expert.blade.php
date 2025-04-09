@@ -46,7 +46,7 @@
             display: block;
         }
 
-        .
+
         /*register-button {
       display: inline-block;
       padding: 10px 20px;
@@ -63,14 +63,12 @@
     <div class="container">
         <div class="text-content">
             <div class="detail-item">
-                <h1> <span class="detail-label">Certified Data Protection Expert</span></h1>
+                <h1> <span class="detail-label">Certified Data Protection Expert (CDPE) – Expert Level</span></h1>
                 <!-- <span class="detail-value">Cybersecurity Specialist</span> -->
             </div>
             <div class="detail-item">
-                <span class="detail-label">Job Responsibilities:</span>
-                <span class="detail-value">Advanced Data Protection Strategy & Policy Development, International Data
-                    Transfers & Cross-Border Compliance, Privacy Program Management & Regulatory Engagement, Managing
-                    Large-Scale Data Protection Programs, Incident Response & Data Breach Management</span>
+                <span class="detail-label">Objective:</span>
+                <span class="detail-value">Recognize and validate mastery in strategic data protection management, regulatory engagement, and cross-border compliance through demonstrated real-world experience and industry contribution.</span>
             </div>
             <!-- <div class="detail-item">
         <span class="detail-label">No. of People to Train:</span>
@@ -81,35 +79,28 @@
         <span class="detail-value">Certified Cybersecurity Professional</span>
       </div> -->
             <div class="detail-item">
-                <span class="detail-label">Training Modules:</span>
+                <span class="detail-label">Qualification Criteria:</span>
+                <span class="detail-value">Candidates must demonstrate expertise through a combination of the following:</span>
                 <ul class="detail-value">
-                    <li>Advanced Data Protection Strategy & Policy Development</li>
-
-
-                    <li>International Data Transfers & Cross-Border Complianc.</li>
-                    <li>Privacy Program Management & Regulatory Engagement</li>
-                    <li>Managing Large-Scale Data Protection Programs</li>
-
+                    <li><b>Proof of Practice:</b> Documented experience managing complex data protection programs or initiatives.</li>
+                    <li><b>Board Assessment:</b> Evaluation by an expert panel based on submitted work, achievements, and impact.</li>
+                    <li><b>Continuous Professional Development (CPD):</b> Participation in CPD activities with points accrued over time.</li>
+                    <li><b>Publications:</b> Authorship of articles, research papers, or thought leadership pieces in reputable journals or platforms</li>
+                    <li><b>Industry Engagement:</b> Active participation in data protection conferences, forums, and advisory roles.</li>
+                    <li><b>Sector-Specific Training & Contributions:</b> Delivery or participation in specialized trainings within industries such as health, finance, education, telecommunications, etc.</li>
                 </ul>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Training Duration:</span>
-                <span class="detail-value">40 hrs</span>
+                <span class="detail-value">1 week</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Training Prerequisite:</span>
-                <span class="detail-value">
-                    <li> Minimum of a Masters degree in law, IT, data management, cybersecurity, business
-                        administration, or related fields.</li>
-                    <li> Must have Completed the both the CDPO and CDPS course</li>
-                </span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Available Certifications:</span>
-                <span class="detail-value">
-                    <li>Certified Information Security Manager (CISM). </li>
-                    <li>ISO 27701 Lead Implementer/Lead Auditor</li>
-                </span>
+                <span class="detail-label">Outcome:</span>
+                <span class="detail-value">Award of CDPE Certification, enabling professionals to:</span>
+                <ul class="detail-value">
+                    <li>Offer Data Protection as a Service <b>(DPaaS)</b></li>
+                    <li>Practice across Africa under mutual recognition and reciprocal arrangements</li>
+                </ul>
             </div>
             <a href="{{ url('/forms/register') }}" class="register-button">Register</a>
         </div>

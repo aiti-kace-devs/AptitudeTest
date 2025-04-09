@@ -62,14 +62,12 @@
     <div class="container">
         <div class="text-content">
             <div class="detail-item">
-                <h1> <span class="detail-label">Certified Data Protection Practitioner</span></h1>
+                <h1> <span class="detail-label">Certified Data Protection Professional (CDPP) – Practitioner Level</span></h1>
                 <!-- <span class="detail-value">Cybersecurity Specialist</span> -->
             </div>
             <div class="detail-item">
-                <span class="detail-label">Job Responsibilities:</span>
-                <span class="detail-value">Compliance Auditing & Enforcement, Privacy by Design Implementation,
-                    Cross-Border Data Transfers, Stakeholder Engagement & Training, Incident Response & Policy
-                    Development</span>
+                <span class="detail-label">Objective:</span>
+                <span class="detail-value">Equip professionals with advanced practical skills to implement and manage data protection frameworks, conduct audits, and lead compliance initiatives.</span>
             </div>
             <!-- <div class="detail-item">
         <span class="detail-label">No. of People to Train:</span>
@@ -80,35 +78,71 @@
         <span class="detail-value">Certified Cybersecurity Professional</span>
       </div> -->
             <div class="detail-item">
-                <span class="detail-label">Training Modules:</span>
+                <span class="detail-label">Core Modules:</span>
                 <ul class="detail-value">
-                    <li>Advanced Compliance Auditing & Enforcement</li>
+                    <li><b>Advanced Compliance Auditing & Enforcement</b></li>
+                    <ul class="detail-value">
+                        <li>Techniques for conducting internal/external audits.</li>
+                        <li>Remediation strategies for non-compliance.</li>
+                    </ul>
 
-                    <li>Operationalizing Privacy by Design</li>
-                    <li>Cross-Border Data Transfers & Legal Mechanisms GDPR.</li>
-                    <li>Stakeholder Engagement & Training technical teams.</li>
+                    <li><b>Operationalizing Privacy by Design</b></li>
+                    <ul class="detail-value">
+                        <li>Integrating data protection into business processes.</li>
+                        <li>Tools for implementing PbD in IT systems and workflows.</li>
+                    </ul>
 
+                    <li><b>Cross-Border Data Transfers & Legal Mechanisms GDPR.</b></li>
+                    <ul class="detail-value">
+                        <li><b>International Compliance Mechanisms</b></li>
+                        <ul class="detail-value">
+                            <li><b>Standard Contractual Clauses (SCCs):</b></li>
+                            <ul class="detail-value">
+                                <li>Use cases, structure, and implementation requirements</li>
+                                <li>Updates under the EU GDPR and implications for African data exporters.</li>
+                            </ul>
+
+                            <li><b>Binding Corporate Rules (BCRs):</b></li>
+                            <ul class="detail-value">
+                                <li>Overview and approval process.</li>
+                                <li>Applicability for multinational organizations operating across jurisdictions.</li>
+                            </ul>
+
+                            <li><b>Adequacy Decisions:</b></li>
+                            <ul class="detail-value">
+                                <li>Concept and criteria under the GDPR.</li>
+                                <li>Assessment of adequacy and its significance for third countries, including possible future recognition of African states.</li>
+                            </ul>
+
+                            <li><b>Other Mechanisms:</b></li>
+                            <ul class="detail-value">
+                                <li>Codes of Conduct and Certification Schemes.</li>
+                                <li>Derogations for specific situations (e.g., explicit consent, contract performance).</li>
+                            </ul>
+                        </ul>
+                    </ul>
+
+                    <li><b>Stakeholder Engagement & Training</b></li>
+                    <ul class="detail-value">
+                        <li>Developing internal training programs.</li>
+                        <li>Communicating data protection requirements to non-technical teams.</li>
+                    </ul>
                 </ul>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Training Duration:</span>
-                <span class="detail-value">40 hrs</span>
+                <span class="detail-value">5 weeks</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Training Prerequisite:</span>
-                <span class="detail-value">
-                    <li> Minimum of a Masters degree in law, IT, data management, cybersecurity, business
-                        administration, or related fields.</li>
-                    <li> Must have Completed the both the CDPO and CDPS course</li>
-                </span>
+                <span class="detail-label">Assessment:</span>
+                <span class="detail-value">Research project, professional presentation and oral presentation.</span>
             </div>
+
             <div class="detail-item">
-                <span class="detail-label">Available Certifications:</span>
-                <span class="detail-value">
-                    <li>Certified Information Security Manager (CISM). </li>
-                    <li>ISO 27701 Lead Implementer/Lead Auditor</li>
-                </span>
+                <span class="detail-label">Outcome:</span>
+                <span class="detail-value"><b>CDPP Certification</b></span>
             </div>
+            
             <a href="{{ url('/forms/register') }}" class="register-button">Register</a>
         </div>
         <div class="image-content">

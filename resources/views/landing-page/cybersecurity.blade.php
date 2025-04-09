@@ -80,7 +80,7 @@
             </div>
             <div class="detail-item">
                 <span class="detail-label">Training Duration:</span>
-                <span class="detail-value">200 hrs</span>
+                <span class="detail-value">5 weeks</span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Training Prerequisite:</span>
