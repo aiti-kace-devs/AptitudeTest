@@ -181,7 +181,7 @@
         </div>
     </div>
     <div class="goto-home">
-        <a class="homepage-link" target="_parent" href="{{ url('/') }}">Goto Homepage</a>
+        <a class="homepage-link" target="_parent" href="{{ url('/') }}">Go To Homepage</a>
     </div>
 
 </body>
