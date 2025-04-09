@@ -46,7 +46,7 @@
             display: block;
         }
 
-        .register-button {
+        /* .register-button {
             display: inline-block;
             padding: 10px 20px;
             background-color: #007BFF;
@@ -54,7 +54,7 @@
             text-decoration: none;
             border-radius: 5px;
             margin-top: 15px;
-        }
+        } */
     </style>
 </head>
 
@@ -80,7 +80,7 @@
             </div>
             <div class="detail-item">
                 <span class="detail-label">Training Duration:</span>
-                <span class="detail-value">200 hrs</span>
+                <span class="detail-value">5 weeks</span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Training Prerequisite:</span>

@@ -202,12 +202,16 @@ input#phone {
 }
 
 .form-image {
-    height: 55rem;
+    min-height: 55rem;
+    max-height: 60rem;
+    padding: 50px 0 0 50px;
 }
 
 @media (max-width: 1024px) {
     .form-image {
         height: 30rem;
+        padding: 10px !important;
+
     }
 }
 </style>

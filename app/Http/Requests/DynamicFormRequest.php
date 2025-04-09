@@ -42,6 +42,7 @@ class DynamicFormRequest extends FormRequest
                 'schema.*.title' => ['required'],
                 'schema.*.description' => ['nullable'],
                 'schema.*.type' => ['required', 'string', 'in:select,radio,checkbox,text,number,file,select_course,email,phonenumber,textarea'],
+                'schema.*.rules' => ['nullable', 'string'],
                 'schema.*.options' => [
                     'nullable',
                     'required_if:schema.*.type,select,radio,checkbox,file',
@@ -67,6 +68,7 @@ class DynamicFormRequest extends FormRequest
                 ],
                 'schema.*.validators.required' => ['nullable', 'boolean'],
                 'schema.*.validators.unique' => ['nullable', 'boolean'],
+
             ];
     }
 

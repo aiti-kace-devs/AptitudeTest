@@ -19,8 +19,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('queue:retry all')
         // ->everySixHours();
 
-        $schedule->command('queue:work', ['--sleep=3', '--tries=3', '--max-time=300'])
-            ->everyFiveMinutes();
+        // $schedule->command('queue:work', ['--sleep=3', '--tries=3', '--max-time=300'])
+        //     ->everyFiveMinutes();
 
         $schedule->command('queue:prune-failed', ['--hours=24'])
             ->dailyAt('01:00');

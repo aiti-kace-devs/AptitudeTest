@@ -284,7 +284,7 @@ class AdminController extends Controller
         } else {
             $exam = new Oex_exam_master();
             $exam->title = $request->title;
-            $exam->exam_date = $request->exam_date;
+            $exam->exam_date = (new Carbon($request->exam_date))->setHour(23)->setMinute(59)->toDateTimeString();
             $exam->exam_duration = $request->exam_duration;
             $exam->category = $request->exam_category;
             $exam->passmark = $request->passmark;
@@ -327,6 +327,8 @@ class AdminController extends Controller
         $data['category'] = Oex_category::where('status', '1')->get()->toArray();
         $data['exam'] = Oex_exam_master::where('id', $id)->get()->first();
 
+        $data['exam']['exam_date'] = (new Carbon($data['exam']['exam_date']))->toDateString();
+
         return view('admin.edit_exam', $data);
     }
 
@@ -335,7 +337,7 @@ class AdminController extends Controller
     {
         $exam = Oex_exam_master::where('id', $request->id)->get()->first();
         $exam->title = $request->title;
-        $exam->exam_date = $request->exam_date;
+        $exam->exam_date = (new Carbon($request->exam_date))->setHour(23)->setMinute(59)->toDateTimeString();
         $exam->category = $request->exam_category;
         $exam->passmark = $request->passmark;
         $exam->exam_duration = $request->exam_duration;
@@ -516,7 +518,7 @@ class AdminController extends Controller
     public function delete_students($id)
     {
         $std = user_exam::where('id', $id)->get()->first();
-        $std->delete();
+        $std?->delete();
         return redirect('admin/manage_students');
     }
 
@@ -1112,19 +1114,4 @@ class AdminController extends Controller
                 'key' => 'success',
             ]);
     }
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-

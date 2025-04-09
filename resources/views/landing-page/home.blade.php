@@ -230,7 +230,7 @@
                         <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Supervisor</h2>
+                        <h2 class="course-title">Certified Data Protection Manager</h2>
                         <p class="course-description">
                             This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
                         </p>
@@ -243,7 +243,7 @@
                         <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Practioner</h2>
+                        <h2 class="course-title">Certified Data Protection Professional</h2>
                         <p class="course-description">
                             This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
                         </p>
@@ -303,7 +303,7 @@
                         <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Supervisor</h2>
+                        <h2 class="course-title">Certified Data Protection Manager</h2>
                         <p class="course-description">
                             This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
                         </p>
@@ -339,7 +339,7 @@
                         <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
                     </div>
                     <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Practioner</h2>
+                        <h2 class="course-title">Certified Data Protection Professional</h2>
                         <p class="course-description">
                             This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
                         </p>

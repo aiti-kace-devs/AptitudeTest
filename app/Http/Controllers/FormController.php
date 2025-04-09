@@ -198,7 +198,7 @@ class FormController extends Controller
             $validated['image'] = $form->image;
         }
 
-        $form->fill($validated)->save();
+        $form->update($validated);
 
         return redirect()->route('admin.form.index');
     }
