@@ -62,15 +62,12 @@
     <div class="container">
         <div class="text-content">
             <div class="detail-item">
-                <h1> <span class="detail-label">Certified Data Protection Supervisor </span></h1>
+                <h1> <span class="detail-label">Certified Data Protection Manager  (CDPM ) – Advance Level</span></h1>
                 <!-- <span class="detail-value">Cybersecurity Specialist</span> -->
             </div>
             <div class="detail-item">
-                <span class="detail-label">Job Responsibilities:</span>
-                <span class="detail-value">Oversee and coordinate data protection activities within an organization,
-                    Ensure data protection policies are implemented and followed, Conduct protection impact assessments
-                    (DPIAs), Provide strategic guidance on data protection and privacy risks, Serve as a liaison between
-                    the organization and regulatory authoritie.</span>
+                <span class="detail-label">Objective:</span>
+                <span class="detail-value">Develop practical skills in data governance, risk management, and compliance enforcement.</span>
             </div>
             <!-- <div class="detail-item">
         <span class="detail-label">No. of People to Train:</span>
@@ -81,33 +78,25 @@
         <span class="detail-value">Certified Cybersecurity Professional</span>
       </div> -->
             <div class="detail-item">
-                <span class="detail-label">Training Modules:</span>
+                <span class="detail-label">Core Modules</span>
                 <ul class="detail-value">
-                    <li>1.Privacy by Design & Data Protection Impact Assessments (DPIA)
-
-                    </li>
+                    <li>Privacy by Design & Data Protection Impact Assessments (DPIA)</li>
                     <li>Managing Data Breaches & Incident Response Plans</li>
-                    <li>Data Protection Audits & Compliance Reporting</li>
-                    <li>Role of the CDPS in Organizational Compliance</li>
-
-
+                    <li>Data Protection Internal Audits & Compliance Reporting</li>
+                    <li>Role of the CDPM in Organizational Compliance</li>
                 </ul>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Training Duration:</span>
-                <span class="detail-value">60 hrs</span>
+                <span class="detail-label">Training Description:</span>
+                <span class="detail-value">5-day intensive course delivered by DPC-accredited institutions.</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Training Prerequisite:</span>
-                <span class="detail-value">A minimum of a diploma or bachelor's degree in law, IT, data management,
-                    cybersecurity, business administration, or related fields.</span>
+                <span class="detail-label">Assessment:</span>
+                <span class="detail-value">TBD by the Commission Case study analysis.</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Available Certifications:</span>
-                <span class="detail-value">
-                    <li> Certified Information Privacy Professional (CIPP)</li>
-                    <li> Certified Information Privacy Manager (CIPM)</li>
-                </span>
+                <span class="detail-label">Outcome:</span>
+                <span class="detail-value"><b>CDPM  Certification</b></span>
             </div>
             <a href="{{ url('/forms/register') }}" class="register-button">Register</a>
         </div>

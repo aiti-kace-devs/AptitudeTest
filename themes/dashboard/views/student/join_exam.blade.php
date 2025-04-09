@@ -16,11 +16,76 @@
             overflow-x: hidden;
             width: 99% !important;
             font-size: 20px;
+            display: none;
+        }
+
+        .exam-info-card {
+            display: flex;
+            flex-direction: row
+        }
+
+        @media screen and (max-width: 600px) {
+
+            #examination_form p {
+                font-size: 16px !important;
+            }
+
+            #examination_form ul>p {
+                text-align: left;
+                font-size: 1rem;
+            }
+
+            .exam-info-card>div>h3 {
+                font-size: 1rem !important;
+                text-align: center;
+            }
+
+            .exam-info-card>div>button {
+                line-height: 1 !important;
+                font-size: 1rem !important;
+
+            }
+
+            .exam-info-card>div:first-child {
+                display: none !important;
+
+            }
+
+
+            .exam-info-card {
+                grid-column: column;
+            }
+
+            .questions-container {
+                padding: 0.5rem !important;
+            }
+
+            .questions-wrapper {
+                padding: 0.5rem !important
+            }
+
+            .question_options li {
+                font-size: 1rem
+            }
+
+            .question_options {
+                padding: 8px;
+            }
         }
 
         input[type="radio"] {
             height: 30px;
         }
+
+        div:where(.swal2-container) div:where(.swal2-html-container) {
+            padding: 1rem 1rem .3em;
+        }
+
+        .questions-container {
+            padding: 1.5rem;
+        }
+
+        .question-body {}
     </style>
     <!-- /.content-header -->
     <!-- Content Wrapper. Contains page content -->
@@ -49,7 +114,7 @@
                             <div class="card">
 
                                 <div class="card-body">
-                                    <div class="row">
+                                    <div class="exam-info-card">
                                         <div class="col-sm-3">
                                             <h3 class="text-center">Time : {{ $exam->exam_duration }} min</h3>
                                         </div>
@@ -73,16 +138,16 @@
                             <!-- /.card -->
                             <div class="card mt-4 w-100">
 
-                                <div class="card-body ">
+                                <div class="card-body questions-wrapper">
 
                                     <form action="{{ url('student/submit_questions') }}" method="POST"
                                         name="examination_form" id="examination_form">
                                         <input type="hidden" name="exam_id" value="{{ Request::segment(3) }}">
                                         {{ csrf_field() }}
                                         <div class="row">
-                                            <div class="card mt-4 col-12 p-4">
+                                            <div class="card mt-4 col-12 questions-container">
 
-                                                <div class="card-body">
+                                                <div class="card-body question-body">
                                                     @foreach ($question as $key => $q)
                                                         <div class="col-sm-12 mt-4 border border-dark">
                                                             <p>{{ $key + 1 }}. {{ $q->questions }}</p>
@@ -145,6 +210,7 @@
         <script>
             var warn = 0;
             var timeLeft = 10;
+            let timeUp = false;
 
 
             const startTest = () => {
@@ -235,26 +301,33 @@
                 submitButton.click();
             }
 
+            let modalWidth = '100%';
+            let fontSize = '1rem'
+
+            if (window.innerWidth > 600) {
+                modalWidth = '70%'; // large screens
+                fontSize = '1.7rem';
+            }
+
             Swal.fire({
                 title: '{{ $exam->title }}',
-                html: `<ol class = "text-left" style = "font-size:1.7rem;color:red" >
+                html: `<ol class = "text-left" style = "font-size:${fontSize};color:red" >
                     <li>Make sure you answer all questions</li>
                     <li>DO NOT exit fullscreen</li>
                     <li>DO NOT switch tabs</li>
-                    <li>You will be warned when you violate the rules</li>
+                    <li>You will be warned when you violate these rules</li>
                     <li>Your test may be automatically SUBMITTED if you keep on violating rules</li>
-                    <li>The duration of the test is {{ $exam->exam_duration }} mins from the time you click 'Start'</li>
+                    <li>The duration of the test is {{ $exam->exam_duration }} mins from the time you click on 'START'</li>
                     <li>Ensure you have good and stable internet</li>
                     <li>Click on 'START' work to begin the test</li>
                     <li>Click on 'Submit Test' after you have completed</li>
                 </ol>
-
-                <h2>Good luck</h2>
+                <h3>Good luck</h3>
                 `,
                 icon: 'info',
                 confirmButtonText: 'START',
                 backdrop: `rgba(0,0,0,0.99)`,
-                width: '70%',
+                width: modalWidth,
                 allowOutsideClick: false,
                 preConfirm: async () => {
                     try {
@@ -273,6 +346,7 @@
                             ${JSON.stringify(await response.json())}
                             `);
                         }
+                        $('#examination_form').show();
                         startTest();
                         Swal.close();
 
@@ -284,11 +358,12 @@
                 },
             });
 
+
             const form = document.getElementById('examination_form');
             form.addEventListener('submit', function(e) {
 
                 // if time is up, just submit
-                if (timeLeft == 0) {
+                if (timeLeft == 0 || timeUp) {
                     form.submit();
                 }
 
@@ -330,6 +405,7 @@
 
             });
 
+
             var interval;
 
             function countdown() {
@@ -354,6 +430,7 @@
                     if (minutes == 0 && seconds == 0) {
                         clearInterval(interval);
                         const elem = document.querySelector('div.content-wrapper > div > section.content');
+                        timeUp = true;
                         sAlert('TIME UP', {
                             target: elem,
                             title: 'END OF TEST',

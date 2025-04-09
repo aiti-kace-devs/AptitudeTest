@@ -8,6 +8,7 @@ use App\Models\FormResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -86,6 +87,7 @@ class FormResponseController extends Controller
         $form = Form::where('uuid', $request->form_uuid)->firstOrFail();
         $schema = $form->schema;
 
+        // $validationRules = $form->getValidationRules();
         $validationRules = [
             'response_data' => 'required|array',
         ];
@@ -96,6 +98,7 @@ class FormResponseController extends Controller
 
 
         $formattedData = [];
+        $attributes = [];
 
         foreach ($request->input('response_data', []) as $key => $value) {
             foreach ($schema as $field) {
@@ -112,6 +115,8 @@ class FormResponseController extends Controller
             $fieldTitle = ucwords(str_replace('_', ' ', $field['title']));
 
             $rules = [];
+
+            $attributes[$fieldKey] = Str::remove('_id', Str::remove('response_data.', $fieldKey, true));
 
             if (!empty($field['validators']['required'])) {
                 $rules[] = 'required';
@@ -207,9 +212,12 @@ class FormResponseController extends Controller
             }
 
             $validationRules[$fieldKey] = implode('|', $rules);
+            $additionRules = Str::length($field['rules'] ?? '') > 0 ? '|' . $field['rules'] ?? '' : '';
+            $validationRules[$fieldKey] =  $validationRules[$fieldKey] . $additionRules;
         }
 
-        $validated = $request->validate($validationRules, $customMessages);
+        // dd($validationRules, $attributes);
+        $validated = $request->validate($validationRules, $customMessages, $attributes);
 
         // Handle file uploads
         foreach ($schema as $field) {

@@ -36,8 +36,15 @@
     <link rel="stylesheet" href="{{ url('assets/plugins/daterangepicker/daterangepicker.css') }}">
     <!-- summernote -->
     <link rel="stylesheet" href="{{ url('assets/plugins/summernote/summernote-bs4.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+    {{-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css"> --}}
+    <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/responsive.bootstrap4.min.css') }}">
     <link href="{{ asset('themes/student/css/app.css') }}" rel="stylesheet">
+
+
+
+    {{-- end datatables  --}}
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -127,7 +134,7 @@
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                             data-accordion="false">
                             <!-- Add icons to the links using the .nav-icon class
-                                                                                                                                                           with font-awesome or any other icon font library -->
+                                                                                                                                                                                                       with font-awesome or any other icon font library -->
                             @if (!Auth::user()->isAdmitted())
                                 <li class="nav-item">
                                     <a href="{{ url('student/dashboard') }}"
@@ -220,9 +227,9 @@
                             <!--
 
 
-                                                                                                                                                    </ul>
-                                                                                                                                                  </nav>
-                                                                                                                                                  <! /.sidebar-menu -->
+                                                                                                                                                                                                </ul>
+                                                                                                                                                                                              </nav>
+                                                                                                                                                                                              <! /.sidebar-menu -->
                 </div>
                 <!-- /.sidebar -->
             </aside>
@@ -267,8 +274,20 @@
     <script src="{{ url('assets/plugins/moment/moment.min.js') }}"></script>
     <script src="{{ url('assets/plugins/daterangepicker/daterangepicker.js') }}"></script>
     <!-- Tempusdominus Bootstrap 4 -->
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+
+    {{-- datatables --}}
+    <script src="{{ url('assets/plugins/datatables-new/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/buttons.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/jszip.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/pdfmake.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/vfs_fonts.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/buttons.html5.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/buttons.print.min.js') }}"></script>
+    <script src="{{ url('assets/plugins/datatables-new/buttons.colVis.min.js') }}"></script>
     <script src="{{ url('assets/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
     <!-- Summernote -->
     <script src="{{ url('assets/plugins/summernote/summernote-bs4.min.js') }}"></script>
@@ -283,7 +302,26 @@
     <script src="{{ url('assets/js/custom.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('.datatable').dataTable();
+            if ($.fn.DataTable.isDataTable('.datatable')) {
+                $('.datatable').DataTable().destroy();
+            }
+            $('.datatable').DataTable({
+                columnDefs: [{
+                    width: "15%",
+                    targets: -1
+                }, ],
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": true,
+                "buttons": [{
+                    extend: 'pdfHtml5',
+                    orientation: 'portrait',
+                    pageSize: 'A4'
+                }]
+            }).buttons().container().appendTo('.dataTables_wrapper .col-md-6:eq(0)');
+
+
+
             document.addEventListener('contextmenu', function(ev) {
                 ev.preventDefault();
                 return false;

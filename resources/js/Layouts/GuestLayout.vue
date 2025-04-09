@@ -4,8 +4,9 @@ import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-        <div>
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-600">
+        <div class="flex items-end mb-4">
+            <img src="http://localhost:8000/assets/home/images/c.png" class=" h-24 lg:h-28 fill-current">
             <Link href="/">
                 <ApplicationLogo class="w-20 h-20 fill-current text-gray-500" />
             </Link>
