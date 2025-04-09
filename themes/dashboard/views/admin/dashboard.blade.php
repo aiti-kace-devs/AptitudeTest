@@ -326,7 +326,7 @@ new Chart(admittedRegionCtx, {
     new Chart(courseCtx, {
       type: 'bar',
       data: {
-        labels: {!! json_encode($studentsPerCourse->pluck('title')) !!},
+        labels: {!! json_encode($studentsPerCourse->pluck('display_name')) !!},
         datasets: [{
           label: 'Number of Students',
           data: {!! json_encode($studentsPerCourse->pluck('total')) !!},

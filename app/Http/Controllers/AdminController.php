@@ -66,16 +66,22 @@ class AdminController extends Controller
                               ->groupBy('courses.location')
                              ->get();
 
-        $studentsPerCourse = User::select('title', DB::raw('count(*) as total'))
-                             ->leftJoin('programmes', 'users.registered_course', '=', 'programmes.id')
+                             $studentsPerCourse = User::select('courses.course_name', DB::raw('count(*) as total'))
+                             ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
                              ->whereNotNull('registered_course')
-                             ->groupBy('title')
+                             ->groupBy('courses.course_name')
                              ->get();
+
+                             $studentsPerCourse = $studentsPerCourse->map(function($item) {
+                                $parts = explode(" - ", $item->course_name);
+                                $item->display_name = $parts[0];
+                                return $item;
+                            });
 
         $registrationsPerDay = User::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
                                ->groupBy('date')
                                ->orderBy('date', 'asc')
-                               ->limit(30) // Last 30 days
+                               ->limit(30) 
                                ->get();
 
         $genderDistribution = User::select('gender', DB::raw('count(*) as total'))
@@ -84,7 +90,7 @@ class AdminController extends Controller
                                ->get();
 
         $ageGroups = User::select(DB::raw('CASE
-                               WHEN age BETWEEN 16 AND 19 THEN "16-19"
+                               WHEN age BETWEEN 16 AND 19 THEN "15-19"
                                WHEN age BETWEEN 20 AND 24 THEN "20-24"
                                WHEN age BETWEEN 25 AND 35 THEN "25-35"
                                WHEN age BETWEEN 36 AND 45 THEN "36-45"
