@@ -56,8 +56,75 @@ class AdminController extends Controller
         $user_count = User::get()->count();
         $exam_count = Oex_exam_master::get()->count();
         $admin_count = Admin::get()->count();
+        $user_admission_count =UserAdmission::get()->count();
+        $programe_count = Programme::get() ->count();
 
-        return view('admin.dashboard', ['student' => $user_count, 'exam' => $exam_count, 'admin' => $admin_count]);
+        $studentsPerRegion = DB::table('users')
+                            ->join('courses', 'users.registered_course', '=', 'courses.id')
+                             ->select('courses.location as region', DB::raw('count(*) as total'))
+                             ->whereNotNull('users.registered_course')
+                              ->groupBy('courses.location')
+                             ->get();
+
+        $studentsPerCourse = User::select('title', DB::raw('count(*) as total'))
+                             ->leftJoin('programmes', 'users.registered_course', '=', 'programmes.id')
+                             ->whereNotNull('registered_course')
+                             ->groupBy('title')
+                             ->get();
+
+        $registrationsPerDay = User::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+                               ->groupBy('date')
+                               ->orderBy('date', 'asc')
+                               ->limit(30) // Last 30 days
+                               ->get();
+
+        $genderDistribution = User::select('gender', DB::raw('count(*) as total'))
+                               ->whereNotNull('gender')
+                               ->groupBy('gender')
+                               ->get();
+
+        $ageGroups = User::select(DB::raw('CASE
+                               WHEN age BETWEEN 16 AND 19 THEN "16-19"
+                               WHEN age BETWEEN 20 AND 24 THEN "20-24"
+                               WHEN age BETWEEN 25 AND 35 THEN "25-35"
+                               WHEN age BETWEEN 36 AND 45 THEN "36-45"
+                               WHEN age >= 45 THEN "45+"
+                               ELSE "Unknown"
+                            END as age_group'),
+                       DB::raw('count(*) as total'))
+                    ->groupBy('age_group')
+                    ->orderBy(DB::raw('MIN(age)'))
+                    ->get();
+
+        //  $admittedstudentsPerRegion = DB::table('users')
+        //                     ->join('courses', 'users.registered_course', '=', 'courses.id')
+        //                      ->select('courses.location as region', DB::raw('count(*) as total'))
+        //                      ->whereNotNull('users.registered_course')
+        //                       ->groupBy('courses.location')
+        //                      ->get();
+
+        $admittedstudentsPerRegion = DB::table('user_admission')
+                            ->join('courses', 'user_admission.course_id', '=', 'courses.id')
+                            ->select('courses.location as region', DB::raw('count(*) as total'))
+                            ->whereNotNull('user_admission.course_id')
+                            ->groupBy('courses.location')
+                            ->get();
+
+
+
+        return view('admin.dashboard', [
+            'student' => $user_count,
+             'exam' => $exam_count,
+             'admin' => $admin_count,
+             'admission' => $user_admission_count,
+             'course' =>$programe_count,
+             'studentsPerRegion' => $studentsPerRegion,
+             'studentsPerCourse' => $studentsPerCourse,
+             'registrationsPerDay' => $registrationsPerDay,
+             'genderDistribution' => $genderDistribution,
+             'ageGroups' => $ageGroups,
+             'admittedstudentsPerRegion' => $admittedstudentsPerRegion
+            ]);
     }
 
     //Exam categories
