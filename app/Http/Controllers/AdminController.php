@@ -217,7 +217,7 @@ class AdminController extends Controller
         } else {
             $exam = new Oex_exam_master();
             $exam->title = $request->title;
-            $exam->exam_date = $request->exam_date;
+            $exam->exam_date = (new Carbon($request->exam_date))->setHour(23)->setMinute(59)->toDateTimeString();
             $exam->exam_duration = $request->exam_duration;
             $exam->category = $request->exam_category;
             $exam->passmark = $request->passmark;
@@ -268,7 +268,7 @@ class AdminController extends Controller
     {
         $exam = Oex_exam_master::where('id', $request->id)->get()->first();
         $exam->title = $request->title;
-        $exam->exam_date = $request->exam_date;
+        $exam->exam_date = (new Carbon($request->exam_date))->setHour(23)->setMinute(59)->toDateTimeString();
         $exam->category = $request->exam_category;
         $exam->passmark = $request->passmark;
         $exam->exam_duration = $request->exam_duration;
