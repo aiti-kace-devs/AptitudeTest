@@ -46,7 +46,7 @@
             display: block;
         }
 
-        .register-button {
+        /* .register-button {
             display: inline-block;
             padding: 10px 20px;
             background-color: #007BFF;
@@ -54,7 +54,7 @@
             text-decoration: none;
             border-radius: 5px;
             margin-top: 15px;
-        }
+        } */
     </style>
 </head>
 
