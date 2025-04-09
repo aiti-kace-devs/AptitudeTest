@@ -260,6 +260,8 @@ class AdminController extends Controller
         $data['category'] = Oex_category::where('status', '1')->get()->toArray();
         $data['exam'] = Oex_exam_master::where('id', $id)->get()->first();
 
+        $data['exam']['exam_date'] = (new Carbon($data['exam']['exam_date']))->toDateString();
+
         return view('admin.edit_exam', $data);
     }
 
