@@ -348,6 +348,7 @@
                                             <th>Email</th>
                                             <th>Age</th>
                                             <th>Course</th>
+                                            <th>Location</th>
                                             <th>Gender</th>
                                             <th>Date Registered</th>
                                             <th>Admission</th>
@@ -472,12 +473,12 @@
                             className: 'btn btn-success',
                             title: 'Students_Export_' + new Date().toISOString().slice(0, 10),
                             exportOptions: {
-                                columns: ':visible',
-                                format: {
-                                    body: function(data, row, column, node) {
-                                        return data.replace(/<[^>]*>/g, '');
-                                    }
-                                }
+                                columns: [1,2,3,4,5,6,7,9],
+                                // format: {
+                                //     body: function(data, row, column, node) {
+                                //         return data.replace(/<[^>]*>/g, '');
+                                //     }
+                                // }
                             }
                         }],
                         processing: true,
@@ -542,6 +543,10 @@
                             {
                                 data: 'course_name',
                                 name: 'course_name'
+                            },
+                            {
+                                data: 'course_location',
+                                name: 'course_location'
                             },
                             {
                                 data: 'gender',
