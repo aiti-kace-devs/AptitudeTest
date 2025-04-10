@@ -376,7 +376,7 @@ class AdminController extends Controller
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
                 ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
                 ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
-                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
+                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
 
             // if ($request->has('ex_name')) {
             //     $baseQuery->whereIn('oex_exam_masters.title', (array) $request->ex_name);
@@ -452,6 +452,9 @@ class AdminController extends Controller
                 })
                 ->addColumn('course_name', function ($std) {
                     return $std->course_name ?? 'N/A';
+                })
+                ->addColumn('gender', function ($std) {
+                    return $std->gender ?? 'N/A';
                 })
                 ->addColumn('score', function ($std) {
                     return optional($std->result)->yes_ans ?? 'N/A';

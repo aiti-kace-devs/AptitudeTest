@@ -348,6 +348,7 @@
                                             <th>Email</th>
                                             <th>Age</th>
                                             <th>Course</th>
+                                            <th>Gender</th>
                                             <th>Admission</th>
                                             <th>Score</th>
                                             <th>Result</th>
@@ -463,6 +464,21 @@
 
 
                     var table = $('#studentsTable').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [{
+                            extend: 'csv',
+                            text: '<i class="fas fa-file-csv"></i> Export CSV',
+                            className: 'btn btn-success',
+                            title: 'Students_Export_' + new Date().toISOString().slice(0, 10),
+                            exportOptions: {
+                                columns: ':visible',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        return data.replace(/<[^>]*>/g, '');
+                                    }
+                                }
+                            }
+                        }],
                         processing: true,
                         serverSide: true,
                         ajax: {
@@ -525,6 +541,10 @@
                             {
                                 data: 'course_name',
                                 name: 'course_name'
+                            },
+                            {
+                                data: 'gender',
+                                name: 'users.gender'
                             },
                             {
                                 data: 'admission_status',
@@ -738,12 +758,6 @@
                     });
 
                 });
-
             </script>
-
-
-
-
-
         @endpush
     @endsection
