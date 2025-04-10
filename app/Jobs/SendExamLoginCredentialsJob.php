@@ -54,7 +54,7 @@ class SendExamLoginCredentialsJob implements ShouldQueue
 
     private function exam_deadline()
     {
-        $registered = isset($registered) ? $registered : auth()->user()->created_at;
+        $registered = $this->std->created_at;
         $now = Carbon::now();
         $exam_id = $this->std->exam;
 
