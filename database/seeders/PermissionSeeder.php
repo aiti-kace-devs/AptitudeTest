@@ -46,7 +46,8 @@ class PermissionSeeder extends Seeder
             'shortlist',
             'admit',
             'bulk-sms',
-            'bulk-email'
+            'bulk-email',
+            'verify'
         ];
         $specialPermissions = [
             'monitor',
@@ -127,16 +128,19 @@ class PermissionSeeder extends Seeder
         $specialAttendanceActions = [
             'verify'
         ];
-        foreach ($specialAttendanceActions as $action) {
-            $name = "attendance.$action";
-            Permission::findOrCreate(
-                $name,
-                "admin"
-            );
-        }
+        // foreach ($specialAttendanceActions as $action) {
+        //     $name = "attendance.$action";
+        //     Permission::findOrCreate(
+        //         $name,
+        //         "admin"
+        //     );
+        // }
+
         // give permissions
         $attendanceOfficerPermissions = $this->findResourcePermissions(['attendance'], $actions);
-        $attendanceOfficerRole->syncPermissions($attendanceOfficerPermissions);
+        $specialAttendancePermissions = $this->findResourcePermissions(['student'], $specialAttendanceActions);
+        $allPermissions = $attendanceOfficerPermissions->merge($specialAttendancePermissions);
+        $attendanceOfficerRole->syncPermissions($allPermissions);
 
         // ADMINISTRATOR ROLE
         $administratorRole = Role::findByName('administrator', 'admin');
@@ -157,7 +161,7 @@ class PermissionSeeder extends Seeder
             'form-response',
             'sms-template',
             'report'
-        ], array_merge($actions, $specialStudentActions, $specialAttendanceActions));
+        ], array_merge($actions, $specialStudentActions));
         $administratorRole->syncPermissions($administratorPermissions);
 
         // APP ADMINISTRATOR ROLE
