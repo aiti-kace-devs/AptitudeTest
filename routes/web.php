@@ -169,6 +169,21 @@ Route::prefix('admin')
                 Route::get('/reset-exam/{exam_id}/student/{user_id}', [StudentOperation::class, 'reset_exam'])->name('reset-exam');
             });
 
+            Route::middleware('permission:student.shortlist')->group(function () {
+                Route::get('/registered_students', [AdminController::class, 'registered_students'])
+                    ->name('student.index')
+                    ->middleware('permission:student.admit');
+                Route::post('/student/admit', [StudentOperation::class, 'admit_student'])
+                    ->name('admit_student')
+                    ->middleware('permission:student.admit');
+                Route::post('/admit', [AdminController::class, 'admit_student'])
+                    ->name('admit_user_ui')
+                    ->middleware('permission:student.admit');
+                Route::get('/manage_students', [AdminController::class, 'manage_students'])
+                    ->name('manage_students')
+                    ->middleware('permission:student.admit');
+            });
+
             Route::middleware('permission:student.read')->group(function () {
                 Route::get('/student_status/{id}', [AdminController::class, 'student_status'])
                     ->name('student.status')
@@ -176,9 +191,6 @@ Route::prefix('admin')
                 Route::get('/delete_students/{id}', [AdminController::class, 'delete_students'])
                     ->name('student.destroy')
                     ->middleware('permission:student.delete');
-                Route::get('/registered_students', [AdminController::class, 'registered_students'])
-                    ->name('student.index')
-                    ->middleware('permission:student.admit');
                 Route::get('/delete_registered_students/{id}', [AdminController::class, 'delete_registered_students'])
                     ->name('student.destroy_registered')
                     ->middleware('permission:student.delete');
@@ -188,19 +200,6 @@ Route::prefix('admin')
                 Route::post('/add_new_students', [AdminController::class, 'add_new_students'])
                     ->name('student.store')
                     ->middleware('permission:student.create');
-                Route::post('/student/admit', [StudentOperation::class, 'admit_student'])
-                    ->name('admit_student')
-                    ->middleware('permission:student.admit');
-                Route::post('/admit', [AdminController::class, 'admit_student'])
-                    ->name('admit_user_ui')
-                    ->middleware('permission:student.admit');
-                Route::post('/send-bulk-email', [AdminController::class, 'sendBulkEmail'])
-                    ->name('send_bulk_email')
-                    ->middleware('permission:student.bulk-email');
-                Route::post('/send_bulk_sms', [AdminController::class, 'sendBulkSMS'])
-                    ->name('send_bulk_sms')
-                    ->middleware('permission:student.bulk-sms');
-                Route::get('/manage_students', [AdminController::class, 'manage_students'])->name('manage_students');
                 Route::get('/view_answer/{id}', [StudentOperation::class, 'view_answer']);
             });
 
@@ -215,18 +214,15 @@ Route::prefix('admin')
                 Route::get('/generate_qrcode', [AdminController::class, 'generate_qrcode_page'])->middleware('permission:attendance.create');
                 Route::post('/generate_qrcode', [AttendanceController::class, 'generateQRCodeData'])->middleware('permission:attendance.create');
                 Route::get('/scan_qrcode', [AdminController::class, 'scan_qrcode_page'])->middleware('permission:attendance.create');
-                Route::post('/verify-student/{id}', [AdminController::class, 'verifyStudent'])
-                    ->name('verify-student')
-                    ->middleware('permission:attendance.verify');
                 Route::get('/verification', [AdminController::class, 'verification_page'])
-                    ->name('verification')
-                    ->middleware('permission:attendance.verify');
+                ->name('verification')
+                ->middleware('permission:attendance.verify');
                 Route::get('/verify_details', [AdminController::class, 'verifyDetails'])
-                    ->name('verify-details')
-                    ->middleware('permission:attendance.verify');
+                ->name('verify-details');
                 Route::get('/reset-verify/{id}', [AdminController::class, 'reset_verify'])
-                    ->name('reset-verify')
-                    ->middleware('permission:attendance.verify');
+                ->name('reset-verify');
+                Route::post('/verify-student/{id}', [AdminController::class, 'verifyStudent'])
+                ->name('verify-student');
             });
 
             Route::middleware('permission:report.read')->group(function () {
@@ -407,6 +403,12 @@ Route::prefix('admin')
                         ->name('sms.template.destroy')
                         ->middleware('permission:sms-template.delete');
                     Route::get('/fetch_sms_template', [AdminController::class, 'fetch_sms_template'])->name('fetch.sms.template');
+                    Route::post('/send-bulk-email', [AdminController::class, 'sendBulkEmail'])
+                        ->name('send_bulk_email')
+                        ->middleware('permission:student.bulk-email');
+                    Route::post('/send_bulk_sms', [AdminController::class, 'sendBulkSMS'])
+                        ->name('send_bulk_sms')
+                        ->middleware('permission:student.bulk-sms');
                 });
             // end of manage sms_template routes
 
