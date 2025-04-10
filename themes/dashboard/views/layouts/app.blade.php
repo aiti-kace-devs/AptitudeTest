@@ -215,7 +215,7 @@
                             </li>
                         @endcan
 
-                        @can('student.read')
+                        {{-- @can('student.read') --}}
                             <li class="nav-item">
                                 <a href="{{ url('admin/manage_students') }}"
                                     class="nav-link @if (request()->is('admin/manage_students')) active @endif">
@@ -224,7 +224,7 @@
                                     <p>Students</p>
                                 </a>
                             </li>
-                        @endcan
+                        {{-- @endcan --}}
 
                         @can('student.admit')
                             <li class="nav-item">
