@@ -376,7 +376,7 @@ class AdminController extends Controller
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
                 ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
                 ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
-                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
+                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'users.created_at', 'courses.course_name as course_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
 
             // if ($request->has('ex_name')) {
             //     $baseQuery->whereIn('oex_exam_masters.title', (array) $request->ex_name);
@@ -456,18 +456,23 @@ class AdminController extends Controller
                 ->addColumn('gender', function ($std) {
                     return $std->gender ?? 'N/A';
                 })
+
+                ->addColumn('date_registered', function ($std) {
+                    return $std->created_at ?? 'N/A';
+                })
+
                 ->addColumn('score', function ($std) {
                     return optional($std->result)->yes_ans ?? 'N/A';
                 })
-                ->addColumn('result', function ($std) {
-                    if (!$std->submitted) {
-                        return '<span class="badge badge-secondary">N/A</span>';
-                    }
-                    $yes_ans = optional($std->result)->yes_ans ?? 0;
-                    $percentage = round(($yes_ans / 30) * 100);
-                    $class = $yes_ans >= $std->passmark ? 'success' : 'danger';
-                    return '<span class="badge badge-' . $class . '">' . $percentage . '%</span>';
-                })
+                // ->addColumn('result', function ($std) {
+                //     if (!$std->submitted) {
+                //         return '<span class="badge badge-secondary">N/A</span>';
+                //     }
+                //     $yes_ans = optional($std->result)->yes_ans ?? 0;
+                //     $percentage = round(($yes_ans / 30) * 100);
+                //     $class = $yes_ans >= $std->passmark ? 'success' : 'danger';
+                //     return '<span class="badge badge-' . $class . '">' . $percentage . '%</span>';
+                // })
                 ->addColumn('status', function ($std) {
                     if (!$std->submitted) {
                         return '<span class="badge badge-secondary">Not Taken</span>';

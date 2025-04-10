@@ -349,9 +349,10 @@
                                             <th>Age</th>
                                             <th>Course</th>
                                             <th>Gender</th>
+                                            <th>Date Registered</th>
                                             <th>Admission</th>
                                             <th>Score</th>
-                                            <th>Result</th>
+                                            {{-- <th>Result</th> --}}
                                             <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
@@ -547,6 +548,10 @@
                                 name: 'users.gender'
                             },
                             {
+                                data: 'date_registered',
+                                name: 'users.created_at'
+                            },
+                            {
                                 data: 'admission_status',
                                 name: 'admission_status'
                             },
@@ -555,11 +560,11 @@
                                 name: 'score',
                                 orderable: false
                             },
-                            {
-                                data: 'result',
-                                name: 'result',
-                                orderable: false
-                            },
+                            // {
+                            //     data: 'result',
+                            //     name: 'result',
+                            //     orderable: false
+                            // },
                             {
                                 data: 'status',
                                 name: 'status',
