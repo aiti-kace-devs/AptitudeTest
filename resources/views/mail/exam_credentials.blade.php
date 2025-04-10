@@ -15,7 +15,7 @@ Start Your Assessment Test
 
 @component('mail::panel')
 
-You have <b>48 hours</b> to complete your assessment. Your deadline for submission is {{$deadline}}
+Your deadline for submission is {{$deadline}}
 If you are having trouble with the button copy and paste this URL in a browser: <a href="{{$examUrl}}">{{$examUrl}}</a>
 @endcomponent
 

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\ExamLoginCredentials;
+use App\Models\Oex_exam_master;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -39,7 +40,7 @@ class SendExamLoginCredentialsJob implements ShouldQueue
      */
     public function handle()
     {
-        $deadline = (new Carbon($this->std->created_at))->addDays(2);
+        $deadline = $this->exam_deadline();
         Mail::to($this->std->email)->send(new ExamLoginCredentials($this->std, $this->plainPassword, $deadline));
 
         //     Log::info('Handling the job, sending email to ' . $this->std->email);
@@ -49,5 +50,29 @@ class SendExamLoginCredentialsJob implements ShouldQueue
         // Log::info('Email sent to ' . $this->std->email);
 
 
+    }
+
+    private function exam_deadline()
+    {
+        $registered = isset($registered) ? $registered : auth()->user()->created_at;
+        $now = Carbon::now();
+        $exam_id = $this->std->exam;
+
+        $date = Oex_exam_master::find($exam_id)->exam_date;
+
+        $leftToDeadline = $now->diffInHours(new Carbon($date));
+
+        $deadline = $date;
+        $hoursLeft = $leftToDeadline;
+
+        $studentDeadline = (new Carbon($registered))->addDays(2);
+        $studentHoursLeft = $now->diffInHours($studentDeadline);
+
+        if ($studentHoursLeft < $leftToDeadline) {
+            $deadline = $studentDeadline->toDateString();
+            $hoursLeft = $studentHoursLeft;
+        }
+
+        return "$deadline in $hoursLeft hour(s)";
     }
 }
