@@ -215,14 +215,16 @@
                             </li>
                         @endcan
 
-                        <li class="nav-item">
-                            <a href="{{ url('admin/manage_students') }}"
-                                class="nav-link @if (request()->is('admin/manage_students')) active @endif">
+                        @canany(['student.read', 'student.admit'])
+                            <li class="nav-item">
+                                <a href="{{ url('admin/manage_students') }}"
+                                    class="nav-link @if (request()->is('admin/manage_students')) active @endif">
 
-                                <i class="fas fa-user nav-icon"></i>
-                                <p>Students</p>
-                            </a>
-                        </li>
+                                    <i class="fas fa-user nav-icon"></i>
+                                    <p>Students</p>
+                                </a>
+                            </li>
+                        @endcanany
 
                         @can('student.admit')
                             <li class="nav-item">
@@ -306,7 +308,7 @@
 
                         @can('manage.config')
                             <li class="nav-item">
-                                <a href="{{ route(config('env-editor.route.name')) }}" class="nav-link">
+                                {{-- <a href="{{ route(config('env-editor.route.name')) }}" class="nav-link"> --}}
                                     <i class="fas fa-external-link-square-alt nav-icon"></i>
                                     <p>Logs</p>
                                 </a>

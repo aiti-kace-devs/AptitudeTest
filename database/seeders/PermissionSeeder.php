@@ -23,6 +23,7 @@ class PermissionSeeder extends Seeder
             'course',
             'session',
             'branch',
+            'programme',
             'centre',
             'category',
             'exam',
@@ -121,6 +122,22 @@ class PermissionSeeder extends Seeder
         $notificationOfficerPermissions->append($specialPermissions->all());
         $notificationOfficerRole->syncPermissions($notificationOfficerPermissions);
 
+        //ATTENDANCE OFFICER ROLE
+        $attendanceOfficerRole = Role::findByName('attendance-officer', 'admin');
+        $specialAttendanceActions = [
+            'verify'
+        ];
+        foreach ($specialAttendanceActions as $action) {
+            $name = "attendance.$action";
+            Permission::findOrCreate(
+                $name,
+                "admin"
+            );
+        }
+        // give permissions
+        $attendanceOfficerPermissions = $this->findResourcePermissions(['attendance'], $actions);
+        $attendanceOfficerRole->syncPermissions($attendanceOfficerPermissions);
+
         // ADMINISTRATOR ROLE
         $administratorRole = Role::findByName('administrator', 'admin');
         // give permissions
@@ -129,6 +146,7 @@ class PermissionSeeder extends Seeder
             'course',
             'session',
             'branch',
+            'programme',
             'centre',
             'category',
             'exam',
@@ -139,7 +157,7 @@ class PermissionSeeder extends Seeder
             'form-response',
             'sms-template',
             'report'
-        ], array_merge($actions, $specialStudentActions));
+        ], array_merge($actions, $specialStudentActions, $specialAttendanceActions));
         $administratorRole->syncPermissions($administratorPermissions);
 
         // APP ADMINISTRATOR ROLE
@@ -168,11 +186,6 @@ class PermissionSeeder extends Seeder
         $superAdminRole->syncPermissions($superAdministratorPermissions);
 
 
-        //ATTENDANCE OFFICER ROLE
-        $attendanceOfficerRole = Role::findByName('attendance-officer', 'admin');
-        // give permissions
-        $attendanceOfficerPermissions = $this->findResourcePermissions(['attendance'], $actions);
-        $attendanceOfficerRole->syncPermissions($attendanceOfficerPermissions);
     }
 
 
