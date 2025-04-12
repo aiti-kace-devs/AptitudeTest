@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dateTime('shortlisted_at')->after('registered_course')->nullable();
+
+            $table->index('shortlisted_at');
         });
     }
 
