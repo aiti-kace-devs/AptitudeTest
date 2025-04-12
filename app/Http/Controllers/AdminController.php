@@ -507,7 +507,14 @@ class AdminController extends Controller
 
 
         return view('admin.manage_students', $data);
+
     }
+
+
+
+
+
+
     public function add_new_students(Request $request)
     {
         $data = $request->input('students') !== null ? $request->input('students') : [$request->all()];
@@ -567,6 +574,165 @@ class AdminController extends Controller
         $std->update();
         echo json_encode(['status' => 'true', 'message' => 'Successfully updated', 'reload' => url('admin/manage_students')]);
     }
+
+
+    //Shortlisted student page
+    public function shortlisted_students(Request $request)
+    {
+        $data['exam'] = Oex_exam_master::all();
+        $data['exams'] = Oex_exam_master::where('status', '1')->get()->toArray();
+
+        $data['courses'] = Course::pluck('course_name', 'id')->toArray();
+
+        $distinctAges = User::select('age')->whereNotNull('age')->distinct()->orderBy('age')->pluck('age')->toArray();
+
+        $data['availableAges'] = User::whereNotNull('age')
+            ->select('age')
+            ->distinct()
+            ->orderBy('age')
+            ->pluck('age')
+            ->toArray();
+
+        if ($request->ajax()) {
+            $baseQuery = user_exam::with('result')
+                ->join('users', 'users.id', '=', 'user_exams.user_id')
+                ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
+                ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
+                ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
+                // ->leftJoin('courses', '')
+                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'users.created_at', 'courses.course_name as course_name', 'courses.location as course_location', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
+
+            // if ($request->has('ex_name')) {
+            //     $baseQuery->whereIn('oex_exam_masters.title', (array) $request->ex_name);
+            // }
+
+            if ($request->has('admission_status')) {
+                $admissionStatuses = (array)$request->admission_status;
+                $baseQuery->where(function ($query) use ($admissionStatuses) {
+                    foreach ($admissionStatuses as $status) {
+                        if ($status === 'Admitted') {
+                            $query->orWhereNotNull('user_admission.user_id');
+                        } elseif ($status === 'Not Admitted') {
+                            $query->orWhereNull('user_admission.user_id');
+                        }
+                    }
+                });
+            }
+
+            if ($request->has('status')) {
+                $statuses = (array) $request->status;
+                $baseQuery->where(function ($query) use ($statuses) {
+                    foreach ($statuses as $status) {
+                        if ($status === 'passed') {
+                            $query->orWhereHas('result', function ($q) {
+                                $q->whereColumn('yes_ans', '>=', 'oex_exam_masters.passmark');
+                            });
+                        } elseif ($status === 'failed') {
+                            $query->orWhereHas('result', function ($q) {
+                                $q->whereColumn('yes_ans', '<', 'oex_exam_masters.passmark');
+                            });
+                        } elseif ($status === 'not_taken') {
+                            $query->orWhereNull('user_exams.submitted');
+                        }
+                    }
+                });
+            }
+
+            if ($request->has('age_range')) {
+                $selectedAges = (array) $request->age_range;
+                $baseQuery->where(function ($query) use ($selectedAges) {
+                    foreach ($selectedAges as $age) {
+                        if ($age === '0') continue;
+                        $query->orWhere('users.age', $age);
+                    }
+                });
+            }
+
+            if ($request->has('course')) {
+                $baseQuery->whereIn('users.registered_course', (array) $request->course);
+            }
+
+            // if($request->has('highest_education')){
+            //     $selectedEducations = (array) $request->highest_education;
+            //     $baseQuery->whereHas('formResponse', function($q) use ($selectedEducations) {
+            //         $q->where(function ($subQuery) use ($selectedEducations) {
+            //             foreach ($selectedEducations as $eduaction)
+            //         })
+            //     })
+            // }
+
+            if ($request->has('filter.search_term')) {
+                $searchTerm = $request->input('filter.search_term');
+                $baseQuery->where(function ($query) use ($searchTerm) {
+                    $query->where('users.name', 'like', "%$searchTerm%")->orWhere('users.email', 'like', "%$searchTerm%");
+                });
+            }
+            return DataTables::of($baseQuery)
+                ->addColumn('checkbox', function ($std) {
+                    return '<input type="checkbox" class="student-checkbox" value="' . $std->id . '">';
+                })
+                ->addColumn('age', function ($std) {
+                    return $std->age ?? 'N/A';
+                })
+                ->addColumn('course_name', function ($std) {
+                    return $std->course_name ?? 'N/A';
+                })
+                ->addColumn('location', function ($std) {
+                    return $std->course_location ?? 'N/A';
+                })
+
+                ->addColumn('gender', function ($std) {
+                    return $std->gender ?? 'N/A';
+                })
+
+                ->addColumn('date_registered', function ($std) {
+                    return $std->created_at ?? 'N/A';
+                })
+
+                ->addColumn('score', function ($std) {
+                    return optional($std->result)->yes_ans ?? 'N/A';
+                })
+                // ->addColumn('result', function ($std) {
+                //     if (!$std->submitted) {
+                //         return '<span class="badge badge-secondary">N/A</span>';
+                //     }
+                //     $yes_ans = optional($std->result)->yes_ans ?? 0;
+                //     $percentage = round(($yes_ans / 30) * 100);
+                //     $class = $yes_ans >= $std->passmark ? 'success' : 'danger';
+                //     return '<span class="badge badge-' . $class . '">' . $percentage . '%</span>';
+                // })
+                ->addColumn('status', function ($std) {
+                    if (!$std->submitted) {
+                        return '<span class="badge badge-secondary">Not Taken</span>';
+                    }
+                    $passed = optional($std->result)->yes_ans >= $std->passmark;
+                    return $passed ? '<span class="badge badge-success">PASS</span>' : '<span class="badge badge-danger">FAIL</span>';
+                })
+                ->addColumn('actions', function ($std) {
+                    $buttons = ['<a href="' . url('admin/delete_students/' . $std->id) . '" class="btn btn-danger btn-sm">Delete</a>'];
+
+                    if ($std->exam_joined) {
+                        $buttons[] = '<a href="' . url('admin/admin_view_result/' . $std->user_id) . '" class="btn btn-success btn-sm">View Result</a>';
+                    }
+
+                    $buttons[] = '<a href="' . route('admin.reset-exam', [$std->exam_id, $std->user_id]) . '" class="btn btn-info btn-sm">Reset Result</a>';
+
+                    return implode(' ', $buttons);
+                })
+                ->with(['all_filtered_ids' => $baseQuery->pluck('user_exams.id')->toArray()])
+                ->rawColumns(['checkbox', 'result', 'status', 'actions'])
+                ->toJson();
+        }
+
+        $data['mailable'] = MailerHelper::getMailableClasses();
+
+        // return view('mailables.index', ['mailables' => $mailables]);
+
+
+        return view('admin.manage_shortlist_students', $data);
+
+    }
+
 
     //Registered student page
     public function registered_students()

@@ -217,6 +217,15 @@
 
 
                             <li class="nav-item">
+                                <a href="{{ url('admin/shortlisted_students') }}"
+                                    class="nav-link @if (request()->is('admin/shortlisted_students')) active @endif">
+                                    <i class="fas fa-user-check nav-icon"></i>
+                                    <p>Shortlisted students</p>
+                                </a>
+                            </li>
+
+
+                            <li class="nav-item">
                                 <a href="{{ url('admin/registered_students') }}"
                                     class="nav-link @if (request()->is('admin/registered_students')) active @endif">
                                     <i class="fas fa-user-check nav-icon"></i>
