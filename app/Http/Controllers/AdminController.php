@@ -599,12 +599,19 @@ class AdminController extends Controller
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
                 ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
                 ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
+                ->leftJoin('course_sessions', 'user_admission.session', '=', 'course_sessions.id')
+
                 // ->leftJoin('courses', '')
-                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'users.created_at', 'courses.course_name as course_name', 'courses.location as course_location', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
+                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'users.created_at', 'users.shortlist', 'courses.course_name as course_name', 'courses.location as course_location', 'course_sessions.name as session_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
 
             // if ($request->has('ex_name')) {
             //     $baseQuery->whereIn('oex_exam_masters.title', (array) $request->ex_name);
             // }
+
+
+
+
+
 
             if ($request->has('admission_status')) {
                 $admissionStatuses = (array)$request->admission_status;

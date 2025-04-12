@@ -344,17 +344,12 @@
                                     <thead>
                                         <tr>
                                             <th width="20px"><input type="checkbox" id="select-all"></th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Age</th>
+                                            <th>Name (Email)</th>
+                                            <th>Shortlisted</th>
+                                            <th>Admitted</th>
                                             <th>Course</th>
-                                            <th>Location</th>
-                                            <th>Gender</th>
-                                            <th>Date Registered</th>
-                                            <th>Admission</th>
-                                            <th>Score</th>
-                                            {{-- <th>Result</th> --}}
-                                            <th>Status</th>
+                                            <th>Session</th>
+
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -381,65 +376,91 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Add new Student</h4>
+                    <h4 class="modal-title">Add Multiple Emails</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ url('admin/add_new_students') }}" class="database_operation">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="">Enter Name</label>
-                                    {{ csrf_field() }}
-                                    <input type="text" required="required" name="name" placeholder="Enter name"
-                                        class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="">Enter E-mail</label>
-                                    {{ csrf_field() }}
-                                    <input type="text" required="required" name="email" placeholder="Enter name"
-                                        class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="">Enter Mobile-no</label>
-                                    {{ csrf_field() }}
-                                    <input type="text" required="required" name="mobile_no"
-                                        placeholder="Enter mobile-no" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="">Select exam</label>
-                                    <select class="form-control" required="required" name="exam">
-                                        <option value="">Select</option>
-                                        @foreach ($exams as $exam)
-                                            <option value="{{ $exam['id'] }}">{{ $exam['title'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="">password</label>
-                                    <input type="password" required="required" name="password"
-                                        placeholder="Enter password" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <button class="btn btn-primary">Add</button>
-                                </div>
-                            </div>
+                    <form action="{{ url('admin/add_emails') }}" class="database_operation">
+                        <div class="form-group">
+                            <label for="">Enter Emails (separate by commas)</label>
+                            {{ csrf_field() }}
+                            <textarea required="required" name="emails" placeholder="Enter emails, separated by commas"
+                                class="form-control" rows="10"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary">Add Emails</button>
                         </div>
                     </form>
                 </div>
 
             </div>
         </div>
+    </div>
+
+
+    <div class="modal fade" id="admitModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Admit Student</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url('/admin/admit') }}" name="admit_form" method="POST">
+                        {{ csrf_field() }}
+                        <input id="user_id" name="user_id" type="hidden" class="form-control" required>
+                        <input id="change" name="change" value="false" type="hidden" class="form-control" required>
+                        <div class="form-group">
+                            <label for="course_id" class="form-label">Select Course</label>
+                            <select id="course_id" name="course_id" class="form-control" required>
+                                <option value="">Choose One Course</option>
+                                @foreach ($courses as $id => $name)
+                                    <option value="{{ $id }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        {{-- <div class="form-group">
+                            <label for="session_id" class="form-label">Select Session</label>
+                            <select id="session_id" name="session_id" class="form-control" required>
+                                <option value="">Choose One Session</option>
+                                @foreach ($sessions as $session)
+                                    <option data-course="{{ $session->course_id }}"
+                                        value="{{ $session->id }}">{{ $session->name }}</option>
+                                @endforeach
+                            </select>
+                        </div> --}}
+
+                        <div class="form-group">
+                            <label for="session_id" class="form-label">Select Session</label>
+                            <select id="session_id" name="session_id" class="form-control" required
+                                    @if (empty($sessions)) disabled @endif>
+                                @if (empty($sessions))
+                                    <option value="">No sessions available</option>
+                                @else
+                                    <option value="">Choose One Session</option>
+                                    @foreach ($sessions as $session)
+                                        <option data-course="{{ $session->course_id }}"
+                                            value="{{ $session->id }}">{{ $session->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @if (empty($sessions))
+                                <small class="text-muted">Sessions are not configured. Please contact support.</small>
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" @if (empty($sessions)) disabled @endif>Admit</button>
+                        </div>
+
+
+                        <div class="form-group">
+                            <button class="btn btn-primary">Admit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -529,58 +550,55 @@
                                 }
                             },
                             {
-                                data: 'name',
-                                name: 'users.name'
-                            },
-                            {
-                                data: 'email',
-                                name: 'users.email'
-                            },
-                            {
-                                data: 'age',
-                                name: 'users.age'
-                            },
-                            {
-                                data: 'course_name',
-                                name: 'course_name'
-                            },
-                            {
-                                data: 'course_location',
-                                name: 'course_location'
-                            },
-                            {
-                                data: 'gender',
-                                name: 'users.gender'
-                            },
-                            {
-                                data: 'date_registered',
-                                name: 'users.created_at'
-                            },
-                            {
-                                data: 'admission_status',
-                                name: 'admission_status'
-                            },
-                            {
-                                data: 'score',
-                                name: 'score',
-                                orderable: false
-                            },
-                            // {
-                            //     data: 'result',
-                            //     name: 'result',
-                            //     orderable: false
-                            // },
-                            {
-                                data: 'status',
-                                name: 'status',
-                                orderable: false
-                            },
-                            {
-                                data: 'actions',
-                                name: 'actions',
-                                orderable: false
+                        data: null,
+                        name: 'name_email',
+                        render: function(data, type, row) {
+                            return row.name + ' (' + row.email + ')';
+                        }
+                    },
+                    {
+                        data: 'admission_status',
+                        name: 'admission_status',
+                        render: function(data, type, row) {
+                            if (data === 'Admitted') {
+                                return '<span class="badge badge-primary">Admitted</span>';
+                            } else {
+                                return '<span class="badge badge-danger">Not Admitted</span>';
                             }
-                        ],
+                        }
+                    },
+
+                    {
+    data: 'shortlist',
+    name: 'shortlist',
+    render: function(data, type, row) {
+        return data == 1 ?
+            '<span class="badge badge-primary">Shortlisted</span>' :
+            '<span class="badge badge-danger">Not Shortlisted</span>';
+    }
+},
+
+                    {
+                        data: 'course_name',
+                        name: 'course_name',
+                        render: function(data, type, row) {
+                            return data || 'N/A';
+                        }
+                    },
+                    {
+                        data: 'session_name',
+                        name: 'session_name',
+                        render: function(data, type, row) {
+                            return data || 'N/A';
+                        }
+                    },
+                    {
+                        data: 'actions',
+                        name: 'actions',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
                         columnDefs: [{
                                 targets: 0,
                                 width: "5%"
@@ -671,6 +689,20 @@
                         }
                     });
 
+                    function openAdmitModal(id, course_id = null, session_id = null) {
+                $('#admitModal #user_id').val(id);
+                $('#admitModal #course_id').val(course_id);
+                $('#admitModal #session_id').val(session_id);
+                if (course_id) {
+                    $('#admitModal button[type="submit"]').text('Change Admission');
+                    $('#admitModal #change').val('true');
+                } else {
+                    $('#admitModal button[type="submit"]').text('Admit');
+                    $('#admitModal #change').val('false');
+                }
+                $('#admitModal').modal('show');
+            }
+
                     $('#admit-selected').click(function() {
                         var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
 
@@ -723,6 +755,20 @@
                     });
                 });
 
+                $(document).on('click', '.admit-btn', function() {
+                var id = $(this).data('id');
+                var course_id = $(this).data('course_id') || null;
+                var session_id = $(this).data('session_id') || null;
+                openAdmitModal(id, course_id, session_id);
+            });
+
+            $('#admitModal #course_id').on('change', function() {
+                var courseId = $(this).val();
+                $('#admitModal #session_id option').each(function() {
+                    $(this).toggle($(this).attr('data-course') === courseId || !$(this).attr('data-course'));
+                });
+            });
+
 
 
                 var modal = $('#bulk-email-modal');
@@ -768,6 +814,10 @@
                     });
 
                 });
+
+                function updateDataTable() {
+            $('#studentsTable').DataTable().ajax.reload();
+        }
             </script>
         @endpush
     @endsection
