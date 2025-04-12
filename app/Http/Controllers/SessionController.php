@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SessionFormRequest;
 use App\Models\Course;
-use App\Models\Session;
+use App\Models\CourseSession;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -20,14 +20,14 @@ class SessionController extends Controller
      */
     public function index()
     {
-        $sessions = Session::get();
+        $sessions = CourseSession::get();
 
         return Inertia::render('Session/List');
     }
 
     public function fetch()
     {
-        $data = Session::get(['uuid', 'name', 'limit', 'course_time']);
+        $data = CourseSession::get(['uuid', 'name', 'limit', 'course_time']);
         return DataTables::of($data)
             ->addIndexColumn()
             ->editColumn('duration', function ($row){
@@ -89,7 +89,7 @@ class SessionController extends Controller
         $validated['name'] = ucwords($name);
         $validated['session'] = ucwords($validated['session']);
 
-        Session::create($validated);
+        CourseSession::create($validated);
 
         return redirect()->route('admin.session.index');
     }
@@ -114,7 +114,7 @@ class SessionController extends Controller
      */
     public function edit($uuid)
     {
-        $session = Session::where('uuid', $uuid)->firstOrFail();
+        $session = CourseSession::where('uuid', $uuid)->firstOrFail();
         $courses = Course::orderBy('course_name')->get();
 
         return Inertia::render('Session/Edit', compact('session', 'courses'));
@@ -137,7 +137,7 @@ class SessionController extends Controller
         $validated['name'] = ucwords($name);
         $validated['session'] = ucwords($validated['session']);
 
-        $session = Session::where('uuid', $uuid)->first();
+        $session = CourseSession::where('uuid', $uuid)->first();
 
         $session->fill($validated)->save();
         return redirect()->route('admin.session.index');
@@ -151,7 +151,7 @@ class SessionController extends Controller
      */
     public function destroy($uuid)
     {
-        $session = Session::where('uuid', $uuid)->first();
+        $session = CourseSession::where('uuid', $uuid)->first();
 
         $session->delete();
     }
