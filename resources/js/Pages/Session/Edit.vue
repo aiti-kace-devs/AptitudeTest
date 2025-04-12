@@ -28,6 +28,7 @@ export default {
       limit: this.session.limit,
       course_time: this.session.course_time,
       session: this.session.session,
+      link: this.session.link,
     });
 
     return {
@@ -131,6 +132,20 @@ export default {
                     :class="{ 'border-red-600': form.errors.session }"
                   />
                   <InputError :message="form.errors.session" />
+                </div>
+
+                <div class="lg:col-span-6">
+                  <InputLabel for="link" value="WhatsApp Link" :required="true" />
+                  <TextInput
+                    id="link"
+                    type="text"
+                    class="w-full"
+                    v-model="form.link"
+                    :placeholder="'WhatsApp Link'"
+                    autocomplete="false"
+                    :class="{ 'border-red-600': form.errors.link }"
+                  />
+                  <InputError :message="form.errors.link" />
                 </div>
 
                 <div class="col-span-full">
