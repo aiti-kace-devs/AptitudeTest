@@ -130,7 +130,7 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label for="session_id" class="form-label">Select Course</label>
+                                        <label for="session_id" class="form-label">Choose Session</label>
                                         <select id="session_id" name="session_id" class="form-control" required>
                                             <option value="">Choose One Session</option>
 
