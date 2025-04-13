@@ -253,7 +253,7 @@
                                     <div class="row">
                                         <div class="col-md-12 d-flex justify-content-end pr-3 mb-2">
                                             <a class="btn btn-info mr-2" href="javascript:;" data-toggle="modal"
-                                                data-target="#myModal">Add new student</a>
+                                                data-target="#shortlisted_students">Choose Shortlist</a>
                                             <button class="btn btn-warning mr-2" data-toggle="modal"
                                                 data-target="#bulk-email-modal">Send Emails
                                                 <i class="fas fa-envelope"></i>
@@ -295,7 +295,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-md-2">
+                                        <!-- <div class="col-md-2">
                                             <select multiple name="status[]" id="status" class="form-control"
                                                 data-filter="status" aria-hidden="true">
                                                 <option value="0">All Statuses</option>
@@ -312,7 +312,7 @@
                                                     <option value="{{ $age }}">{{ $age }} years</option>
                                                 @endforeach
                                             </select>
-                                        </div>
+                                        </div> -->
                                         <div class="col-md-3">
                                             <input type="text" class="form-control" id="studentSearch"
                                                 placeholder="Search by name or email">
@@ -371,32 +371,21 @@
     @include('admin.send_bulk_sms')
 
 
-    <div class="modal fade" id="myModal" role="dialog">
-        <div class="modal-dialog">
+    <x-modal id="shortlisted_students" title="Copy and Paste Shortlisted Student Emails" size="modal-lg">
+    <label for="email_list">Paste Emails Here</label>
+    <textarea class="form-control mb-3" name="email_list" id="email_list"
+              rows="10"
+              style="min-height: 250px;"
+              placeholder="Paste emails, one per line..."></textarea>
 
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Add Multiple Emails</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ url('admin/add_emails') }}" class="database_operation">
-                        <div class="form-group">
-                            <label for="">Enter Emails (separate by commas)</label>
-                            {{ csrf_field() }}
-                            <textarea required="required" name="emails" placeholder="Enter emails, separated by commas"
-                                class="form-control" rows="10"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-primary">Add Emails</button>
-                        </div>
-                    </form>
-                </div>
+    <x-slot name="footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="shortlist-modal-submit" type="button" class="btn btn-primary">Submit</button>
+    </x-slot>
+    </x-modal>
 
-            </div>
-        </div>
-    </div>
+
+
 
 
     <div class="modal fade" id="admitModal" role="dialog">
@@ -806,5 +795,49 @@
             }
         });
     </script>
+
+
+
+    <script>
+    $(document).on('click', '#shortlist-modal-submit', function () {
+        const rawEmails = $('#email_list').val();
+        const emailList = rawEmails
+            .split(/\r?\n/)
+            .map(email => email.trim())
+            .filter(email => email !== '');
+
+        if (emailList.length === 0) {
+            toastr.error('Please paste at least one valid email address.');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('admin.save_shortlisted_students') }}",
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            },
+            data: {
+                emails: emailList,
+            },
+            success: function (response) {
+                toastr.success(response.message || 'Users updated successfully.');
+                $('#shortlisted_students').modal('hide');
+
+                // Reload after short delay
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            },
+            error: function (xhr) {
+                toastr.error(xhr.responseJSON?.message || 'Error updating shortlisted users.');
+            }
+        });
+    });
+
+    </script>
+
+
+
     @endpush
 @endsection

@@ -376,6 +376,7 @@ class AdminController extends Controller
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
                 ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
                 ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
+                ->where('users.shortlist', 1)
                 // ->leftJoin('courses', '')
                 ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'users.created_at', 'courses.course_name as course_name', 'courses.location as course_location', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
 
@@ -604,15 +605,6 @@ class AdminController extends Controller
                 // ->leftJoin('courses', '')
                 ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'users.created_at', 'users.shortlist', 'courses.course_name as course_name', 'courses.location as course_location', 'course_sessions.name as session_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
 
-            // if ($request->has('ex_name')) {
-            //     $baseQuery->whereIn('oex_exam_masters.title', (array) $request->ex_name);
-            // }
-
-
-
-
-
-
             if ($request->has('admission_status')) {
                 $admissionStatuses = (array)$request->admission_status;
                 $baseQuery->where(function ($query) use ($admissionStatuses) {
@@ -659,15 +651,6 @@ class AdminController extends Controller
                 $baseQuery->whereIn('users.registered_course', (array) $request->course);
             }
 
-            // if($request->has('highest_education')){
-            //     $selectedEducations = (array) $request->highest_education;
-            //     $baseQuery->whereHas('formResponse', function($q) use ($selectedEducations) {
-            //         $q->where(function ($subQuery) use ($selectedEducations) {
-            //             foreach ($selectedEducations as $eduaction)
-            //         })
-            //     })
-            // }
-
             if ($request->has('filter.search_term')) {
                 $searchTerm = $request->input('filter.search_term');
                 $baseQuery->where(function ($query) use ($searchTerm) {
@@ -699,15 +682,7 @@ class AdminController extends Controller
                 ->addColumn('score', function ($std) {
                     return optional($std->result)->yes_ans ?? 'N/A';
                 })
-                // ->addColumn('result', function ($std) {
-                //     if (!$std->submitted) {
-                //         return '<span class="badge badge-secondary">N/A</span>';
-                //     }
-                //     $yes_ans = optional($std->result)->yes_ans ?? 0;
-                //     $percentage = round(($yes_ans / 30) * 100);
-                //     $class = $yes_ans >= $std->passmark ? 'success' : 'danger';
-                //     return '<span class="badge badge-' . $class . '">' . $percentage . '%</span>';
-                // })
+
                 ->addColumn('status', function ($std) {
                     if (!$std->submitted) {
                         return '<span class="badge badge-secondary">Not Taken</span>';
@@ -732,9 +707,6 @@ class AdminController extends Controller
         }
 
         $data['mailable'] = MailerHelper::getMailableClasses();
-
-        // return view('mailables.index', ['mailables' => $mailables]);
-
 
         return view('admin.manage_shortlist_students', $data);
 
@@ -1306,4 +1278,50 @@ class AdminController extends Controller
                 'key' => 'success',
             ]);
     }
+
+
+
+
+
+
+    public function saveShortlistedStudents(Request $request)
+    {
+        $request->validate([
+            'emails' => 'required|array',
+            'emails.*' => 'email',
+        ], [], [
+            'emails.*' => 'email address'
+        ]);
+    
+        $emails = $request->input('emails');
+    
+        $usersToUpdate = User::whereIn('email', $emails)
+            ->where(function ($query) {
+                $query->whereNull('shortlist')
+                      ->orWhere('shortlist', '!=', 1);
+            })
+            ->get();
+    
+        if ($usersToUpdate->isEmpty()) {
+            return response()->json([
+                'message' => 'No users found to update or all are already shortlisted.',
+            ], 404);
+        }
+    
+        $updatedCount = User::whereIn('id', $usersToUpdate->pluck('id'))
+            ->update(['shortlist' => 1]);
+    
+        return response()->json([
+            'message' => "$updatedCount user(s) successfully shortlisted.",
+        ]);
+    }
+
+
+
+
+
+
+
+
+
 }

@@ -110,7 +110,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('/question_status/{id}', [AdminController::class, 'question_status'])->middleware('admin.super');
         Route::get('/delete_question/{id}', [AdminController::class, 'delete_question'])->middleware('admin.super');
         Route::get('/update_question/{id}', [AdminController::class, 'update_question'])->middleware('admin.super');
-        Route::get('/shortlisted_students', [AdminController::class, 'shortlisted_students'])->middleware('admin.super')->name('shortlisted_students');;
+        Route::get('/shortlisted_students', [AdminController::class, 'shortlisted_students'])->middleware('admin.super')->name('shortlisted_students');
+        Route::post('/save_shortlisted_students', [AdminController::class, 'saveShortlistedStudents'])->name('save_shortlisted_students');
         Route::get('/registered_students', [AdminController::class, 'registered_students'])->middleware('admin.super');
         Route::get('/delete_registered_students/{id}', [AdminController::class, 'delete_registered_students'])->middleware('admin.super');
         Route::get('/apply_exam/{id}', [AdminController::class, 'apply_exam']);
