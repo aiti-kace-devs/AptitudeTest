@@ -63,13 +63,15 @@ class AdmitStudentsCommand extends Command
 
         $shortlistedStudents = User::where('shortlist', '1')->where('registered_course', $course_id)
             // ->leftJoin('user_admission', 'users.userId', '=', 'user_admission.user_id')
-            ->whereDoesntHave('admission')->limit(1)->get();
+            ->whereDoesntHave('admission')->get();
 
-        $this->info($shortlistedStudents->count() . 'student(s) yet to be admitted');
+        $this->info($shortlistedStudents->count() . ' student(s) yet to be admitted');
 
         $this->withProgressBar($shortlistedStudents, function ($student) {
             CreateStudentAdmissionJob::dispatch($student);
         });
+
+        $this->info('All students admitted successfully');
     }
 
     private function askForOptionSelection($options, $message)

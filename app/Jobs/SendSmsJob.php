@@ -41,7 +41,7 @@ class SendSmsJob implements ShouldQueue
                 'sender' => $sender,
                 'message' => $this->message,
                 'recipients' => [$this->phone],
-                'sandbox' => env('USE_SMS_SANDBOX', 'true'),
+                'sandbox' => env('USE_SMS_SANDBOX', config('app.env') === 'local' ? true : false),
             ]);
 
             \Log::info('SMS Response', ['response' => $response->json()]);

@@ -5,9 +5,9 @@ This is to confirm that you have successfully enrolled for {{$courseSession->nam
 Time is {{$courseSession->course_time}}
 <br>
 
-@if($session->link)
+@if($courseSession->link)
 Click on the link below to join the official Whatsapp group for the course
-<x-mail::button :url="$session->link" color="success">Join WhatsApp Group</x-mail::button>
+<x-mail::button :url="$courseSession->link" color="success">Join WhatsApp Group</x-mail::button>
 @endif
 
 Thanks,<br>

@@ -295,7 +295,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                       
+
                                         <div class="col-md-3">
                                             <input type="text" class="form-control" id="studentSearch"
                                                 placeholder="Search by name or email">
@@ -355,16 +355,14 @@
 
 
     <x-modal id="shortlisted_students" title="Copy and Paste Shortlisted Student Emails" size="modal-lg">
-    <label for="email_list">Paste Emails Here</label>
-    <textarea class="form-control mb-3" name="email_list" id="email_list"
-              rows="10"
-              style="min-height: 250px;"
-              placeholder="Paste emails, one per line..."></textarea>
+        <label for="email_list">Paste Emails Here</label>
+        <textarea class="form-control mb-3" name="email_list" id="email_list" rows="10" style="min-height: 250px;"
+            placeholder="Paste emails, one per line..."></textarea>
 
-    <x-slot name="footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button id="shortlist-modal-submit" type="button" class="btn btn-primary">Submit</button>
-    </x-slot>
+        <x-slot name="footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button id="shortlist-modal-submit" type="button" class="btn btn-primary">Submit</button>
+        </x-slot>
     </x-modal>
 
 
@@ -382,7 +380,8 @@
                     <form action="{{ url('/admin/admit') }}" name="admit_form" method="POST">
                         {{ csrf_field() }}
                         <input id="user_id" name="user_id" type="hidden" class="form-control" required>
-                        <input id="change" name="change" value="false" type="hidden" class="form-control" required>
+                        <input id="change" name="change" value="false" type="hidden" class="form-control"
+                            required>
                         <div class="form-group">
                             <label for="course_id" class="form-label">Select Course</label>
                             <select id="course_id" name="course_id" class="form-control" required>
@@ -406,14 +405,14 @@
                         <div class="form-group">
                             <label for="session_id" class="form-label">Choose Session</label>
                             <select id="session_id" name="session_id" class="form-control" required
-                                    @if (empty($sessions)) disabled @endif>
+                                @if (empty($sessions)) disabled @endif>
                                 @if (empty($sessions))
                                     <option value="">No sessions available</option>
                                 @else
                                     <option value="">Choose One Session</option>
                                     @foreach ($sessions as $session)
-                                        <option data-course="{{ $session->course_id }}"
-                                            value="{{ $session->id }}">{{ $session->name }}</option>
+                                        <option data-course="{{ $session->course_id }}" value="{{ $session->id }}">
+                                            {{ $session->name }}</option>
                                     @endforeach
                                 @endif
                             </select>
@@ -422,7 +421,8 @@
                             @endif
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-primary" @if (empty($sessions)) disabled @endif>Admit</button>
+                            <button class="btn btn-primary"
+                                @if (empty($sessions)) disabled @endif>Admit</button>
                         </div>
 
 
@@ -438,388 +438,399 @@
 
 
     @push('scripts')
-    <script type="text/javascript" src="{{ url('assets/js/jquery-multiselect.min.js') }}"></script>
-    <script>
-        // Define openAdmitModal globally
-        window.openAdmitModal = function(id, course_id = null, session_id = null) {
-            console.log('Opening admit modal with:', { id, course_id, session_id });
-            try {
-                $('#admitModal #user_id').val(id);
-                $('#admitModal #course_id').val(course_id);
-                $('#admitModal #session_id').val(session_id);
-                if (course_id) {
-                    $('#admitModal button[type="submit"]').text('Change Admission');
-                    $('#admitModal #change').val('true');
-                } else {
-                    $('#admitModal button[type="submit"]').text('Admit');
-                    $('#admitModal #change').val('false');
-                }
-                $('#admitModal').modal('show');
-            } catch (e) {
-                console.error('Error opening modal:', e);
-            }
-        };
-
-        $(document).ready(function() {
-            console.log('Document ready, openAdmitModal defined:', typeof window.openAdmitModal);
-
-            $('select[multiple][data-filter]').multiSelect({
-                selectableHeader: "<div class='multi-select-legend'>Available Options</div>",
-                selectionHeader: "<div class='multi-select-legend'>Selected Options</div>",
-                afterSelect: function(values) {
-                    updateDataTable();
-                },
-                afterDeselect: function(values) {
-                    updateDataTable();
-                }
-            });
-
-            var table = $('#studentsTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [{
-                    extend: 'csv',
-                    text: '<i class="fas fa-file-csv"></i> Export CSV',
-                    className: 'btn btn-success',
-                    title: 'Students_Export_' + new Date().toISOString().slice(0, 10),
-                    exportOptions: {
-                        columns: [1, 2, 3, 4, 5]
+        <script type="text/javascript" src="{{ url('assets/js/jquery-multiselect.min.js') }}"></script>
+        <script>
+            // Define openAdmitModal globally
+            window.openAdmitModal = function(id, course_id = null, session_id = null) {
+                // console.log('Opening admit modal with:', { id, course_id, session_id });
+                try {
+                    $('#admitModal #user_id').val(id);
+                    $('#admitModal #course_id').val(course_id);
+                    $('#admitModal #session_id').val(session_id);
+                    if (course_id) {
+                        $('#admitModal button[type="submit"]').text('Change Admission');
+                        $('#admitModal #change').val('true');
+                    } else {
+                        $('#admitModal button[type="submit"]').text('Admit');
+                        $('#admitModal #change').val('false');
                     }
-                }],
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "{{ route('admin.shortlisted_students') }}",
-                    type: "GET",
-                    data: function(d) {
-                        d.draw = d.draw;
-                        d.start = d.start;
-                        d.length = d.length;
-                        isFilterApplied = false;
+                    $('#admitModal').modal('show');
+                } catch (e) {
+                    console.error('Error opening modal:', e);
+                }
+            };
 
-                        $('select[multiple][data-filter]').each(function() {
-                            var filterName = $(this).data('filter');
-                            var selected = $(this).val();
-                            if (selected && selected.length > 0 && !selected.includes("0")) {
-                                d[filterName] = selected;
+            $(document).ready(function() {
+                // console.log('Document ready, openAdmitModal defined:', typeof window.openAdmitModal);
+
+                $('select[multiple][data-filter]').multiSelect({
+                    selectableHeader: "<div class='multi-select-legend'>Available Options</div>",
+                    selectionHeader: "<div class='multi-select-legend'>Selected Options</div>",
+                    afterSelect: function(values) {
+                        updateDataTable();
+                    },
+                    afterDeselect: function(values) {
+                        updateDataTable();
+                    }
+                });
+
+                var table = $('#studentsTable').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [{
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv"></i> Export CSV',
+                        className: 'btn btn-success',
+                        title: 'Students_Export_' + new Date().toISOString().slice(0, 10),
+                        exportOptions: {
+                            columns: [1, 2, 3, 4, 5]
+                        }
+                    }],
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('admin.shortlisted_students') }}",
+                        type: "GET",
+                        data: function(d) {
+                            d.draw = d.draw;
+                            d.start = d.start;
+                            d.length = d.length;
+                            isFilterApplied = false;
+
+                            $('select[multiple][data-filter]').each(function() {
+                                var filterName = $(this).data('filter');
+                                var selected = $(this).val();
+                                if (selected && selected.length > 0 && !selected.includes("0")) {
+                                    d[filterName] = selected;
+                                    isFilterApplied = true;
+                                }
+                            });
+                            if ($('#studentSearch').val()) {
+                                d['filter[search_term]'] = $('#studentSearch').val();
                                 isFilterApplied = true;
                             }
-                        });
-                        if ($('#studentSearch').val()) {
-                            d['filter[search_term]'] = $('#studentSearch').val();
-                            isFilterApplied = true;
+                        },
+                        dataSrc: function(json) {
+                            allFilteredIds = json.all_filtered_ids || [];
+                            return json.data;
+                        },
+                        error: function(xhr, error, thrown) {
+                            console.log("AJAX Error:", xhr.responseText);
+                            $('#studentsTable tbody').html(
+                                '<tr><td colspan="7" class="text-center text-danger">Error loading data. Please try again.</td></tr>'
+                            );
                         }
                     },
-                    dataSrc: function(json) {
-                        allFilteredIds = json.all_filtered_ids || [];
-                        return json.data;
-                    },
-                    error: function(xhr, error, thrown) {
-                        console.log("AJAX Error:", xhr.responseText);
-                        $('#studentsTable tbody').html(
-                            '<tr><td colspan="7" class="text-center text-danger">Error loading data. Please try again.</td></tr>'
-                        );
-                    }
-                },
-                columns: [{
-                        data: 'checkbox',
-                        name: 'checkbox',
-                        orderable: false,
-                        searchable: false,
-                        render: function(data, type, row) {
-                            return '<input type="checkbox" class="student-checkbox" value="' + row.id + '" ' +
-                                (isFilterApplied ? 'checked' : '') + '>';
-                        }
-                    },
-                    {
-                        data: null,
-                        name: 'name',
-                        render: function(data, type, row) {
-                            return row.name + ' (' + row.email + ')';
-                        }
-                    },
-                    {
-                        data: 'admitted',
-                        name: 'admitted',
-                        render: function(data, type, row) {
-                            if (data) {
-                                return '<span class="badge badge-primary">Admitted</span>';
-                            } else {
-                                return '<span class="badge badge-danger">Not Admitted</span>';
+                    columns: [{
+                            data: 'checkbox',
+                            name: 'checkbox',
+                            orderable: false,
+                            searchable: false,
+                            render: function(data, type, row) {
+                                return '<input type="checkbox" class="student-checkbox" value="' + row
+                                    .id + '" ' +
+                                    (isFilterApplied ? 'checked' : '') + '>';
                             }
-                        }
-                    },
-                    {
-                    data: 'shortlist',
-                    name: 'shortlist',
-                    render: function(data, type, row) {
-                        return '<span class="badge badge-success">Shortlisted</span>';
-                    }
-                    },
-                    {
-                        data: 'course_name',
-                        name: 'course_name',
-                        render: function(data, type, row) {
-                            return data ? data : 'N/A';
-                        }
-                    },
-                    {
-                        data: 'session_name',
-                        name: 'session_name',
-                        render: function(data, type, row) {
-                            return data ? data : 'N/A';
-                        }
-                    },
-
-                    {
-                        data: 'actions',
-                        name: 'actions',
-                        orderable: false,
-                        searchable: false,
-                        render: function(data, type, row) {
-                            var buttons = [];
-                            if (!row.admitted) {
-                                buttons.push('<button class="btn btn-primary btn-sm admit-btn" data-id="' + row.id + '">Admit</button>');
-                            } else {
-                                buttons.push('<button class="btn btn-info btn-sm admit-btn" data-id="' + row.id + '" data-course_id="' + (row.course_id || '') + '" data-session_id="' + (row.session_id || '') + '">Change Admission</button>');
-                                if (row.session_name) {
-                                    buttons.push('<a href="' + "{{ url('student/select-session') }}" + '/' + row.id + '" target="_blank" class="btn btn-primary btn-sm">Choose Session</a>');
+                        },
+                        {
+                            data: null,
+                            name: 'name',
+                            render: function(data, type, row) {
+                                return row.name + ' (' + row.email + ')';
+                            }
+                        },
+                        {
+                            data: 'admitted',
+                            name: 'admitted',
+                            render: function(data, type, row) {
+                                if (data) {
+                                    return '<span class="badge badge-primary">Admitted</span>';
+                                } else {
+                                    return '<span class="badge badge-danger">Not Admitted</span>';
                                 }
                             }
-                            // if ({{ Auth::guard('admin')->user()->is_super ?? 0 }} == 1) {
-                            //     buttons.push('<a href="' + "{{ url('admin/delete_shortlisted_student') }}" + '/' + row.id + '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this student?\')">Delete</a>');                            }
-                            return buttons.join(' ');
+                        },
+                        {
+                            data: 'shortlist',
+                            name: 'shortlist',
+                            render: function(data, type, row) {
+                                return '<span class="badge badge-success">Shortlisted</span>';
+                            }
+                        },
+                        {
+                            data: 'course_name',
+                            name: 'course_name',
+                            render: function(data, type, row) {
+                                return data ? data : 'N/A';
+                            }
+                        },
+                        {
+                            data: 'session_name',
+                            name: 'session_name',
+                            render: function(data, type, row) {
+                                return data ? data : 'N/A';
+                            }
+                        },
+
+                        {
+                            data: 'actions',
+                            name: 'actions',
+                            orderable: false,
+                            searchable: false,
+                            render: function(data, type, row) {
+                                var buttons = [];
+                                if (!row.admitted) {
+                                    buttons.push(
+                                        '<button class="btn btn-primary btn-sm admit-btn" data-id="' +
+                                        row.userId + '">Admit</button>');
+                                } else {
+                                    buttons.push(
+                                        '<button class="btn btn-info btn-sm admit-btn" data-id="' +
+                                        row.userId + '" data-course_id="' + (row.course_id || '') +
+                                        '" data-session_id="' + (row.session_id || '') +
+                                        '">Change Admission</button>');
+                                    if (row.session_name) {
+                                        buttons.push('<a href="' +
+                                            "{{ url('student/select-session') }}" + '/' + row
+                                            .userId +
+                                            '" target="_blank" class="btn btn-primary btn-sm">Choose Session</a>'
+                                        );
+                                    }
+                                }
+                                // if ({{ Auth::guard('admin')->user()->is_super ?? 0 }} == 1) {
+                                //     buttons.push('<a href="' + "{{ url('admin/delete_shortlisted_student') }}" + '/' + row.id + '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this student?\')">Delete</a>');                            }
+                                return buttons.join(' ');
+                            }
                         }
+                    ],
+                    columnDefs: [{
+                            targets: 0,
+                            width: "5%"
+                        },
+                        {
+                            targets: -1,
+                            width: "15%"
+                        }
+                    ],
+                    order: [
+                        [1, 'asc']
+                    ],
+                    drawCallback: function(settings) {
+                        if (isFilterApplied) {
+                            $('.student-checkbox').prop('checked', true);
+                            manuallySelectedIds = [...allFilteredIds];
+                        } else {
+                            manuallySelectedIds = [];
+                        }
+                        var allChecked = $('.student-checkbox:not(:checked)').length === 0;
+                        $('#select-all').prop('checked', allChecked);
                     }
-                ],
-                columnDefs: [{
-                        targets: 0,
-                        width: "5%"
-                    },
-                    {
-                        targets: -1,
-                        width: "15%"
+                });
+
+                var allFilteredIds = [];
+                var manuallySelectedIds = [];
+                var isFilterApplied = false;
+                var debounceTimer;
+
+                $(document).on('click', '.admit-btn', function() {
+                    console.log('Admit button clicked');
+                    var id = $(this).data('id');
+                    var course_id = $(this).data('course_id') || null;
+                    var session_id = $(this).data('session_id') || null;
+                    if (!id) {
+                        console.error('No user ID found for admit button');
+                        return;
                     }
-                ],
-                order: [
-                    [1, 'asc']
-                ],
-                drawCallback: function(settings) {
-                    if (isFilterApplied) {
-                        $('.student-checkbox').prop('checked', true);
+                    if (typeof window.openAdmitModal === 'function') {
+                        window.openAdmitModal(id, course_id, session_id);
+                    } else {
+                        console.error('openAdmitModal is not defined');
+                    }
+                });
+
+                $('#studentSearch').on('keyup', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function() {
+                        table.ajax.reload();
+                    }, 500);
+                });
+
+                $('select[multiple][data-filter]').on('change', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function() {
+                        table.ajax.reload();
+                    }, 300);
+                });
+
+                $('#clear-filters').click(function() {
+                    $('select[multiple][data-filter]').each(function() {
+                        $(this).val(['0']);
+                        $(this).multiSelect('deselect_all');
+                        $(this).multiSelect('select', '0');
+                    });
+                    $('#studentSearch').val('');
+                    table.ajax.reload();
+                    $('#select-all').prop('checked', false);
+                    manuallySelectedIds = [];
+                });
+
+                $(document).on('change', '.student-checkbox', function() {
+                    var studentId = $(this).val();
+                    if ($(this).is(':checked')) {
+                        if (!manuallySelectedIds.includes(studentId)) {
+                            manuallySelectedIds.push(studentId);
+                        }
+                    } else {
+                        manuallySelectedIds = manuallySelectedIds.filter(id => id != studentId);
+                    }
+                    var allChecked = $('.student-checkbox:not(:checked)').length === 0;
+                    $('#select-all').prop('checked', allChecked);
+                });
+
+                $('#select-all').change(function() {
+                    var isChecked = $(this).prop('checked');
+                    $('.student-checkbox').prop('checked', isChecked);
+                    if (isChecked) {
                         manuallySelectedIds = [...allFilteredIds];
                     } else {
                         manuallySelectedIds = [];
                     }
-                    var allChecked = $('.student-checkbox:not(:checked)').length === 0;
-                    $('#select-all').prop('checked', allChecked);
-                }
-            });
-
-            var allFilteredIds = [];
-            var manuallySelectedIds = [];
-            var isFilterApplied = false;
-            var debounceTimer;
-
-            $(document).on('click', '.admit-btn', function() {
-                console.log('Admit button clicked');
-                var id = $(this).data('id');
-                var course_id = $(this).data('course_id') || null;
-                var session_id = $(this).data('session_id') || null;
-                if (!id) {
-                    console.error('No user ID found for admit button');
-                    return;
-                }
-                if (typeof window.openAdmitModal === 'function') {
-                    window.openAdmitModal(id, course_id, session_id);
-                } else {
-                    console.error('openAdmitModal is not defined');
-                }
-            });
-
-            $('#studentSearch').on('keyup', function() {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(function() {
-                    table.ajax.reload();
-                }, 500);
-            });
-
-            $('select[multiple][data-filter]').on('change', function() {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(function() {
-                    table.ajax.reload();
-                }, 300);
-            });
-
-            $('#clear-filters').click(function() {
-                $('select[multiple][data-filter]').each(function() {
-                    $(this).val(['0']);
-                    $(this).multiSelect('deselect_all');
-                    $(this).multiSelect('select', '0');
                 });
-                $('#studentSearch').val('');
-                table.ajax.reload();
-                $('#select-all').prop('checked', false);
-                manuallySelectedIds = [];
-            });
 
-            $(document).on('change', '.student-checkbox', function() {
-                var studentId = $(this).val();
-                if ($(this).is(':checked')) {
-                    if (!manuallySelectedIds.includes(studentId)) {
-                        manuallySelectedIds.push(studentId);
+                $('#admit-selected').click(function() {
+                    var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
+                    if (!selectedIds || selectedIds.length === 0) {
+                        toastr.warning('No students selected or no students match your filters');
+                        return;
                     }
-                } else {
-                    manuallySelectedIds = manuallySelectedIds.filter(id => id != studentId);
-                }
-                var allChecked = $('.student-checkbox:not(:checked)').length === 0;
-                $('#select-all').prop('checked', allChecked);
-            });
 
-            $('#select-all').change(function() {
-                var isChecked = $(this).prop('checked');
-                $('.student-checkbox').prop('checked', isChecked);
-                if (isChecked) {
-                    manuallySelectedIds = [...allFilteredIds];
-                } else {
-                    manuallySelectedIds = [];
-                }
-            });
+                    var btn = $(this);
+                    btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
 
-            $('#admit-selected').click(function() {
-                var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
-                if (!selectedIds || selectedIds.length === 0) {
-                    toastr.warning('No students selected or no students match your filters');
-                    return;
-                }
+                    Swal.fire({
+                        title: 'Admit Students?',
+                        text: `You are about to admit ${selectedIds.length} students. Continue?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, admit them',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "{{ route('admin.admit_student') }}",
+                                type: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    student_ids: selectedIds
+                                },
+                                success: function(response) {
+                                    toastr.success(response.message ||
+                                        'Students admitted successfully!');
+                                    table.ajax.reload();
+                                    manuallySelectedIds = [];
+                                },
+                                error: function(xhr) {
+                                    toastr.error(xhr.responseJSON?.message ||
+                                        'Failed to admit students.');
+                                    console.error(xhr.responseText);
+                                },
+                                complete: function() {
+                                    btn.prop('disabled', false).html('Admit Students');
+                                }
+                            });
+                        } else {
+                            btn.prop('disabled', false).html('Admit Students');
+                        }
+                    });
+                });
 
-                var btn = $(this);
-                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                $('#admitModal #course_id').on('change', function() {
+                    var courseId = $(this).val();
+                    $('#admitModal #session_id option').each(function() {
+                        $(this).toggle($(this).attr('data-course') === courseId || !$(this).attr(
+                            'data-course'));
+                    });
+                });
 
-                Swal.fire({
-                    title: 'Admit Students?',
-                    text: `You are about to admit ${selectedIds.length} students. Continue?`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, admit them',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ route('admin.admit_student') }}",
-                            type: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            data: {
-                                student_ids: selectedIds
-                            },
-                            success: function(response) {
-                                toastr.success(response.message || 'Students admitted successfully!');
-                                table.ajax.reload();
-                                manuallySelectedIds = [];
-                            },
-                            error: function(xhr) {
-                                toastr.error(xhr.responseJSON?.message || 'Failed to admit students.');
-                                console.error(xhr.responseText);
-                            },
-                            complete: function() {
-                                btn.prop('disabled', false).html('Admit Students');
-                            }
-                        });
-                    } else {
-                        btn.prop('disabled', false).html('Admit Students');
+                var modal = $('#bulk-email-modal');
+                $(modal).on('modalAction', function(event) {
+                    const message = event.detail.message;
+                    const subject = event.detail.subject;
+                    const template = event.detail.template;
+                    if (!subject || (!message && !template)) {
+                        toastr.error('You need a message/template and a subject');
+                        return;
                     }
+                    var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
+                    $.ajax({
+                        url: "{{ route('admin.send_bulk_email') }}",
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            student_ids: selectedIds,
+                            subject,
+                            message,
+                            template
+                        },
+                        success: function(response) {
+                            toastr.success(response.message ||
+                                'Emails transfer initiated successfully!');
+                            $(modal).modal('hide');
+                        },
+                        error: function(xhr) {
+                            toastr.error(xhr.responseJSON?.message || 'Failed to send emails.');
+                            console.error(xhr.responseText);
+                        }
+                    });
                 });
-            });
 
-            $('#admitModal #course_id').on('change', function() {
-                var courseId = $(this).val();
-                $('#admitModal #session_id option').each(function() {
-                    $(this).toggle($(this).attr('data-course') === courseId || !$(this).attr('data-course'));
-                });
+                function updateDataTable() {
+                    $('#studentsTable').DataTable().ajax.reload();
+                }
             });
+        </script>
 
-            var modal = $('#bulk-email-modal');
-            $(modal).on('modalAction', function(event) {
-                const message = event.detail.message;
-                const subject = event.detail.subject;
-                const template = event.detail.template;
-                if (!subject || (!message && !template)) {
-                    toastr.error('You need a message/template and a subject');
+
+
+        <script>
+            $(document).on('click', '#shortlist-modal-submit', function() {
+                const rawEmails = $('#email_list').val();
+                const emailList = rawEmails
+                    .split(/\r?\n/)
+                    .map(email => email.trim())
+                    .filter(email => email !== '');
+
+                if (emailList.length === 0) {
+                    toastr.error('Please paste at least one valid email address.');
                     return;
                 }
-                var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
+
                 $.ajax({
-                    url: "{{ route('admin.send_bulk_email') }}",
+                    url: "{{ route('admin.save_shortlisted_students') }}",
                     type: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                     },
                     data: {
-                        student_ids: selectedIds,
-                        subject,
-                        message,
-                        template
+                        emails: emailList,
                     },
                     success: function(response) {
-                        toastr.success(response.message || 'Emails transfer initiated successfully!');
-                        $(modal).modal('hide');
+                        toastr.success(response.message || 'Users updated successfully.');
+                        $('#shortlisted_students').modal('hide');
+
+                        // Reload after short delay
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Failed to send emails.');
-                        console.error(xhr.responseText);
+                        toastr.error(xhr.responseJSON?.message || 'Error updating shortlisted users.');
                     }
                 });
             });
-
-            function updateDataTable() {
-                $('#studentsTable').DataTable().ajax.reload();
-            }
-        });
-    </script>
-
-
-
-    <script>
-    $(document).on('click', '#shortlist-modal-submit', function () {
-        const rawEmails = $('#email_list').val();
-        const emailList = rawEmails
-            .split(/\r?\n/)
-            .map(email => email.trim())
-            .filter(email => email !== '');
-
-        if (emailList.length === 0) {
-            toastr.error('Please paste at least one valid email address.');
-            return;
-        }
-
-        $.ajax({
-            url: "{{ route('admin.save_shortlisted_students') }}",
-            type: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-            },
-            data: {
-                emails: emailList,
-            },
-            success: function (response) {
-                toastr.success(response.message || 'Users updated successfully.');
-                $('#shortlisted_students').modal('hide');
-
-                // Reload after short delay
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
-            },
-            error: function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Error updating shortlisted users.');
-            }
-        });
-    });
-
-    </script>
-
-
-
+        </script>
     @endpush
 @endsection

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CreateStudentAdmissionJob;
 use Yajra\DataTables\Facades\DataTables;
 use App\Events\UserRegistered;
 use App\Jobs\AddNewStudentsJob;
@@ -56,40 +57,41 @@ class AdminController extends Controller
         $user_count = User::get()->count();
         $exam_count = Oex_exam_master::get()->count();
         $admin_count = Admin::get()->count();
-        $user_admission_count =UserAdmission::get()->count();
-        $programe_count = Programme::get() ->count();
+        $user_admission_count = UserAdmission::get()->count();
+        $programe_count = Programme::get()->count();
 
         $studentsPerRegion = DB::table('users')
-                            ->join('courses', 'users.registered_course', '=', 'courses.id')
-                             ->select('courses.location as region', DB::raw('count(*) as total'))
-                             ->whereNotNull('users.registered_course')
-                              ->groupBy('courses.location')
-                             ->get();
+            ->join('courses', 'users.registered_course', '=', 'courses.id')
+            ->select('courses.location as region', DB::raw('count(*) as total'))
+            ->whereNotNull('users.registered_course')
+            ->groupBy('courses.location')
+            ->get();
 
-                             $studentsPerCourse = User::select('courses.course_name', DB::raw('count(*) as total'))
-                             ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
-                             ->whereNotNull('registered_course')
-                             ->groupBy('courses.course_name')
-                             ->get();
+        $studentsPerCourse = User::select('courses.course_name', DB::raw('count(*) as total'))
+            ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
+            ->whereNotNull('registered_course')
+            ->groupBy('courses.course_name')
+            ->get();
 
-                             $studentsPerCourse = $studentsPerCourse->map(function($item) {
-                                $parts = explode(" - ", $item->course_name);
-                                $item->display_name = $parts[0];
-                                return $item;
-                            });
+        $studentsPerCourse = $studentsPerCourse->map(function ($item) {
+            $parts = explode(" - ", $item->course_name);
+            $item->display_name = $parts[0];
+            return $item;
+        });
 
         $registrationsPerDay = User::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
-                               ->groupBy('date')
-                               ->orderBy('date', 'asc')
-                               ->limit(30)
-                               ->get();
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->limit(30)
+            ->get();
 
         $genderDistribution = User::select('gender', DB::raw('count(*) as total'))
-                               ->whereNotNull('gender')
-                               ->groupBy('gender')
-                               ->get();
+            ->whereNotNull('gender')
+            ->groupBy('gender')
+            ->get();
 
-        $ageGroups = User::select(DB::raw('CASE
+        $ageGroups = User::select(
+            DB::raw('CASE
                                WHEN age BETWEEN 15 AND 19 THEN "15-19"
                                WHEN age BETWEEN 20 AND 24 THEN "20-24"
                                WHEN age BETWEEN 25 AND 35 THEN "25-35"
@@ -97,10 +99,11 @@ class AdminController extends Controller
                                WHEN age >= 45 THEN "45+"
                                ELSE "Unknown"
                             END as age_group'),
-                       DB::raw('count(*) as total'))
-                    ->groupBy('age_group')
-                    ->orderBy(DB::raw('MIN(age)'))
-                    ->get();
+            DB::raw('count(*) as total')
+        )
+            ->groupBy('age_group')
+            ->orderBy(DB::raw('MIN(age)'))
+            ->get();
 
         //  $admittedstudentsPerRegion = DB::table('users')
         //                     ->join('courses', 'users.registered_course', '=', 'courses.id')
@@ -110,27 +113,27 @@ class AdminController extends Controller
         //                      ->get();
 
         $admittedstudentsPerRegion = DB::table('user_admission')
-                            ->join('courses', 'user_admission.course_id', '=', 'courses.id')
-                            ->select('courses.location as region', DB::raw('count(*) as total'))
-                            ->whereNotNull('user_admission.course_id')
-                            ->groupBy('courses.location')
-                            ->get();
+            ->join('courses', 'user_admission.course_id', '=', 'courses.id')
+            ->select('courses.location as region', DB::raw('count(*) as total'))
+            ->whereNotNull('user_admission.course_id')
+            ->groupBy('courses.location')
+            ->get();
 
 
 
         return view('admin.dashboard', [
             'student' => $user_count,
-             'exam' => $exam_count,
-             'admin' => $admin_count,
-             'admission' => $user_admission_count,
-             'course' =>$programe_count,
-             'studentsPerRegion' => $studentsPerRegion,
-             'studentsPerCourse' => $studentsPerCourse,
-             'registrationsPerDay' => $registrationsPerDay,
-             'genderDistribution' => $genderDistribution,
-             'ageGroups' => $ageGroups,
-             'admittedstudentsPerRegion' => $admittedstudentsPerRegion
-            ]);
+            'exam' => $exam_count,
+            'admin' => $admin_count,
+            'admission' => $user_admission_count,
+            'course' => $programe_count,
+            'studentsPerRegion' => $studentsPerRegion,
+            'studentsPerCourse' => $studentsPerCourse,
+            'registrationsPerDay' => $registrationsPerDay,
+            'genderDistribution' => $genderDistribution,
+            'ageGroups' => $ageGroups,
+            'admittedstudentsPerRegion' => $admittedstudentsPerRegion
+        ]);
     }
 
     //Exam categories
@@ -378,7 +381,25 @@ class AdminController extends Controller
                 ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
                 ->where('users.shortlist', 1)
                 // ->leftJoin('courses', '')
-                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'users.created_at', 'courses.course_name as course_name', 'courses.location as course_location', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
+                ->select([
+                    'users.id as id',
+                    'users.userId as userId',
+                    'user_exams.id as exam_id',
+                    'users.name',
+                    'users.email',
+                    'users.age',
+                    'users.gender',
+                    'users.created_at',
+                    'courses.course_name as course_name',
+                    'courses.location as course_location',
+                    'oex_exam_masters.title as ex_name',
+                    'oex_exam_masters.passmark',
+                    'user_exams.user_id',
+                    'user_exams.exam_id',
+                    'user_exams.submitted',
+                    'user_exams.exam_joined',
+                    \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')
+                ]);
 
             // if ($request->has('ex_name')) {
             //     $baseQuery->whereIn('oex_exam_masters.title', (array) $request->ex_name);
@@ -508,7 +529,6 @@ class AdminController extends Controller
 
 
         return view('admin.manage_students', $data);
-
     }
 
 
@@ -584,7 +604,7 @@ class AdminController extends Controller
         $data['exams'] = Oex_exam_master::where('status', '1')->get()->toArray();
         $data['courses'] = Course::pluck('course_name', 'id')->toArray();
         $data['sessions'] = CourseSession::all();
-    
+
         if ($request->ajax()) {
             $baseQuery = user_exam::with('result')
                 ->join('users', 'users.id', '=', 'user_exams.user_id') // Join with users
@@ -613,7 +633,7 @@ class AdminController extends Controller
                     'user_admission.session as session_id',
                     'courses.id as course_id',
                 ]);
-    
+
             // Apply additional filters
             if ($request->has('admission_status')) {
                 $statuses = (array) $request->admission_status;
@@ -627,21 +647,21 @@ class AdminController extends Controller
                     }
                 });
             }
-    
+
             // Filter by course
             if ($request->has('course')) {
                 $baseQuery->whereIn('users.registered_course', (array) $request->course);
             }
-    
+
             // Search
             if ($request->has('filter.search_term')) {
                 $term = $request->input('filter.search_term');
                 $baseQuery->where(function ($query) use ($term) {
                     $query->where('users.name', 'like', "%$term%")
-                          ->orWhere('users.email', 'like', "%$term%");
+                        ->orWhere('users.email', 'like', "%$term%");
                 });
             }
-    
+
             return DataTables::of($baseQuery)
                 ->addColumn('checkbox', fn($std) => '<input type="checkbox" class="student-checkbox" value="' . $std->id . '">')
                 ->addColumn('session_name', fn($std) => $std->session_name ?? 'N/A')
@@ -663,11 +683,11 @@ class AdminController extends Controller
                 ->rawColumns(['checkbox', 'session_name', 'course_name', 'admission_status', 'actions'])
                 ->toJson();
         }
-    
+
         $data['mailable'] = MailerHelper::getMailableClasses();
         return view('admin.manage_shortlist_students', $data);
     }
-    
+
 
 
     //Registered student page
@@ -933,6 +953,12 @@ class AdminController extends Controller
 
         $course = Course::find($validated['course_id']);
         $session = CourseSession::find($validated['session_id']);
+        $user_id = $validated['user_id'];
+
+        $change = $validated['change'] == 'true';
+        $user = User::where('userId', $user_id)->first();
+
+
         if ($session->course_id != $course->id) {
             return redirect()
                 ->back()
@@ -942,26 +968,22 @@ class AdminController extends Controller
                 ]);
         }
 
-        $user_id = $validated['user_id'];
+        CreateStudentAdmissionJob::dispatch($user, $course, $session);
 
-        $change = $validated['change'] == 'true';
+
 
         try {
             $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
-            $user = User::where('userId', $user_id)->first();
             $url = url('student/select-session/' . $user_id);
             $message = 'Student admitted successfully';
 
             if ($oldAdmission && !$oldAdmission->email_sent) {
-                Mail::to($user->email)->queue(new StudentAdmitted(name: $user->name, course: $course_name, location: $location, url: $url));
+                Mail::to($user->email)->queue(new StudentAdmitted($user));
                 $oldAdmission->email_sent = now();
                 $oldAdmission->save();
             }
 
             if ($oldAdmission && $change) {
-                $oldAdmission->course_id = $course->id;
-                $oldAdmission->session = $session->id;
-                $oldAdmission->save();
                 $message = 'Student admission changed successfully';
             }
 
@@ -975,7 +997,8 @@ class AdminController extends Controller
                 $admission->location = $course->location;
                 $admission->save();
 
-                Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))->queue(new StudentAdmitted(name: $user->name, course: $course->course_name, location: $course->location, url: $url));
+                Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
+                    ->queue(new StudentAdmitted($user));
 
                 AdmitStudentJob::dispatch($admission);
             }
@@ -1249,36 +1272,27 @@ class AdminController extends Controller
         ], [], [
             'emails.*' => 'email address'
         ]);
-    
+
         $emails = $request->input('emails');
-    
+
         $usersToUpdate = User::whereIn('email', $emails)
             ->where(function ($query) {
                 $query->whereNull('shortlist')
-                      ->orWhere('shortlist', '!=', 1);
+                    ->orWhere('shortlist', '!=', 1);
             })
             ->get();
-    
+
         if ($usersToUpdate->isEmpty()) {
             return response()->json([
                 'message' => 'No users found to update or all are already shortlisted.',
             ], 404);
         }
-    
+
         $updatedCount = User::whereIn('id', $usersToUpdate->pluck('id'))
             ->update(['shortlist' => 1]);
-    
+
         return response()->json([
             'message' => "$updatedCount user(s) successfully shortlisted.",
         ]);
     }
-
-
-
-
-
-
-
-
-
 }

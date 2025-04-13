@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\CourseSession;
 use App\Helpers\GoogleSheets;
 use App\Helpers\SmsHelper;
+use App\Models\Course;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
@@ -28,11 +29,15 @@ class AdmitStudentJob implements ShouldQueue
      * @return void
      */
 
-    public $admission;
+    public $admission, $course, $session, $student;
+
 
     public function __construct(UserAdmission $admission)
     {
         $this->admission = $admission;
+        $this->student = User::where('userId', $this->admission->user_id)->first();
+        $this->course = Course::findOrFail($this->admission->course_id);
+        $this->session = CourseSession::findOrFail($this->admission->session);
     }
 
     /**
@@ -43,30 +48,28 @@ class AdmitStudentJob implements ShouldQueue
     public function handle()
     {
 
-        $user = User::where('userId', $this->admission->user_id)->first();
-
-        $session = CourseSession::findOrFail($this->admission->session);
-
-        if (!$user || !$session) {
+        if (!$this->student || !$this->course || !$this->session) {
             return;
         }
 
-        Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
-            ->queue(new ConfirmationSuccessful($user->name, $session->name, $session->course_time));
+        $this->sendConfirmationEmail();
+    }
+
+    private function sendConfirmationEmail()
+    {
+        Mail::to($this->student->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))
+            ->send(new ConfirmationSuccessful(
+                $this->student->name,
+                $this->session
+            ));
 
         $smsContent = SmsHelper::getTemplate(AFTER_ADMISSION_CONFIRMATION_SMS, [
-            'name' => $user->name,
-            'course' => $session->name,
-        ]) ?? '';
-
-        // send sms
+            'name' => $this->student->name,
+            'course' => $this->course->programme->title,
+        ]) ?? '';;
         $details['message'] = $smsContent;
-        $details['phonenumber'] = $user->mobile_no;
-        SendSMSAfterRegistrationJob::dispatch($details);
+        $details['phonenumber'] = $this->student->mobile_no;
 
-        // GoogleSheets::updateGoogleSheets($this->admission->user_id, [
-        //     "confirmed" => true,
-        //     "session" => $session->session,
-        // ]);
+        SendSMSAfterRegistrationJob::dispatch($details);
     }
 }

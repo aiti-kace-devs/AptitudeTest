@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Helpers\SmsHelper;
 use App\Mail\StudentAdmitted;
 use App\Models\Course;
+use App\Models\CourseSession;
 use App\Models\User;
 use App\Models\UserAdmission;
 use Illuminate\Bus\Queueable;
@@ -21,7 +22,7 @@ class CreateStudentAdmissionJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public User $student)
+    public function __construct(public User $student, public ?Course $course = null, public ?CourseSession $session = null)
     {
         //
     }
@@ -33,11 +34,12 @@ class CreateStudentAdmissionJob implements ShouldQueue
     {
         if (!$this->student) return;
 
-        $course = Course::find($this->student->registered_course);
+        $course = $this->course ?? Course::find($this->student->registered_course);
         if (!$course) return;
 
+
         $existingAdmission = UserAdmission::where('user_id', $this->student->userId)->first();
-        if ($existingAdmission) {
+        if ($existingAdmission && !$this->session) {
             if (!$existingAdmission->email_sent) {
                 $this->sendAdmissionEmail();
                 $existingAdmission->update(['email_sent' => now()]);
@@ -45,13 +47,30 @@ class CreateStudentAdmissionJob implements ShouldQueue
             return;
         }
 
-        UserAdmission::create([
+        $admissionData = [
             'user_id' => $this->student->userId,
             'course_id' => $course->id,
             'email_sent' => now(),
-        ]);
+        ];
 
-        $this->sendAdmissionEmail();
+        if (isset($this->session)) {
+            $admissionData['session'] = $this->session->id;
+            $admissionData['location'] = $this->course->centre->title;
+            $admissionData['confirmed'] = now();
+        }
+
+        if (isset($existingAdmission)) {
+            $admission = $existingAdmission->update($admissionData);
+        } else {
+            $admission = UserAdmission::create($admissionData);
+        }
+
+
+        if (isset($this->session)) {
+            AdmitStudentJob::dispatch($admission);
+        } else {
+            $this->sendAdmissionEmail();
+        }
     }
 
 
