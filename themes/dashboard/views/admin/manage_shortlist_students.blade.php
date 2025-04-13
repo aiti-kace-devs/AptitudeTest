@@ -295,24 +295,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <!-- <div class="col-md-2">
-                                            <select multiple name="status[]" id="status" class="form-control"
-                                                data-filter="status" aria-hidden="true">
-                                                <option value="0">All Statuses</option>
-                                                <option value="passed">Passed</option>
-                                                <option value="failed">Failed</option>
-                                                <option value="not_taken">Not Taken</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <select multiple name="age_range[]" id="age_range" class="form-control"
-                                                data-filter="age_range" aria-hidden="true">
-                                                <option value="0">All Ages</option>
-                                                @foreach ($availableAges as $age)
-                                                    <option value="{{ $age }}">{{ $age }} years</option>
-                                                @endforeach
-                                            </select>
-                                        </div> -->
+                       
                                         <div class="col-md-3">
                                             <input type="text" class="form-control" id="studentSearch"
                                                 placeholder="Search by name or email">
@@ -505,7 +488,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('admin.manage_students') }}",
+                    url: "{{ route('admin.shortlisted_students') }}",
                     type: "GET",
                     data: function(d) {
                         d.draw = d.draw;
@@ -555,10 +538,10 @@
                         }
                     },
                     {
-                        data: 'admission_status',
-                        name: 'admission_status',
+                        data: 'admitted',
+                        name: 'admitted',
                         render: function(data, type, row) {
-                            if (data === 'Admitted') {
+                            if (data) {
                                 return '<span class="badge badge-primary">Admitted</span>';
                             } else {
                                 return '<span class="badge badge-danger">Not Admitted</span>';
@@ -566,28 +549,27 @@
                         }
                     },
                     {
-                        data: 'shortlist',
-                        name: 'shortlist',
-                        render: function(data, type, row) {
-                            return data == 1 ?
-                                '<span class="badge badge-primary">Shortlisted</span>' :
-                                '<span class="badge badge-danger">Not Shortlisted</span>';
-                        }
+                    data: 'shortlist',
+                    name: 'shortlist',
+                    render: function(data, type, row) {
+                        return '<span class="badge badge-success">Shortlisted</span>';
+                    }
                     },
                     {
                         data: 'course_name',
                         name: 'course_name',
                         render: function(data, type, row) {
-                            return data || 'N/A';
+                            return data ? data : 'N/A';
                         }
                     },
                     {
                         data: 'session_name',
                         name: 'session_name',
                         render: function(data, type, row) {
-                            return data || 'N/A';
+                            return data ? data : 'N/A';
                         }
                     },
+
                     {
                         data: 'actions',
                         name: 'actions',
@@ -595,11 +577,11 @@
                         searchable: false,
                         render: function(data, type, row) {
                             var buttons = [];
-                            if (row.admission_status === 'Not Admitted') {
+                            if (!row.admitted) {
                                 buttons.push('<button class="btn btn-primary btn-sm admit-btn" data-id="' + row.id + '">Admit</button>');
                             } else {
                                 buttons.push('<button class="btn btn-info btn-sm admit-btn" data-id="' + row.id + '" data-course_id="' + (row.course_id || '') + '" data-session_id="' + (row.session_id || '') + '">Change Admission</button>');
-                                if (!row.session_name) {
+                                if (row.session_name) {
                                     buttons.push('<a href="' + "{{ url('student/select-session') }}" + '/' + row.id + '" target="_blank" class="btn btn-primary btn-sm">Choose Session</a>');
                                 }
                             }
