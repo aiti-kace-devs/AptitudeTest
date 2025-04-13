@@ -1,6 +1,4 @@
 <x-modal id="bulk-sms-modal" title="Send Bulk SMS" size="modal-lg">
-    <!-- <label for="subject">Subject</label>
-    <input type="text" class="form-control mb-3" name="subject" id="sms_subject" placeholder="SMS Subject"> -->
 
     <label for="sms_template">Select Template To Use</label>
     <select name="sms_template" id="sms_template" class="form-control">

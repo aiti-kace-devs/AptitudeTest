@@ -260,7 +260,7 @@
                                             </button>
 
                                             <button class="btn btn-success mr-2" data-toggle="modal"
-                                                data-target="#bulk-sms-modal">Send SMS
+                                                data-target="#bulk-sms-to-shortlisted-students-modal">Send SMS
                                                 <i class="fas fa-sms"></i>
                                             </button>
 
@@ -351,7 +351,7 @@
 
     <!-- Modal -->
     @include('admin.send-bulk-email')
-    @include('admin.send_bulk_sms')
+    <!-- @include('admin.send_bulk_sms') -->
 
 
     <x-modal id="shortlisted_students" title="Copy and Paste Shortlisted Student Emails" size="modal-lg">
@@ -404,7 +404,7 @@
 
                         <div class="form-group">
                             <label for="session_id" class="form-label">Choose Session</label>
-                            <select id="session_id" name="session_id" class="form-control" required
+                            <select id="session_id" name="session_id" class="form-control"
                                 @if (empty($sessions)) disabled @endif>
                                 @if (empty($sessions))
                                     <option value="">No sessions available</option>
@@ -437,14 +437,43 @@
 
 
 
+
+    <x-modal id="bulk-sms-to-shortlisted-students-modal" title="Send Bulk SMS" size="modal-lg">
+        <label for="sms_template">Select Template To Use</label>
+        <select name="sms_template" id="sms_template" class="form-control">
+            <option value="" selected disabled>Loading templates...</option>
+        </select>
+
+        <br>
+
+        <label for="sms_message">Or Write Message</label>
+        <textarea class="form-control mb-3" name="sms_message" id="sms_message"
+                placeholder="Type your SMS message here..."></textarea>
+
+        <x-slot name="footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button id="send-bulk-sms-shortlist-modal-submit" type="button" class="btn btn-primary">Submit</button>
+        </x-slot>
+    </x-modal>
+
+
     @push('scripts')
         <script type="text/javascript" src="{{ url('assets/js/jquery-multiselect.min.js') }}"></script>
         <script>
-            // Define openAdmitModal globally
-            window.openAdmitModal = function(id, course_id = null, session_id = null) {
+
+            $(document).on('click', '.admit-btn', function () {
+                const user_id = $(this).data('id');
+                const course_id = $(this).data('course_id');
+                const session_id = $(this).data('session_id');
+
+                // Call the modal function
+                openAdmitModal(user_id, course_id, session_id);
+            });
+
+            window.openAdmitModal = function(user_id, course_id = null, session_id = null) {
                 // console.log('Opening admit modal with:', { id, course_id, session_id });
                 try {
-                    $('#admitModal #user_id').val(id);
+                    $('#admitModal #user_id').val(user_id);
                     $('#admitModal #course_id').val(course_id);
                     $('#admitModal #session_id').val(session_id);
                     if (course_id) {
@@ -461,7 +490,6 @@
             };
 
             $(document).ready(function() {
-                // console.log('Document ready, openAdmitModal defined:', typeof window.openAdmitModal);
 
                 $('select[multiple][data-filter]').multiSelect({
                     selectableHeader: "<div class='multi-select-legend'>Available Options</div>",
@@ -527,7 +555,7 @@
                             searchable: false,
                             render: function(data, type, row) {
                                 return '<input type="checkbox" class="student-checkbox" value="' + row
-                                    .id + '" ' +
+                                    .userId + '" ' +
                                     (isFilterApplied ? 'checked' : '') + '>';
                             }
                         },
@@ -630,18 +658,20 @@
                 var manuallySelectedIds = [];
                 var isFilterApplied = false;
                 var debounceTimer;
+ 
 
                 $(document).on('click', '.admit-btn', function() {
                     console.log('Admit button clicked');
-                    var id = $(this).data('id');
+                    
+                    var userId = $(this).data('userId');
                     var course_id = $(this).data('course_id') || null;
                     var session_id = $(this).data('session_id') || null;
-                    if (!id) {
+                    if (!userId) {
                         console.error('No user ID found for admit button');
                         return;
                     }
                     if (typeof window.openAdmitModal === 'function') {
-                        window.openAdmitModal(id, course_id, session_id);
+                        window.openAdmitModal(userId, course_id, session_id);
                     } else {
                         console.error('openAdmitModal is not defined');
                     }
@@ -680,7 +710,7 @@
                             manuallySelectedIds.push(studentId);
                         }
                     } else {
-                        manuallySelectedIds = manuallySelectedIds.filter(id => id != studentId);
+                        manuallySelectedIds = manuallySelectedIds.filter(userId => userId != studentId);
                     }
                     var allChecked = $('.student-checkbox:not(:checked)').length === 0;
                     $('#select-all').prop('checked', allChecked);
@@ -705,6 +735,8 @@
 
                     var btn = $(this);
                     btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                    console.log('Student IDs: ', selectedIds)
+                    
 
                     Swal.fire({
                         title: 'Admit Students?',
@@ -832,5 +864,105 @@
                 });
             });
         </script>
+
+
+
+
+
+        <script>
+            $(document).ready(function () {
+                const modal = $('#bulk-sms-to-shortlisted-students-modal');
+                const templateSelect = $('#sms_template');
+                const messageBox = $('#sms_message');
+
+                // Load templates when the modal opens
+                modal.on('show.bs.modal', function () {
+                    templateSelect.empty().append('<option selected disabled>Loading templates...</option>');
+
+                    $.get("{{ route('admin.fetch.sms.template') }}", function (templates) {
+                        templateSelect.empty().append('<option value="" disabled selected>Select a template</option>');
+
+                        $.each(templates, function (index, template) {
+                            const option = $('<option></option>')
+                                .val(template.id)
+                                .text(template.name)
+                                .data('content', template.content); // store SMS content
+                            templateSelect.append(option);
+                        });
+                    }).fail(function () {
+                        toastr.error('Failed to load SMS templates.');
+                        templateSelect.empty().append('<option value="" disabled selected>Unable to load templates</option>');
+                    });
+                });
+
+                // When a template is selected, auto-fill the message box
+                templateSelect.on('change', function () {
+                    const selectedOption = $(this).find('option:selected');
+                    const content = selectedOption.data('content');
+                    if (content) {
+                        messageBox.val(content);
+                    }
+                });
+
+                // Submit button handler
+                $(document).on('click', '#send-bulk-sms-shortlist-modal-submit', function () {
+                    const message = messageBox.val();
+                    //const subject = $('#sms_subject').val();
+                    const template = templateSelect.val();
+
+                    const modalActionEvent = new CustomEvent('shortlistModalAction', {
+                        detail: {
+                            message,
+                            // subject,
+                            template,
+                            modalId: 'bulk-sms-to-shortlisted-students-modal',
+                        },
+                        bubbles: true,
+                        cancelable: true,
+                    });
+
+                    document.getElementById('bulk-sms-to-shortlisted-students-modal').dispatchEvent(modalActionEvent);
+                });
+
+                // Handle actual AJAX submission
+                modal.on('shortlistModalAction', function (event) {
+                    const { message, subject, template } = event.detail;
+
+                    if ((!message && !template)) {
+                        toastr.error('You need a message/template and a subject');
+                        return;
+                    }
+
+                    const selectedIds = typeof manuallySelectedIds !== 'undefined' && manuallySelectedIds.length > 0
+                        ? manuallySelectedIds
+                        : allFilteredIds;
+
+                    $.ajax({
+                        url: "{{ route('admin.send_bulk_sms') }}",
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        },
+                        data: {
+                            student_ids: selectedIds,
+                            //subject,
+                            message,
+                            //template
+                        },
+                        success: function (response) {
+                            toastr.success(response.message || 'SMS transfer initiated successfully!');
+                            modal.modal('hide');
+                        },
+                        error: function (xhr) {
+                            toastr.error(xhr.responseJSON?.message || 'Failed to send SMS to students.');
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+
+
     @endpush
 @endsection

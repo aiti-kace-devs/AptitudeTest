@@ -131,7 +131,7 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label for="session_id" class="form-label">Choose Session</label>
-                                        <select id="session_id" name="session_id" class="form-control" required>
+                                        <select id="session_id" name="session_id" class="form-control">
                                             <option value="">Choose One Session</option>
 
                                             @foreach ($sessions as $session)

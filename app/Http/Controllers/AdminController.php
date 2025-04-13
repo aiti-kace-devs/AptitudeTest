@@ -57,7 +57,7 @@ class AdminController extends Controller
         $user_count = User::get()->count();
         $exam_count = Oex_exam_master::get()->count();
         $admin_count = Admin::get()->count();
-        $user_admission_count = UserAdmission::get()->count();
+        $user_admission_count = UserAdmission::whereNotNull('session')->count();
         $programe_count = Programme::get()->count();
 
         $studentsPerRegion = DB::table('users')
@@ -379,7 +379,7 @@ class AdminController extends Controller
                 ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
                 ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
                 ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
-                ->where('users.shortlist', 1)
+                // ->where('users.shortlist', 1)
                 // ->leftJoin('courses', '')
                 ->select([
                     'users.id as id',
@@ -621,7 +621,7 @@ class AdminController extends Controller
                     'users.age',
                     'users.shortlist',
                     'users.created_at',
-                    'users.userId',
+                    'users.userId as userId',
                     'user_exams.user_id',
                     'user_exams.exam_id',
                     'user_exams.exam_joined',
@@ -679,7 +679,7 @@ class AdminController extends Controller
                     $buttons[] = '<a href="' . route('admin.reset-exam', [$std->exam_id, $std->user_id]) . '" class="btn btn-info btn-sm">Reset Result</a>';
                     return implode(' ', $buttons);
                 })
-                ->with(['all_filtered_ids' => $baseQuery->pluck('user_exams.id')->toArray()])
+                ->with(['all_filtered_ids' => $baseQuery->pluck('userId')->toArray()])
                 ->rawColumns(['checkbox', 'session_name', 'course_name', 'admission_status', 'actions'])
                 ->toJson();
         }
@@ -950,71 +950,79 @@ class AdminController extends Controller
             'user_id' => 'required|exists:users,userId',
             'change' => 'sometimes',
         ]);
-
+    
         $course = Course::find($validated['course_id']);
         $session = CourseSession::find($validated['session_id']);
         $user_id = $validated['user_id'];
-
         $change = $validated['change'] == 'true';
         $user = User::where('userId', $user_id)->first();
-
-
+    
         if ($session->course_id != $course->id) {
-            return redirect()
-                ->back()
-                ->with([
-                    'flash' => 'Session not valid for selected course',
-                    'key' => 'error',
-                ]);
+            return redirect()->back()->with([
+                'flash' => 'Session not valid for selected course',
+                'key' => 'error',
+            ]);
         }
-
+    
         CreateStudentAdmissionJob::dispatch($user, $course, $session);
-
-
-
+    
+        $message = 'Student admitted successfully';
+    
+        $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
+        $url = url('student/select-session/' . $user_id);
+    
         try {
-            $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
-            $url = url('student/select-session/' . $user_id);
-            $message = 'Student admitted successfully';
-
             if ($oldAdmission && !$oldAdmission->email_sent) {
-                Mail::to($user->email)->queue(new StudentAdmitted($user));
-                $oldAdmission->email_sent = now();
-                $oldAdmission->save();
+                try {
+                    Mail::to($user->email)->queue(new StudentAdmitted($user));
+                    $oldAdmission->email_sent = now();
+                    $oldAdmission->save();
+                } catch (\Exception $e) {
+                    \Log::warning('Failed to send admission email (existing admission): ' . $e->getMessage());
+                }
             }
-
+    
             if ($oldAdmission && $change) {
                 $message = 'Student admission changed successfully';
             }
-
+    
             if (!$oldAdmission) {
                 $admission = new UserAdmission();
                 $admission->user_id = $user_id;
                 $admission->course_id = $course->id;
-                $admission->email_sent = now();
+                $admission->email_sent = now(); // Update immediately even if email fails
                 $admission->session = $session->id;
                 $admission->confirmed = now();
                 $admission->location = $course->location;
                 $admission->save();
-
-                Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
-                    ->queue(new StudentAdmitted($user));
-
+    
+                try {
+                    Mail::to($user->email)
+                        ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
+                        ->queue(new StudentAdmitted($user));
+                } catch (\Exception $e) {
+                    \Log::warning('Failed to send admission email (new admission): ' . $e->getMessage());
+                }
+    
                 AdmitStudentJob::dispatch($admission);
             }
-            return redirect()
-                ->back()
-                ->with([
-                    'flash' => $message,
-                    'key' => 'success',
-                ]);
+    
+            return redirect()->back()->with([
+                'flash' => $message,
+                'key' => 'success',
+            ]);
         } catch (\Exception $e) {
+            \Log::error('Admit Student Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+    
             return redirect(url('student/select-session/' . $user_id))->with([
                 'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
                 'key' => 'error',
             ]);
         }
     }
+    
 
     public function reset_verify($userId)
     {

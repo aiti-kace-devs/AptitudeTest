@@ -453,56 +453,67 @@ class StudentOperation extends Controller
     {
         $count = 0;
         $studentIds = $request->student_ids;
-
+    
         if (empty($studentIds)) {
             return response()->json(['success' => false, 'message' => 'No students selected.'], 400);
         }
-
+    
         try {
             foreach ($studentIds as $studentId) {
-                $user = User::find($studentId);
+                $user = User::where('userId', $studentId)->first();
                 if (!$user) continue;
-
+    
                 $course = Course::find($user->registered_course);
                 if (!$course) continue;
-
-                $existingAdmission = UserAdmission::where('user_id', $studentId)->first();
+    
+                $existingAdmission = UserAdmission::where('user_id', $user->userId)->first();
                 if ($existingAdmission) {
                     if (!$existingAdmission->email_sent) {
-                        Mail::to($user->email)->send(new StudentAdmitted(
-                            $user->name,
-                            $course->course_name,
-                            $course->location,
-                            url: url('student/select-session/' . $user->id)
-                        ));
-                        $existingAdmission->update(['email_sent' => now()]);
-                        $count++;
+                        try {
+                            Mail::to($user->email)->send(new StudentAdmitted(
+                                $user->name,
+                                $course->course_name,
+                                $course->location,
+                                url('student/select-session/' . $user->userId)
+                            ));
+                            $existingAdmission->update(['email_sent' => now()]);
+                            $count++;
+                        } catch (\Throwable $mailError) {
+                            \Log::error("Failed to send email to {$user->email}: " . $mailError->getMessage());
+                        }
                     }
                     continue;
                 }
-
+    
                 UserAdmission::create([
-                    'user_id' => $studentId,
+                    'user_id' => $user->userId, // Keep UUID
                     'course_id' => $course->id,
                     'email_sent' => now(),
                 ]);
-
-                Mail::to($user->email)
-                    ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))
-                    ->send(new StudentAdmitted(
-                        name: $user->name,
-                        course: $course->course_name,
-                        location: $course->location,
-                        url: url('student/select-session/' . $user->id)
-                    ));
-
+    
+                try {
+                    Mail::to($user->email)
+                        ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))
+                        ->send(new StudentAdmitted(
+                            name: $user->name,
+                            course: $course->course_name,
+                            location: $course->location,
+                            url: url('student/select-session/' . $user->userId)
+                        ));
+                } catch (\Throwable $mailError) {
+                    \Log::error("Failed to send email to {$user->email}: " . $mailError->getMessage());
+                }
+    
                 $count++;
             }
 
+    
             return response()->json([
                 'success' => true,
                 'message' => "Admitted {$count} students successfully!"
             ]);
+
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -510,6 +521,11 @@ class StudentOperation extends Controller
             ], 500);
         }
     }
+    
+
+
+
+
 
     public function get_attendance_page()
     {
