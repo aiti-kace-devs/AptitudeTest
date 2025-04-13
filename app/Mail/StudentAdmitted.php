@@ -2,7 +2,10 @@
 
 namespace App\Mail;
 
+use App\Models\Centre;
 use App\Models\Course;
+use App\Models\Programme;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,31 +17,34 @@ class StudentAdmitted extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $data = [];
+    public $student = null;
     public $course;
+    public $centre;
+    public $programme;
+
 
     public $url;
 
     public $name;
     public $subject;
 
-    public $courses = [];
-
-    public $locations = [];
-
-
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($name = null, $course = null, $url = null)
+    public function __construct(User $student)
     {
         // $this->setDetails($course, $location);
-        $this->url = $url ?? 'https://';
-        $this->subject = " eSkills4jobs - {$course}";
-        $this->name = $name;
-        $this->course = isset($course) ? $course : Course::all()->random(1);
+        $this->student = $student;
+
+
+        $this->course =  Course::find($this->student->registered_course ?? 1);
+        $this->programme = Programme::find($this->course->programme_id ?? 1);
+        $this->centre = Centre::find($this->course->centre_id ?? 1);
+        $this->url = url('student/select-session/' . $this->student->userId);
+        $this->subject = " One Million Coders Programme - {$this->programme->title}";
+        $this->name = $this->student->name;
     }
 
     /**

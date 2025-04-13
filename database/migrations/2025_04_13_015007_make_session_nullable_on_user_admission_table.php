@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('shortlist')->after('registered_course')->nullable();
+        Schema::table('user_admission', function (Blueprint $table) {
+            $table->unsignedBigInteger('session')->nullable()->change();
         });
     }
 
@@ -21,6 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {});
+        //
     }
 };

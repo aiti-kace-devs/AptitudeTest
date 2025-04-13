@@ -2,6 +2,8 @@
 
 namespace App\Mail;
 
+use App\Models\Course;
+use App\Models\CourseSession;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,18 +15,16 @@ class ConfirmationSuccessful extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $name, $session, $sessionTime;
+    public $course;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($name = 'Guest', $session = 'General', $sessionTime = '00:00 AM')
+    public function __construct(public string $name, public CourseSession $courseSession)
     {
-        $this->name = $name;
-        $this->session = $session;
-        $this->sessionTime = $sessionTime;
+        $this->course = Course::findOrFail($this->courseSession->course_id);
     }
 
     /**
