@@ -116,6 +116,7 @@ class AdminController extends Controller
             ->join('courses', 'user_admission.course_id', '=', 'courses.id')
             ->select('courses.location as region', DB::raw('count(*) as total'))
             ->whereNotNull('user_admission.course_id')
+            ->whereNotNull('user_admission.session')
             ->groupBy('courses.location')
             ->get();
 
