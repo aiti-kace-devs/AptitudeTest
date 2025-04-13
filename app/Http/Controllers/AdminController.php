@@ -582,135 +582,92 @@ class AdminController extends Controller
     {
         $data['exam'] = Oex_exam_master::all();
         $data['exams'] = Oex_exam_master::where('status', '1')->get()->toArray();
-
         $data['courses'] = Course::pluck('course_name', 'id')->toArray();
-
-        $distinctAges = User::select('age')->whereNotNull('age')->distinct()->orderBy('age')->pluck('age')->toArray();
-
-        $data['availableAges'] = User::whereNotNull('age')
-            ->select('age')
-            ->distinct()
-            ->orderBy('age')
-            ->pluck('age')
-            ->toArray();
-
+        $data['sessions'] = CourseSession::all();
+    
         if ($request->ajax()) {
             $baseQuery = user_exam::with('result')
-                ->join('users', 'users.id', '=', 'user_exams.user_id')
-                ->join('oex_exam_masters', 'user_exams.exam_id', '=', 'oex_exam_masters.id')
-                ->leftJoin('courses', 'users.registered_course', '=', 'courses.id')
-                ->leftJoin('user_admission', 'user_admission.user_id', '=', 'user_exams.user_id')
-                ->leftJoin('course_sessions', 'user_admission.session', '=', 'course_sessions.id')
-
-                // ->leftJoin('courses', '')
-                ->select(['users.id as id', 'user_exams.id as exam_id', 'users.name', 'users.email', 'users.age', 'users.gender', 'users.created_at', 'users.shortlist', 'courses.course_name as course_name', 'courses.location as course_location', 'course_sessions.name as session_name', 'oex_exam_masters.title as ex_name', 'oex_exam_masters.passmark', 'user_exams.user_id', 'user_exams.exam_id', 'user_exams.submitted', 'user_exams.exam_joined', \DB::raw('CASE WHEN user_admission.user_id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status')]);
-
+                ->join('users', 'users.id', '=', 'user_exams.user_id') // Join with users
+                ->leftJoin('user_admission', 'user_admission.user_id', '=', 'users.userId') // Join with user_admission
+                ->leftJoin('courses', 'user_admission.course_id', '=', 'courses.id') // Join with courses
+                ->leftJoin('course_sessions', 'user_admission.session', '=', 'course_sessions.id') // Join with course_sessions
+                ->where('users.shortlist', 1) // This filters users with shortlist = 1
+                ->select([
+                    'user_exams.id as exam_id',
+                    'users.id',
+                    'users.name',
+                    'users.email',
+                    'users.gender',
+                    'users.age',
+                    'users.shortlist',
+                    'users.created_at',
+                    'users.userId',
+                    'user_exams.user_id',
+                    'user_exams.exam_id',
+                    'user_exams.exam_joined',
+                    'user_exams.submitted',
+                    'user_admission.id as admitted',
+                    \DB::raw('CASE WHEN user_admission.id IS NOT NULL THEN "Admitted" ELSE "Not Admitted" END as admission_status'),
+                    \DB::raw('CASE WHEN user_admission.id IS NOT NULL THEN courses.course_name ELSE NULL END as course_name'),
+                    \DB::raw('CASE WHEN user_admission.id IS NOT NULL THEN course_sessions.name ELSE NULL END as session_name'),
+                    'user_admission.session as session_id',
+                    'courses.id as course_id',
+                ]);
+    
+            // Apply additional filters
             if ($request->has('admission_status')) {
-                $admissionStatuses = (array)$request->admission_status;
-                $baseQuery->where(function ($query) use ($admissionStatuses) {
-                    foreach ($admissionStatuses as $status) {
-                        if ($status === 'Admitted') {
-                            $query->orWhereNotNull('user_admission.user_id');
-                        } elseif ($status === 'Not Admitted') {
-                            $query->orWhereNull('user_admission.user_id');
-                        }
-                    }
-                });
-            }
-
-            if ($request->has('status')) {
-                $statuses = (array) $request->status;
-                $baseQuery->where(function ($query) use ($statuses) {
+                $statuses = (array) $request->admission_status;
+                $baseQuery->where(function ($q) use ($statuses) {
                     foreach ($statuses as $status) {
-                        if ($status === 'passed') {
-                            $query->orWhereHas('result', function ($q) {
-                                $q->whereColumn('yes_ans', '>=', 'oex_exam_masters.passmark');
-                            });
-                        } elseif ($status === 'failed') {
-                            $query->orWhereHas('result', function ($q) {
-                                $q->whereColumn('yes_ans', '<', 'oex_exam_masters.passmark');
-                            });
-                        } elseif ($status === 'not_taken') {
-                            $query->orWhereNull('user_exams.submitted');
+                        if ($status === 'Admitted') {
+                            $q->orWhereNotNull('user_admission.id');
+                        } elseif ($status === 'Not Admitted') {
+                            $q->orWhereNull('user_admission.id');
                         }
                     }
                 });
             }
-
-            if ($request->has('age_range')) {
-                $selectedAges = (array) $request->age_range;
-                $baseQuery->where(function ($query) use ($selectedAges) {
-                    foreach ($selectedAges as $age) {
-                        if ($age === '0') continue;
-                        $query->orWhere('users.age', $age);
-                    }
-                });
-            }
-
+    
+            // Filter by course
             if ($request->has('course')) {
                 $baseQuery->whereIn('users.registered_course', (array) $request->course);
             }
-
+    
+            // Search
             if ($request->has('filter.search_term')) {
-                $searchTerm = $request->input('filter.search_term');
-                $baseQuery->where(function ($query) use ($searchTerm) {
-                    $query->where('users.name', 'like', "%$searchTerm%")->orWhere('users.email', 'like', "%$searchTerm%");
+                $term = $request->input('filter.search_term');
+                $baseQuery->where(function ($query) use ($term) {
+                    $query->where('users.name', 'like', "%$term%")
+                          ->orWhere('users.email', 'like', "%$term%");
                 });
             }
+    
             return DataTables::of($baseQuery)
-                ->addColumn('checkbox', function ($std) {
-                    return '<input type="checkbox" class="student-checkbox" value="' . $std->id . '">';
-                })
-                ->addColumn('age', function ($std) {
-                    return $std->age ?? 'N/A';
-                })
-                ->addColumn('course_name', function ($std) {
-                    return $std->course_name ?? 'N/A';
-                })
-                ->addColumn('location', function ($std) {
-                    return $std->course_location ?? 'N/A';
-                })
-
-                ->addColumn('gender', function ($std) {
-                    return $std->gender ?? 'N/A';
-                })
-
-                ->addColumn('date_registered', function ($std) {
-                    return $std->created_at ?? 'N/A';
-                })
-
-                ->addColumn('score', function ($std) {
-                    return optional($std->result)->yes_ans ?? 'N/A';
-                })
-
-                ->addColumn('status', function ($std) {
-                    if (!$std->submitted) {
-                        return '<span class="badge badge-secondary">Not Taken</span>';
-                    }
-                    $passed = optional($std->result)->yes_ans >= $std->passmark;
-                    return $passed ? '<span class="badge badge-success">PASS</span>' : '<span class="badge badge-danger">FAIL</span>';
+                ->addColumn('checkbox', fn($std) => '<input type="checkbox" class="student-checkbox" value="' . $std->id . '">')
+                ->addColumn('session_name', fn($std) => $std->session_name ?? 'N/A')
+                ->addColumn('course_name', fn($std) => $std->course_name ?? 'N/A')
+                ->addColumn('admission_status', function ($std) {
+                    return $std->admission_status === 'Admitted'
+                        ? '<span class="badge badge-success">Admitted</span>'
+                        : '<span class="badge badge-secondary">Not Admitted</span>';
                 })
                 ->addColumn('actions', function ($std) {
                     $buttons = ['<a href="' . url('admin/delete_students/' . $std->id) . '" class="btn btn-danger btn-sm">Delete</a>'];
-
                     if ($std->exam_joined) {
                         $buttons[] = '<a href="' . url('admin/admin_view_result/' . $std->user_id) . '" class="btn btn-success btn-sm">View Result</a>';
                     }
-
                     $buttons[] = '<a href="' . route('admin.reset-exam', [$std->exam_id, $std->user_id]) . '" class="btn btn-info btn-sm">Reset Result</a>';
-
                     return implode(' ', $buttons);
                 })
                 ->with(['all_filtered_ids' => $baseQuery->pluck('user_exams.id')->toArray()])
-                ->rawColumns(['checkbox', 'result', 'status', 'actions'])
+                ->rawColumns(['checkbox', 'session_name', 'course_name', 'admission_status', 'actions'])
                 ->toJson();
         }
-
+    
         $data['mailable'] = MailerHelper::getMailableClasses();
-
         return view('admin.manage_shortlist_students', $data);
-
     }
+    
 
 
     //Registered student page
