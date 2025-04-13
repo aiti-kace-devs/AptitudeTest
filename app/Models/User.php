@@ -80,4 +80,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(FormResponse::class, 'form_response_id');
     }
+
+    public function admission()
+    {
+        return $this->hasOne(UserAdmission::class, 'user_id', 'userId');
+    }
 }
