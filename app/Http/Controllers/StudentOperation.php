@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Jobs\AdmitStudentJob;
 use App\Jobs\TestSubmittedJob;
+use App\Models\AdmissionRejection;
 
 class StudentOperation extends Controller
 {
@@ -542,6 +543,11 @@ class StudentOperation extends Controller
 
         if ($delete_user_admission) {
             $delete_user_admission->delete();
+            AdmissionRejection::create([
+                'user_id' => $user_id,
+                'course_id' => $delete_user_admission->course_id,
+                'rejected_at' => now(),
+            ]);
 
             User::where('userId', $user_id)->update(['shortlist' => 0]);
 

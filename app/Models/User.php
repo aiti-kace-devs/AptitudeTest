@@ -91,4 +91,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserAdmission::class, 'user_id', 'userId');
     }
+
+    public function rejectedAdmissions()
+    {
+        return $this->hasMany(AdmissionRejection::class, 'user_id', 'userId');
+    }
 }
