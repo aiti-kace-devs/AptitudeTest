@@ -937,7 +937,7 @@
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "Are you sure you want to delete this student admission?",
+                    text: "AAre you sure you want to remove this student from the shortlist and delete their admission?",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
