@@ -134,7 +134,7 @@
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                             data-accordion="false">
                             <!-- Add icons to the links using the .nav-icon class
-                                                                                                                                                                                                       with font-awesome or any other icon font library -->
+                                                                                                                                                                                                               with font-awesome or any other icon font library -->
                             @if (!Auth::user()->isAdmitted())
                                 <li class="nav-item">
                                     <a href="{{ url('student/dashboard') }}"
@@ -164,7 +164,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (!Auth::user()->isAdmitted() && Auth::user()->admissionEmailSent())
+                            @if (Auth::user()->hasAdmission())
                                 <li class="nav-item">
                                     <a href="{{ url('student/select-session/' . Auth::user()->userId) }}"
                                         class="nav-link {{ request()->is('student/select-session*') ? 'active' : '' }}">
@@ -175,17 +175,17 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (!Auth::user()->isAdmitted())
-                                <li class="nav-item">
-                                    <a href="{{ url('student/application-status') }}"
-                                        class="nav-link {{ request()->is('student/application-status') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-clipboard"></i>
-                                        <p>
-                                            Application Status
-                                        </p>
-                                    </a>
-                                </li>
-                            @endif
+                            {{-- @if (!Auth::user()->isAdmitted()) --}}
+                            <li class="nav-item">
+                                <a href="{{ url('student/application-status') }}"
+                                    class="nav-link {{ request()->is('student/application-status') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-clipboard"></i>
+                                    <p>
+                                        Application Status
+                                    </p>
+                                </a>
+                            </li>
+                            {{-- @endif --}}
                             @if (Auth::user()->isAdmitted())
                                 <li class="nav-item">
                                     <a href="{{ url('student/id-qrcode') }}" class="nav-link">
@@ -227,9 +227,9 @@
                             <!--
 
 
-                                                                                                                                                                                                </ul>
-                                                                                                                                                                                              </nav>
-                                                                                                                                                                                              <! /.sidebar-menu -->
+                                                                                                                                                                                                        </ul>
+                                                                                                                                                                                                      </nav>
+                                                                                                                                                                                                      <! /.sidebar-menu -->
                 </div>
                 <!-- /.sidebar -->
             </aside>
