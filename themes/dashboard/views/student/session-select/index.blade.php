@@ -103,7 +103,7 @@
                 <div class="container">
                     <div class="card">
                         <div class="card-header">
-                            Select Your Session
+                            Select Your Session or Revoke Admission
                         </div>
                         <div class="card-body">
                             <div class="alert alert-info" role="alert">
@@ -142,8 +142,13 @@
                                 </button>
                             </form>
                             <div class="decline-section text-center">
-                                <p class="mt-3">If the terms of this admission are unfavorable and you wish to decline,
+                                <p>If the terms of this admission are unfavorable and you wish to decline,
                                     please click the button below.</p>
+                                <h4 class="font-bold text-danger">Important: Revoking your current admission is a required
+                                    step
+                                    if you
+                                    want to switch to a different course or be eligible for future admission opportunities.
+                                </h4>
                                 <button id="revoke-admission-button" type="button" class="btn btn-danger">
                                     @if ($session?->id ?? false)
                                         Revoke
