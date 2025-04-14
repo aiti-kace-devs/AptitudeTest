@@ -90,7 +90,9 @@
                                         </p>
                                         {{-- <p class="exam-detail"><strong>Pass Mark:</strong> {{ $exam['passmark'] }}</p> --}}
                                         <p class="exam-detail"><strong>Total Questions:</strong>
-                                            {{ $exam['question_count'] }}</p>
+                                            {{-- {{ $exam['question_count'] }} --}}
+                                            30
+                                        </p>
                                     </div>
                                 </div>
 

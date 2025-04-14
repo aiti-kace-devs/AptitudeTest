@@ -60,6 +60,12 @@ class User extends Authenticatable
             ->whereNotNull('confirmed')->count() == 1;
     }
 
+    public function hasAdmission()
+    {
+        return UserAdmission::where('user_id', $this->userId)
+            ->count() == 1;
+    }
+
     public function admissionEmailSent()
     {
         return UserAdmission::where('user_id', $this->userId)
