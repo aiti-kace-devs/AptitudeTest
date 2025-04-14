@@ -60,8 +60,6 @@ class StudentOperation extends Controller
             $course = Course::find($user->registered_course);
         }
 
-
-
         return view('student.profile', compact('user', 'course'));
     }
 
@@ -402,6 +400,13 @@ class StudentOperation extends Controller
     public function change_course()
     {
         $user = Auth::user();
+
+        if ($user->admission) {
+            return redirect()->back()->with([
+                'flash' => 'Unable to change course.',
+                'key' => 'error',
+            ]);
+        }
 
         $currentCourseId = $user->registered_course;
 
