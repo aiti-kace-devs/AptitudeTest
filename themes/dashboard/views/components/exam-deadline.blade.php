@@ -3,7 +3,7 @@
 @php
     $registered = isset($registered) ? $registered : auth()->user()->created_at;
     $now = Carbon\Carbon::now();
-    $leftToDeadline = $now->diffInHours(new Carbon\Carbon($date));
+    $leftToDeadline = $now->diffInHours((new Carbon\Carbon($date))->setHour(23)->setMinute(59));
 
     $deadline = $date;
     $hoursLeft = $leftToDeadline;

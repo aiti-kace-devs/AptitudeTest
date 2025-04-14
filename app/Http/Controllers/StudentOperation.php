@@ -105,9 +105,9 @@ class StudentOperation extends Controller
             return redirect('/student/id-qrcode');
         }
 
-        $questionSets = Oex_question_master::select('exam_id')->distinct()->pluck('exam_id');
+        $questionSets = Oex_question_master::select('exam_set_id')->distinct()->pluck('exam_set_id');
         $randomExamId = $questionSets->random();
-        $question = Oex_question_master::where('exam_id', $randomExamId)->inRandomOrder()->get();
+        $question = Oex_question_master::where('exam_set_id', $randomExamId)->inRandomOrder()->get();
 
         // $question = Oex_question_master::where('exam_id', $id)->inRandomOrder()->get();
         $user_exam = user_exam::where('exam_id', $id)->where('user_id', Session::get('id'))->get()->first();
@@ -147,6 +147,10 @@ class StudentOperation extends Controller
             $usedTime = $now->diffInMinutes($start);
         }
         if ($usedTime > $exam->exam_duration) {
+            // time elapsed update exam status
+            $user_exam->submitted = now();
+            $user_exam->update();
+
             return redirect(url('student/exam'))->with([
                 'flash' => 'Unable to take exam. Exam duration time has elapsed. ' . $usedTime . ' mins has passed since user started exams.',
                 'key' => 'error',
@@ -202,11 +206,17 @@ class StudentOperation extends Controller
         $no_ans = 0;
         $data = $request->all();
         $result = [];
+        $exam_set_id = null;
         for ($i = 1; $i <= $request->index; $i++) {
+            // set exam_set on first iteration
+
             if (isset($data['question' . $i])) {
                 $q = Oex_question_master::where('id', $data['question' . $i])
                     ->get()
                     ->first();
+                if ($i == 1) {
+                    $exam_set_id = $q->exam_set_id;
+                }
 
                 if ($q->ans == $data['ans' . $i]) {
                     $result[$data['question' . $i]] = 'YES';
@@ -232,6 +242,7 @@ class StudentOperation extends Controller
         $res->no_ans = $no_ans;
         $res->result_json = json_encode($result);
         $total = $yes_ans + $no_ans;
+        $res->exam_set = $exam_set_id;
         $percentage = round(($yes_ans / $total) * 100);
         $res->save();
         // $storedResult = Oex_result::where('user_id', $user->id)
@@ -378,6 +389,7 @@ class StudentOperation extends Controller
                 'key' => 'success',
             ]);
         } catch (\Exception $e) {
+            // Log::error($e);
             return redirect(url('student/select-session/' . $user_id))->with([
                 'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
                 'key' => 'error',

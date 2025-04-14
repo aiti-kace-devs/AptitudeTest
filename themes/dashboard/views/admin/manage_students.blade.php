@@ -348,9 +348,12 @@
                                             <th>Email</th>
                                             <th>Age</th>
                                             <th>Course</th>
+                                            <th>Location</th>
+                                            <th>Gender</th>
+                                            <th>Date Registered</th>
                                             <th>Admission</th>
                                             <th>Score</th>
-                                            <th>Result</th>
+                                            {{-- <th>Result</th> --}}
                                             <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
@@ -463,6 +466,21 @@
 
 
                     var table = $('#studentsTable').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [{
+                            extend: 'csv',
+                            text: '<i class="fas fa-file-csv"></i> Export CSV',
+                            className: 'btn btn-success',
+                            title: 'Students_Export_' + new Date().toISOString().slice(0, 10),
+                            exportOptions: {
+                                columns: [1,2,3,4,5,6,7,9],
+                                // format: {
+                                //     body: function(data, row, column, node) {
+                                //         return data.replace(/<[^>]*>/g, '');
+                                //     }
+                                // }
+                            }
+                        }],
                         processing: true,
                         serverSide: true,
                         ajax: {
@@ -527,6 +545,18 @@
                                 name: 'course_name'
                             },
                             {
+                                data: 'course_location',
+                                name: 'course_location'
+                            },
+                            {
+                                data: 'gender',
+                                name: 'users.gender'
+                            },
+                            {
+                                data: 'date_registered',
+                                name: 'users.created_at'
+                            },
+                            {
                                 data: 'admission_status',
                                 name: 'admission_status'
                             },
@@ -535,11 +565,11 @@
                                 name: 'score',
                                 orderable: false
                             },
-                            {
-                                data: 'result',
-                                name: 'result',
-                                orderable: false
-                            },
+                            // {
+                            //     data: 'result',
+                            //     name: 'result',
+                            //     orderable: false
+                            // },
                             {
                                 data: 'status',
                                 name: 'status',
@@ -738,12 +768,6 @@
                     });
 
                 });
-
             </script>
-
-
-
-
-
         @endpush
     @endsection

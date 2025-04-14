@@ -24,7 +24,7 @@ array when the `selectedLocation` changes. */
       </option>
     </SelectInput>
 
-     <InputLabel for="centre" value="Centre" :required="true" class="mt-2" />
+     <InputLabel for="centre" value="Centre (Select a location first)" :required="true" class="mt-2" />
     <SelectInput
       class="mt-1 mb-1 w-full"
       v-model="selectedCentre"
@@ -37,7 +37,7 @@ array when the `selectedLocation` changes. */
       </option>
     </SelectInput>
 
-    <InputLabel for="course" value="Course (Select a location and a centre first)" :required="true" class="mt-2" />
+    <InputLabel for="course" value="Course (Select a centre first)" :required="true" class="mt-2" />
     <SelectInput
       class="mt-1 w-full"
       v-model="form.response_data.course_id"

@@ -43,6 +43,7 @@
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/plugins/datatables-new/buttons.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets@11.4.0/styles/default.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
         integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
@@ -227,6 +228,15 @@
                         {{-- @endcan --}}
 
                         @can('student.admit')
+                            <li class="nav-item">
+                                <a href="{{ url('admin/shortlisted_students') }}"
+                                    class="nav-link @if (request()->is('admin/shortlisted_students')) active @endif">
+                                    <i class="fas fa-user-check nav-icon"></i>
+                                    <p>Shortlisted students</p>
+                                </a>
+                            </li>
+
+
                             <li class="nav-item">
                                 <a href="{{ url('admin/registered_students') }}"
                                     class="nav-link @if (request()->is('admin/registered_students')) active @endif">
@@ -446,6 +456,11 @@
     <script src="{{ url('assets/plugins/datatables-new/buttons.colVis.min.js') }}"></script>
 
     {{-- end datatables  --}}
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="{{ url('assets/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
     <!-- Summernote -->
     <script src="{{ url('assets/plugins/summernote/summernote-bs4.min.js') }}"></script>

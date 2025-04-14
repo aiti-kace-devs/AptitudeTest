@@ -32,7 +32,8 @@ class User extends Authenticatable
         'ghcard',
         'gender',
         'network_type',
-        'registered_course'
+        'registered_course',
+        'shortlist'
     ];
 
     /**
@@ -79,5 +80,10 @@ class User extends Authenticatable
     public function formResponse()
     {
         return $this->belongsTo(FormResponse::class, 'form_response_id');
+    }
+
+    public function admission()
+    {
+        return $this->hasOne(UserAdmission::class, 'user_id', 'userId');
     }
 }
