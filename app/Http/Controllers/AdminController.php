@@ -1231,42 +1231,83 @@ class AdminController extends Controller
 
     public function sendBulkSMS(Request $request)
     {
-        $validated = $request->validate([
-            'message' => 'required|string',
-            'student_ids' => 'required|array',
-            'student_ids.*' => 'exists:users,id',
-        ], [], [
-            'student_ids.*' => 'student'
-        ]);
 
-        // Fetch mobile numbers of selected students
-        $mobileNumbers = User::whereIn('id', $validated['student_ids'])
-            ->pluck('mobile_no')
-            ->filter() // Remove any null values
-            ->toArray();
-
-        if (empty($mobileNumbers)) {
-            return redirect()->back()->with([
-                'flash' => 'No valid mobile numbers found.',
-                'key' => 'error',
-            ]);
+        $studentIds = $request->student_ids;
+        if (empty($studentIds)) {
+            return response()->json(['success' => false, 'message' => 'No students selected.'], 400);
         }
+    
+        try {
+            foreach ($studentIds as $studentId) {
+                $user = User::where('userId', $studentId)->first();
+                if (!$user) continue;
 
+        
+            }
 
-        // Dispatch job for bulk SMS sending
-        $message = (string) $validated['message'];
-        $recipients = array_filter((array) $mobileNumbers);
-
-        SendBulkSMSJob::dispatch($message, $recipients);
-
-
-        return redirect()
+            return redirect()
             ->back()
             ->with([
                 'flash' => 'SMS sending initiated successfully!',
                 'key' => 'success',
             ]);
+
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+
+
     }
+
+
+
+
+
+    // public function sendBulkSMS(Request $request)
+    // {
+        // $validated = $request->validate([
+        //     'message' => 'required|string',
+        //     'student_ids' => 'required|array',
+        //     'student_ids.*' => 'exists:users,id',
+        // ], [], [
+        //     'student_ids.*' => 'student'
+        // ]);
+
+        // Log::info('Students student_ids.', $mobileNumbers);
+
+        // // Fetch mobile numbers of selected students
+        // $mobileNumbers = User::whereIn('userId', $validated['student_ids'])
+        //     ->pluck('mobile_no')
+        //     ->filter() // Remove any null values
+        //     ->toArray();
+
+        // if (empty($mobileNumbers)) {
+        //     return redirect()->back()->with([
+        //         'flash' => 'No valid mobile numbers found.',
+        //         'key' => 'error',
+        //     ]);
+        // }
+
+        // Log::info('Students mobileNumbers.', $mobileNumbers);
+
+        // // Dispatch job for bulk SMS sending
+        // $message = (string) $validated['message'];
+        // $recipients = array_filter((array) $mobileNumbers);
+
+        // //SendBulkSMSJob::dispatch($message, $recipients);
+
+
+        // return redirect()
+        //     ->back()
+        //     ->with([
+        //         'flash' => 'SMS sending initiated successfully!',
+        //         'key' => 'success',
+        //     ]);
+    // }
 
 
 

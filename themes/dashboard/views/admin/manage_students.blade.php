@@ -260,7 +260,7 @@
                                             </button>
 
                                             <button class="btn btn-success mr-2" data-toggle="modal"
-                                                data-target="#bulk-sms-modal">Send SMS
+                                                data-target="#bulk">Send SMS
                                                 <i class="fas fa-sms"></i>
                                             </button>
 
@@ -372,7 +372,7 @@
 
     <!-- Modal -->
     @include('admin.send-bulk-email')
-    @include('admin.send_bulk_sms')
+    <!-- @include('admin.send_bulk_sms') -->
 
 
     <div class="modal fade" id="myModal" role="dialog">

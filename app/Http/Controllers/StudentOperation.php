@@ -627,4 +627,19 @@ class StudentOperation extends Controller
         //     ]);
         // }
     }
+
+
+
+    public function delete_admission($user_id, Request $request)
+    {
+        $delete_user_admission = UserAdmission::where('user_id', $user_id)->first();
+    
+        if ($delete_user_admission) {
+            $delete_user_admission->delete();
+            return response()->json(['message' => 'User admission deleted successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'User admission not found.'], 404);
+        }
+    }
+    
 }
