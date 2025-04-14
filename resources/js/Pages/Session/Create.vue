@@ -74,7 +74,7 @@ export default {
         <div class="bg-white overflow-hidden shadow-none sm:rounded-lg">
           <div class="p-6">
             <form @submit.prevent="submit">
-              <div class="grid grid-cols-12 gap-5">
+              <div class="grid lg:grid-cols-12 gap-5">
                 <div class="lg:col-span-6">
                   <InputLabel for="course_id" value="course" :required="true" />
                   <SelectInput
@@ -106,20 +106,6 @@ export default {
                 </div>
 
                 <div class="lg:col-span-6">
-                  <InputLabel for="course_time" value="Duration" :required="true" />
-                  <TextInput
-                    id="course_time"
-                    type="text"
-                    class="w-full"
-                    v-model="form.course_time"
-                    :placeholder="'Duration'"
-                    autocomplete="false"
-                    :class="{ 'border-red-600': form.errors.course_time }"
-                  />
-                  <InputError :message="form.errors.course_time" />
-                </div>
-
-                <div class="lg:col-span-6">
                   <InputLabel for="session" value="Session" :required="true" />
                   <TextInput
                     id="session"
@@ -134,7 +120,21 @@ export default {
                 </div>
 
                 <div class="lg:col-span-6">
-                  <InputLabel for="link" value="WhatsApp Link" :required="true" />
+                  <InputLabel for="course_time" value="Duration" :required="true" />
+                  <TextInput
+                    id="course_time"
+                    type="text"
+                    class="w-full"
+                    v-model="form.course_time"
+                    :placeholder="'Duration'"
+                    autocomplete="false"
+                    :class="{ 'border-red-600': form.errors.course_time }"
+                  />
+                  <InputError :message="form.errors.course_time" />
+                </div>
+
+                <div class="lg:col-span-6">
+                  <InputLabel for="link" value="WhatsApp Link" :required="false" />
                   <TextInput
                     id="link"
                     type="text"
