@@ -599,35 +599,32 @@
                             orderable: false,
                             searchable: false,
                             render: function(data, type, row) {
-                                var buttons = [];
-                                if (!row.admitted) {
-                                    buttons.push(
-                                        '<button class="btn btn-primary btn-sm admit-btn" data-id="' +
-                                        row.userId + '">Admit</button>');
-                                } else {
-                                    buttons.push(
-                                        '<button class="btn btn-info btn-sm admit-btn" data-id="' +
-                                        row.userId + '" data-course_id="' + (row.course_id || '') +
-                                        '" data-session_id="' + (row.session_id || '') +
-                                        '">Change Admission</button>');
-                                    if (row.session_name) {
-                                        buttons.push('<a href="' +
-                                            "{{ url('student/select-session') }}" + '/' + row
-                                            .userId +
-                                            '" target="_blank" class="btn btn-primary btn-sm">Choose Session</a>'
-                                        );
-                                    }
-                                    if (row.session_name) {
-                                        buttons.push(
-                                            '<a href="javascript:void(0);" class="btn btn-danger btn-sm delete-admission" data-userid="' + row.userId + '">Delete Admission</a>'
-                                        );
+    var actionDropdown = '<div class="dropdown">' +
+        '<button class="btn btn-info dropdown-toggle" type="button" id="actionDropdown_' + row.userId + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+        'Action' +
+        '</button>' +
+        '<div class="dropdown-menu" aria-labelledby="actionDropdown_' + row.userId + '">';
 
-                                    }
-                                }
-                                // if ({{ Auth::guard('admin')->user()->is_super ?? 0 }} == 1) {
-                                //     buttons.push('<a href="' + "{{ url('admin/delete_shortlisted_student') }}" + '/' + row.id + '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this student?\')">Delete</a>');                            }
-                                return buttons.join(' ');
-                            }
+    if (!row.admitted) {
+        actionDropdown += '<a class="dropdown-item admit-btn" href="javascript:void(0);" data-id="' + row.userId + '">Admit</a>';
+    } else {
+        actionDropdown += '<a class="dropdown-item admit-btn" href="javascript:void(0);" data-id="' + row.userId +
+            '" data-course_id="' + (row.course_id || '') + '" data-session_id="' + (row.session_id || '') + '">Change Admission</a>';
+
+        if (row.session_name) {
+            actionDropdown += '<a class="dropdown-item" href="' + "{{ url('student/select-session') }}" + '/' + row.userId +
+                '" target="_blank">Choose Session</a>';
+        }
+
+        if (row.session_name) {
+            actionDropdown += '<a class="dropdown-item delete-admission" href="javascript:void(0);" data-userid="' + row.userId + '">Delete Admission</a>';
+        }
+    }
+
+    actionDropdown += '</div></div>';
+
+    return actionDropdown;
+}
                         }
                     ],
                     columnDefs: [{
@@ -663,11 +660,11 @@
 
 
 
- 
+
 
                 $(document).on('click', '.admit-btn', function() {
                     console.log('Admit button clicked');
-                    
+
                     var userId = $(this).data('userId');
                     var course_id = $(this).data('course_id') || null;
                     var session_id = $(this).data('session_id') || null;
@@ -741,7 +738,7 @@
                     var btn = $(this);
                     btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
                     console.log('Student IDs: ', selectedIds)
-                    
+
 
                     Swal.fire({
                         title: 'Admit Students?',
@@ -792,7 +789,7 @@
 
                 var modal = $('#bulk-email-modal');
                 $(modal).on('modalAction', function(event) {
-                    
+
                     const message = event.detail.message;
                     const subject = event.detail.subject;
                     const template = event.detail.template;
@@ -838,7 +835,7 @@
 
                     // Load templates when the modal opens
                     modal.on('show.bs.modal', function () {
-                        
+
                         templateSelect.empty().append('<option selected disabled>Loading templates...</option>');
 
                         $.get("{{ route('admin.fetch.sms.template') }}", function (templates) {
@@ -903,7 +900,7 @@
                                 return;
                             }
                         console.log('Student IDs: ', selectedIds)
-                        
+
                         $.ajax({
                             url: "{{ route('admin.send_bulk_sms') }}",
                             type: 'POST',
