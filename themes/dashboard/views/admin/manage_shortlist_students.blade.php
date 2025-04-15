@@ -933,11 +933,11 @@
                 $(document).on('click', '.delete-admission', function(e) {
                 e.preventDefault();
                 const userId = $(this).data('userid');
-                const deleteUrl = "{{ url('student/delete-student-admission') }}/" + userId;
+                const deleteUrl = "{{ url('admin/delete-student-admission') }}/" + userId;
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "AAre you sure you want to remove this student from the shortlist and delete their admission?",
+                    text: "Are you sure you want to remove this student from the shortlist and delete their admission?",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
