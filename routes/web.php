@@ -169,7 +169,7 @@ Route::prefix('admin')
                 Route::get('/reset-exam/{exam_id}/student/{user_id}', [StudentOperation::class, 'reset_exam'])->name('reset-exam');
             });
 
-            Route::middleware('permission:student.shortlist')->group(function () {
+            Route::middleware('permission:student.read')->group(function () {
                 Route::get('/registered_students', [AdminController::class, 'registered_students'])
                     ->name('student.index')
                     ->middleware('permission:student.admit');
@@ -179,10 +179,10 @@ Route::prefix('admin')
                 Route::post('/admit', [AdminController::class, 'admit_student'])
                     ->name('admit_user_ui')
                     ->middleware('permission:student.admit');
-                Route::get('/manage_students', [AdminController::class, 'manage_students'])
-                    ->name('manage_students')
-                    ->middleware('permission:student.admit');
             });
+
+            Route::get('/manage_students', [AdminController::class, 'manage_students'])
+                    ->name('manage_students');
 
             Route::middleware('permission:student.read')->group(function () {
                 Route::get('/student_status/{id}', [AdminController::class, 'student_status'])
@@ -206,8 +206,7 @@ Route::prefix('admin')
             Route::middleware('permission:attendance.read')->group(function () {
                 Route::post('/confirm_attendance', [AttendanceController::class, 'confirmAttendance'])->middleware('permission:attendance.create');
                 Route::get('/view_attendance', [AdminController::class, 'viewAttendanceByDate'])
-                    ->name('viewAttendanceByDate')
-                    ->middleware('permission:attendance.');
+                    ->name('viewAttendanceByDate');
                 Route::get('/remove-attendance/{id}', [AttendanceController::class, 'removeAttendance'])
                     ->name('remove-attendance')
                     ->middleware('permission:attendance.delete');
@@ -215,8 +214,7 @@ Route::prefix('admin')
                 Route::post('/generate_qrcode', [AttendanceController::class, 'generateQRCodeData'])->middleware('permission:attendance.create');
                 Route::get('/scan_qrcode', [AdminController::class, 'scan_qrcode_page'])->middleware('permission:attendance.create');
                 Route::get('/verification', [AdminController::class, 'verification_page'])
-                ->name('verification')
-                ->middleware('permission:attendance.verify');
+                ->name('verification');
                 Route::get('/verify_details', [AdminController::class, 'verifyDetails'])
                 ->name('verify-details');
                 Route::get('/reset-verify/{id}', [AdminController::class, 'reset_verify'])
@@ -411,8 +409,9 @@ Route::prefix('admin')
                         ->middleware('permission:student.bulk-sms');
                 });
             // end of manage sms_template routes
-
-            Route::get('app-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware('permission:manage.cofig');
+                Route::middleware('permission:manage.monitor')->group(function () {
+                    Route::get('app-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware('permission:manage.cofig');
+                });
         });
     });
 

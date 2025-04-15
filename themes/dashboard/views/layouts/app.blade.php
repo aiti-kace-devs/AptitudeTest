@@ -233,6 +233,7 @@
                                     class="nav-link @if (request()->is('admin/shortlisted_students')) active @endif">
                                     <i class="fas fa-user-check nav-icon"></i>
                                     <p>Shortlisted students</p>
+
                                 </a>
                             </li>
 
@@ -318,7 +319,7 @@
 
                         @can('manage.config')
                             <li class="nav-item">
-                                {{-- <a href="{{ route(config('env-editor.route.name')) }}" class="nav-link"> --}}
+                                <a href="{{ route(config('env-editor.route.name')) }}" class="nav-link">
                                     <i class="fas fa-external-link-square-alt nav-icon"></i>
                                     <p>Logs</p>
                                 </a>
