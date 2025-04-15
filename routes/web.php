@@ -232,6 +232,9 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         // end of manage sms_template routes
 
         Route::get('app-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['admin.super']);
+
+        Route::get('/app-settings', [AdminController::class, 'getSettingsPage'])->name('admit_user_ui')->middleware('admin.super');
+        Route::post('/app-settings', [AdminController::class, 'getSettingsPage'])->name('app_settings.update')->middleware('admin.super');
     });
 });
 
