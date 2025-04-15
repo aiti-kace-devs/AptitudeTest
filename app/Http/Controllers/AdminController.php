@@ -36,7 +36,7 @@ use App\Mail\ExamLoginCredentials;
 use App\Mail\StudentAdmitted;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\AdmissionRejection;
 use App\Helpers\GoogleSheets;
 use App\Models\Course;
 use App\Models\Branch;
@@ -895,6 +895,31 @@ class AdminController extends Controller
             'message' => 'Unable to verify. Card Number format is wrong',
         ]);
     }
+
+
+
+    public function delete_admission($user_id, Request $request)
+    {
+        $delete_user_admission = UserAdmission::where('user_id', $user_id)->first();
+
+        if ($delete_user_admission) {
+            $delete_user_admission->delete();
+            AdmissionRejection::create([
+                'user_id' => $user_id,
+                'course_id' => $delete_user_admission->course_id,
+                'rejected_at' => now(),
+            ]);
+
+            User::where('userId', $user_id)->update(['shortlist' => 0]);
+
+            return response()->json(['message' => 'User admission and shortlisted deleted successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'User admission not found.'], 404);
+        }
+    }
+
+
+
 
     public function verification_page(Request $request)
     {
