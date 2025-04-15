@@ -419,10 +419,11 @@ Route::prefix('admin')
 /* Student section routes */
 Route::prefix('student')
     ->middleware('theme:dashboard')
-    ->name('student.')
-    ->group(function () {
-        Route::get('/select-session/{user_id}', [StudentOperation::class, 'select_session_view'])->name('view-select-session');
-        Route::post('/select-session/{user_id}', [StudentOperation::class, 'confirm_session'])->name('select-session');
+    ->name('student.')->group(function () {
+
+        Route::get('/select-session/{user_id}', [StudentOperation::class, 'select_session_view'])->middleware('auth');
+        Route::post('/select-session/{user_id}', [StudentOperation::class, 'confirm_session'])->name('select-session')->middleware('auth');
+        Route::delete('/delete-student-admission/{user_id}', [StudentOperation::class, 'delete_admission'])->name('delete-student-admission')->middleware('auth');
 
         Route::middleware(['auth:web'])->group(function () {
             Route::get('/dashboard', [StudentOperation::class, 'dashboard'])->name('dashboard');

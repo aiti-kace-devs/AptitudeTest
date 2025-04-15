@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Jobs\AdmitStudentJob;
 use App\Jobs\TestSubmittedJob;
+use App\Models\AdmissionRejection;
 
 class StudentOperation extends Controller
 {
@@ -59,8 +60,6 @@ class StudentOperation extends Controller
             // Assuming 'exam' field in users table holds the course_id
             $course = Course::find($user->registered_course);
         }
-
-
 
         return view('student.profile', compact('user', 'course'));
     }
@@ -327,24 +326,28 @@ class StudentOperation extends Controller
     public function select_session_view($user_id)
     {
         $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
-        if ($admission->confirmed) {
-            return view('student.session-select.index', [
-                'confirmed' => true,
-                'session' => CourseSession::where('id', $admission->session)->first(),
-            ]);
-        }
+        $user = User::select('id', 'name', 'userId')->where('userId', $user_id)->first();
+
+        // if ($admission->confirmed) {
+        //     return view('student.session-select.index', [
+        //         'confirmed' => true,
+        //         'user' => $user,
+        //         'session' => CourseSession::where('id', $admission->session)->first(),
+        //     ]);
+        // }
         $courseDetails = Course::find($admission->course_id);
         $sessions = CourseSession::where('course_id', $courseDetails->id)->get();
         // $sessions->each(function($s){
         //     $used = UserAdmission::where('session', $s->id)->whereNotNull('confirmed')->count();
 
         // });
-        $user = User::select('id', 'name', 'userId')->where('userId', $user_id)->first();
         return view('student.session-select.index', [
             'user' => $user,
             'sessions' => $sessions,
             'course' => $courseDetails,
             'confirmed' => false,
+            'admission' => $admission,
+            'session' => CourseSession::where('id', $admission->session)->first()
         ]);
     }
 
@@ -355,7 +358,10 @@ class StudentOperation extends Controller
                 'session_id' => 'required|exists:course_sessions,id',
             ]);
 
+
             $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
+            $changingSession = $admission->confirmed && $admission->session;
+
             $courseDetails = Course::find($admission->course_id);
             $session = CourseSession::where('course_id', $courseDetails->id)
                 ->where('id', $data['session_id'])
@@ -383,9 +389,11 @@ class StudentOperation extends Controller
             $admission->location = $courseDetails->location;
             $admission->save();
 
-            AdmitStudentJob::dispatch($admission);
+            if (!$changingSession) {
+                AdmitStudentJob::dispatch($admission);
+            }
             return redirect(url('student/select-session/' . $user_id))->with([
-                'flash' => 'Confirmation successful',
+                'flash' => $changingSession ? 'Session changed successfully' : 'Confirmation successful',
                 'key' => 'success',
             ]);
         } catch (\Exception $e) {
@@ -402,6 +410,13 @@ class StudentOperation extends Controller
     public function change_course()
     {
         $user = Auth::user();
+
+        if ($user->admission) {
+            return redirect()->back()->with([
+                'flash' => 'Unable to change course.',
+                'key' => 'error',
+            ]);
+        }
 
         $currentCourseId = $user->registered_course;
 
@@ -460,44 +475,53 @@ class StudentOperation extends Controller
 
         try {
             foreach ($studentIds as $studentId) {
-                $user = User::find($studentId);
+                $user = User::where('userId', $studentId)->first();
                 if (!$user) continue;
 
                 $course = Course::find($user->registered_course);
                 if (!$course) continue;
 
-                $existingAdmission = UserAdmission::where('user_id', $studentId)->first();
+                $existingAdmission = UserAdmission::where('user_id', $user->userId)->first();
                 if ($existingAdmission) {
                     if (!$existingAdmission->email_sent) {
-                        Mail::to($user->email)->send(new StudentAdmitted(
-                            $user->name,
-                            $course->course_name,
-                            $course->location,
-                            url: url('student/select-session/' . $user->id)
-                        ));
-                        $existingAdmission->update(['email_sent' => now()]);
-                        $count++;
+                        try {
+                            Mail::to($user->email)->send(new StudentAdmitted(
+                                $user->name,
+                                $course->course_name,
+                                $course->location,
+                                url('student/select-session/' . $user->userId)
+                            ));
+                            $existingAdmission->update(['email_sent' => now()]);
+                            $count++;
+                        } catch (\Throwable $mailError) {
+                            \Log::error("Failed to send email to {$user->email}: " . $mailError->getMessage());
+                        }
                     }
                     continue;
                 }
 
                 UserAdmission::create([
-                    'user_id' => $studentId,
+                    'user_id' => $user->userId, // Keep UUID
                     'course_id' => $course->id,
                     'email_sent' => now(),
                 ]);
 
-                Mail::to($user->email)
-                    ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))
-                    ->send(new StudentAdmitted(
-                        name: $user->name,
-                        course: $course->course_name,
-                        location: $course->location,
-                        url: url('student/select-session/' . $user->id)
-                    ));
+                try {
+                    Mail::to($user->email)
+                        ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))
+                        ->send(new StudentAdmitted(
+                            name: $user->name,
+                            course: $course->course_name,
+                            location: $course->location,
+                            url: url('student/select-session/' . $user->userId)
+                        ));
+                } catch (\Throwable $mailError) {
+                    \Log::error("Failed to send email to {$user->email}: " . $mailError->getMessage());
+                }
 
                 $count++;
             }
+
 
             return response()->json([
                 'success' => true,
@@ -510,6 +534,31 @@ class StudentOperation extends Controller
             ], 500);
         }
     }
+
+
+
+    public function delete_admission($user_id, Request $request)
+    {
+        $delete_user_admission = UserAdmission::where('user_id', $user_id)->first();
+
+        if ($delete_user_admission) {
+            $delete_user_admission->delete();
+            AdmissionRejection::create([
+                'user_id' => $user_id,
+                'course_id' => $delete_user_admission->course_id,
+                'rejected_at' => now(),
+            ]);
+
+            User::where('userId', $user_id)->update(['shortlist' => 0]);
+
+            return response()->json(['message' => 'User admission and shortlisted deleted successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'User admission not found.'], 404);
+        }
+    }
+
+
+
 
     public function get_attendance_page()
     {

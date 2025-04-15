@@ -26,7 +26,7 @@ class SessionFormRequest extends FormRequest
             'limit' => ['required', 'numeric', 'min:0'],
             'course_time' => ['required', 'string', 'max:100'],
             'session' => ['required', 'string', 'max:100'],
-            'link' => ['required', 'url'],
+            'link' => ['nullable', 'url'],
         ];
     }
 

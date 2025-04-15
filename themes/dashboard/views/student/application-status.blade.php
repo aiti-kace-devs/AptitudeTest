@@ -115,7 +115,6 @@
             align-items: center
         }
     </style>
-
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -221,7 +220,8 @@
 
                     <div class="status-item" data-toggle="collapse" data-target="#collapse4" aria-expanded="true"
                         aria-controls="collapse4">
-                        <div class="status-number pending" data-step="4">4</div>
+                        <div class="status-number  @if ($user_admission?->session) active @else pending @endif"
+                            data-step="4">4</div>
                         <div class="status-details">
                             <span class="text-row">
                                 <h5
@@ -239,11 +239,22 @@
 
                         {{-- <div class="arrow">></div> --}}
                     </div>
+
                     <div class="collapse-content" id="collapse4">
-                        <p>If shortlisted, you must select a session to confirm your admission. Further instructions will be
-                            provided upon selection.</p>
+                        @if ($user_admission && $user_admission->confirmed)
+                            Congratulations, you have been admitted <br>
+                            <button id="revoke-admission-button" class="btn btn-danger mb-2">Revoke Admission Now</button>
+                        @else
+                            <p>If shortlisted, you must select a session to confirm your admission. Further instructions
+                                will be
+                                provided upon selection.</p>
+                        @endif
                     </div>
                 </div>
         </section>
 
     @endsection
+
+    @push('scripts')
+        @include('student.decline-admission-js', ['id' => auth()->user()->userId])
+    @endpush

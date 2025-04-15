@@ -127,7 +127,7 @@
                             </div>
                             <input id="contact" type="text" required value="{{ $user->contact }}" name="contact"
                                 placeholder="201234567" @if ($user->contact) disabled @endif
-                                class="form-control  @error('contact') is-invalid @enderror col-12 mr-2">
+                                class="form-control @error('contact') is-invalid @enderror col-12 mr-2">
                         </div>
                         @error('contact')
                             <div role="alert" class="alert alert-danger">{{ $message }}</div>
@@ -135,14 +135,15 @@
 
 
                         <div class="col-12">
+                            <p class="alert alert-info">You'll be given the opportunity to change your details later.</p>
                             @if (detailsUpdated($user) && null !== $user->gender && null !== $user->network_type && null !== $user->contact)
                                 <p class="text-sm text-danger">You have already updated your details</p>
                             @else
-                                <button onclick="confirmUpdateDetails()" type="button"
-                                    class="btn btn-primary">Update</button>
-                                <p class="text-sm text-danger">You can only update your details once, make sure you verify
-                                    all
-                                    details before submitting.</p>
+                                {{-- <button onclick="confirmUpdateDetails()" type="button"
+                            class="btn btn-primary">Update</button> --}}
+                                {{-- <p class="text-sm text-danger">You can only update your details once, make sure you verify
+                            all
+                            details before submitting.</p> --}}
                             @endif
                         </div>
                     </div>
@@ -170,16 +171,40 @@
     <script src="{{ asset('assets/js/jquery.inputmask.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/easy.qrcode.min.js') }}"></script>
     <script>
-        const innerWidth = Math.floor(window.innerWidth * (7 / 9));
-        const width = innerWidth > 400 ? 400 : innerWidth
-        const qrcode = new QRCode(document.getElementById("qrcode"), {
-            text: "{{ Auth::user()->userId }}",
-            width: width,
-            height: width,
-            colorDark: "blue",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H,
-        });
+        const logoCanvas = document.createElement('canvas');
+        logoCanvas.width = 200;
+        logoCanvas.height = 100;
+        const logoCtx = logoCanvas.getContext('2d');
+
+        // Draw logo
+        const logoImg = new Image();
+        let qrcode;
+
+        logoImg.src = "{{ asset('assets/images/logo-bt.png') }}";
+        logoImg.onload = function() {
+            logoCtx.drawImage(logoImg, 50, 0, 100, 60);
+
+            // Add text
+            logoCtx.font = 'bold 14px Arial';
+            logoCtx.fillStyle = 'black';
+            logoCtx.textAlign = 'center';
+            logoCtx.fillText("{{ Auth::user()->name }}", 100, 85);
+
+            const innerWidth = Math.floor(window.innerWidth * (7 / 9));
+            const width = innerWidth > 400 ? 400 : innerWidth
+            qrcode = new QRCode(document.getElementById("qrcode"), {
+                text: "{{ Auth::user()->userId }}",
+                width: width,
+                height: width,
+                colorDark: "black",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H,
+                quietZone: 20,
+                logo: logoCanvas.toDataURL('image/png'),
+                logoWidth: 200,
+                logoHeight: 150,
+            });
+        }
 
         function downloadQRCode() {
             qrcode.download("StudentID-{{ Auth::user()->userId }}")

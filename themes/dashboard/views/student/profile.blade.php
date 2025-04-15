@@ -110,13 +110,15 @@
                 <div class="col-md-3 font-weight-bold">Session:</div>
                 <div class="col-md-9">{{ $user->status }}</div>
             </div> -->
-            <div class="col-sm-12">
+            @unless($user->admission)
+            <div class="col-sm-12" >
                 <div class="form-group">
                     <a href="{{ route('student.change-course') }}" class="btn btn-primary">
                         <i class="fas fa-exchange-alt"></i> Change Course
                     </a>
                 </div>
             </div>
+            @endunless
         @else
             <div class="alert alert-warning text-center">
                 <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
