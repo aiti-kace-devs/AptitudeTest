@@ -55,7 +55,7 @@ class AdminController extends Controller
     public function index()
     {
         $user_count = User::get()->count();
-        $exam_count = Oex_exam_master::get()->count();
+        $shortlist_count = User::where('shortlist', 1)->count();
         $admin_count = Admin::get()->count();
         $user_admission_count = UserAdmission::whereNotNull('session')->count();
         $programe_count = Programme::get()->count();
@@ -124,7 +124,7 @@ class AdminController extends Controller
 
         return view('admin.dashboard', [
             'student' => $user_count,
-            'exam' => $exam_count,
+            'shortlist' => $shortlist_count,
             'admin' => $admin_count,
             'admission' => $user_admission_count,
             'course' => $programe_count,
