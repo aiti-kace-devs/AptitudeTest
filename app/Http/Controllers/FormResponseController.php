@@ -136,11 +136,9 @@ class FormResponseController extends Controller
                     $dbColumn = $userFieldMap[$field['field_name']] ?? null;
             
                     if ($dbColumn) {
-                        Log::info("Index Column:", ['column' => $dbColumn]);
                         $exists = User::where($dbColumn, $valueToCheck)->exists();
             
                         if ($exists) {
-                            Log::info("{$fieldTitle} has already been taken.");
                             return redirect()->back()->withInput()->withErrors([
                                 $fieldKey => ["{$fieldTitle} has already been taken."]
                             ]);
