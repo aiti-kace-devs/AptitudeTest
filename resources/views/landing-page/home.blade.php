@@ -163,105 +163,20 @@
     <div class="courses">
         <section id="all" class="course-section active">
             <div class="course-grid">
+                @foreach ($programmes as $programme)
                 <div class="course-card">
                     <div class="course-image">
-                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
+                        <img src="{{ asset('storage/programme/' . $programme->image) }}" alt="{{ $programme->title }} Course Image" />
                     </div>
                     <div class="course-content">
-                        <h2 class="course-title">Certified Cybersecurity Professional</h2>
+                        <h2 class="course-title">{{ $programme->title }}</h2>
                         <p class="course-description">
-                            This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
+                        {{ $programme->description }}
                         </p>
-                        <a href="{{ route('dynamic-course', 'cybersecurity-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('course', $programme->slug) }}" class="course-button">Read More</a>
                     </div>
                 </div>
-              <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Network Support Technician (CNST)</h2>
-                        <p class="course-description">
-                            Provide technical support with a focus on networking. Assist in network device management.
-                        </p>
-                        <a href="{{ route('dynamic-course', 'cnst-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/ai.jpeg') }}" alt="Data Protection Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Data Analyst Associate</h2>
-                        <p class="course-description">
-                            This course focuses on safeguarding sensitive and personal data in today's digital world. It covers key topics such as data privacy laws (including GDPR), encryption techniques, risk management, and best practices for mitigating data breaches.
-                        </p>
-                        <a href="{{ route('dynamic-course', 'ai-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Expert</h2>
-                        <p class="course-description">
-                            Advanced Data Protection Strategy & Policy Development, International Data Transfers & Cross-Border Compliance, Privacy Program Management & Regulatory Engagement, Managing Large-Scale Data Protection Programs, Incident Response & Data Breach Management.
-                        </p>
-                        <a href="{{ route('dynamic-course', 'protection-expert-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-
-                <!-- <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/ai.jpeg') }} " alt="Artificial Intelligence Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Artificial Intelligence Training</h2>
-                        <p class="course-description">
-                            This course offers comprehensive, hands-on training in artificial intelligence fundamentals, including machine learning, neural networks, and deep learning. Designed for both beginners and those looking to expand their expertise, the curriculum covers data preprocessing, model building, algorithm selection, and the deployment of AI solutions.
-                        </p>
-                        <a href="{{ route('dynamic-course', 'ai-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div> -->
-                 <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Manager</h2>
-                        <p class="course-description">
-                            This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
-                        </p>
-                        <a href="{{ route('dynamic-course', 'protection-sup-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-
-                 <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Professional</h2>
-                        <p class="course-description">
-                            This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
-                        </p>
-                        <a href="{{ route('dynamic-course', 'data-protection-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Officer</h2>
-                        <p class="course-description">
-                            Monitor compliance with data protection laws and policies, detect and assess data protection risks and breaches, respond to data incidents and ensure regulatory compliance.
-                        </p>
-                        <a href="{{ route('dynamic-course', 'certified-dpf-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
+                @endforeach                
             </div>
         </section>
 
@@ -276,7 +191,7 @@
                         <p class="course-description">
                             This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
                         </p>
-                        <a href="{{ route('dynamic-course', 'cybersecurity-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('course', 'cybersecurity-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
                 <div class="course-card">
@@ -288,7 +203,7 @@
                         <p class="course-description">
                             Provide technical support with a focus on networking. Assist in network device management.
                         </p>
-                        <a href="{{ route('dynamic-course', 'cnst-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('course', 'cnst-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
             </div>
@@ -307,7 +222,7 @@
                         <p class="course-description">
                             This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
                         </p>
-                        <a href="{{ route('dynamic-course', 'protection-sup-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('course', 'protection-sup-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
                 <div class="course-card">
@@ -319,7 +234,7 @@
                         <p class="course-description">
                             Advanced Data Protection Strategy & Policy Development, International Data Transfers & Cross-Border Compliance, Privacy Program Management & Regulatory Engagement, Managing Large-Scale Data Protection Programs, Incident Response & Data Breach Management.
                         </p>
-                        <a href="{{ route('dynamic-course', 'protection-expert-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('course', 'protection-expert-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
                 <div class="course-card">
@@ -331,7 +246,7 @@
                         <p class="course-description">
                             Monitor compliance with data protection laws and policies, detect and assess data protection risks and breaches, respond to data incidents and ensure regulatory compliance.
                         </p>
-                        <a href="{{ route('dynamic-course', 'certified-dpf-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('course', 'certified-dpf-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
                  <div class="course-card">
@@ -343,7 +258,7 @@
                         <p class="course-description">
                             This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
                         </p>
-                        <a href="{{ route('dynamic-course', 'data-protection-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('course', 'data-protection-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
             </div>
@@ -360,7 +275,7 @@
                         <p class="course-description">
                             Analyze and preprocess data for models. Create visualizations using Microsoft Technologies
                         </p>
-                        <a href="{{ route('dynamic-course', 'ai-course') }}" class="course-button">Read More</a>
+                        <a href="{{ route('course', 'ai-course') }}" class="course-button">Read More</a>
                     </div>
                 </div>
             </div>

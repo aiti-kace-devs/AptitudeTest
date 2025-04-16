@@ -14,7 +14,11 @@ class Programme extends Model
         'duration',
         'start_date',
         'end_date',
-        'status'
+        'status',
+        'image',
+        'description',
+        'content',
+        'slug'
     ];
 
     public function centre(){

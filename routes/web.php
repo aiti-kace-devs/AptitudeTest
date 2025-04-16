@@ -41,8 +41,8 @@ Route::get('/available-courses', [LandingPageController::class, 'availableCourse
 
 Route::get('/application', [LandingPageController::class, 'application'])->name('application');
 
-Route::get('/{course}', [LandingPageController::class, 'courseView'])->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
-    ->name('dynamic-course');
+Route::get('/course/{slug}', [LandingPageController::class, 'show'])->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
+    ->name('course');
 
 
 Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
@@ -180,6 +180,8 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         // manage programme routes
         Route::prefix('manage-programme')->group(function () {
             Route::get('/', [ProgrammeController::class, 'index'])->name('programme.index');
+            Route::get('/fetch', [ProgrammeController::class, 'fetch'])->name('programme.fetch');
+            Route::get('/create', [ProgrammeController::class, 'create'])->name('programme.create');
             Route::post('/', [ProgrammeController::class, 'store'])->name('programme.store');
             Route::get('/{id}/edit', [ProgrammeController::class, 'edit'])->name('programme.edit');
             Route::put('/{programme}/update', [ProgrammeController::class, 'update'])->name('programme.update');
@@ -234,8 +236,6 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::get('app-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['admin.super']);
     });
 });
-
-
 
 /* Student section routes */
 Route::prefix('student')

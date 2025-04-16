@@ -181,6 +181,14 @@ const { component } = usePage().props;
               </SidebarNavLink>
 
               <SidebarNavLink
+                :href="route('admin.programme.index')"
+                :active="route().current('admin.programme.*')"
+                :label="'programmes'"
+              >
+                <span class="material-symbols-outlined">book</span>
+              </SidebarNavLink>
+
+              <SidebarNavLink
                 :href="route('admin.form.index')"
                 :active="
                   route().current('admin.form.*') ||

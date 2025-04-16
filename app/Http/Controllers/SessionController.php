@@ -20,8 +20,6 @@ class SessionController extends Controller
      */
     public function index()
     {
-        $sessions = CourseSession::get();
-
         return Inertia::render('Session/List');
     }
 
