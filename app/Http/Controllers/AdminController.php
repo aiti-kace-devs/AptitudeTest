@@ -972,18 +972,18 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
-            'session_id' => 'required|exists:course_sessions,id',
+            'session_id' => 'sometimes|exists:course_sessions,id',
             'user_id' => 'required|exists:users,userId',
             'change' => 'sometimes',
         ]);
 
         $course = Course::find($validated['course_id']);
-        $session = CourseSession::find($validated['session_id']);
+        $session = CourseSession::find($validated['session_id'] ?? '');
         $user_id = $validated['user_id'];
         $change = $validated['change'] == 'true';
         $user = User::where('userId', $user_id)->first();
 
-        if ($session->course_id != $course->id) {
+        if ($session && $session->course_id != $course->id) {
             return redirect()->back()->with([
                 'flash' => 'Session not valid for selected course',
                 'key' => 'error',
@@ -1292,15 +1292,28 @@ class AdminController extends Controller
     public function saveShortlistedStudents(Request $request)
     {
         $request->validate([
-            'emails' => 'required|array',
+            'emails' => 'sometimes|array',
             'emails.*' => 'email',
+            'student_ids' => 'sometimes|array',
+            'student_ids.*' => 'numeric',
+            'phone_numbers' => 'sometimes|array',
+            // 'phone_numbers.*' => 'phone'
         ], [], [
-            'emails.*' => 'email address'
+            'emails.*' => 'email address',
+            'student_ids.*' => 'student'
         ]);
+        if (empty($request->input('emails')) && empty($request->input('student_ids')) && empty($request->input('phone_numbers'))) {
+            return response()->json([
+                'message' => 'Email(s), Student ID(s), or PhoneNumber(s) are required.',
+            ], 400);
+        }
 
-        $emails = $request->input('emails');
+        $data = $request->input('emails') ?? $request->input('student_ids') ?? $request->input('phone_numbers');
+        $columnName  = $request->has('emails')
+            ? 'email'
+            : ($request->has('phone_numbers') ? 'mobile_no' : 'id');;
 
-        $usersToUpdate = User::whereIn('email', $emails)
+        $usersToUpdate = User::whereIn($columnName, (array) $data)
             ->where(function ($query) {
                 $query->whereNull('shortlist')
                     ->orWhere('shortlist', '!=', 1);

@@ -339,7 +339,7 @@ class StudentOperation extends Controller
         ]);
     }
 
-    public function confirm_session($user_id, Request $request)
+    public function confirm_session(Request $request, $user_id)
     {
         try {
             $data = $request->validate([
@@ -349,11 +349,18 @@ class StudentOperation extends Controller
             $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
             $changingSession = $admission->confirmed && $admission->session;
 
+            if ($changingSession && !config(ALLOW_SESSION_CHANGE, false)) {
+                return redirect(url('student/select-session/' . $user_id))->with([
+                    'flash' => 'Unable to change session at this time. Contact administrator',
+                    'key' => 'error',
+                ]);
+            }
+
             $courseDetails = Course::find($admission->course_id);
             $session = CourseSession::where('course_id', $courseDetails->id)->where('id', $data['session_id'])->first();
 
             if (!$session) {
-                return redirect(url('student/select-session' . $data['user_id']))->with([
+                return redirect(url('student/select-session/' . $user_id))->with([
                     'flash' => 'Unable to confirm session. Try again later',
                     'key' => 'error',
                 ]);
@@ -362,7 +369,7 @@ class StudentOperation extends Controller
             $slotLeft = $session->slotLeft();
 
             if ($slotLeft < 1) {
-                return redirect(url('student/select-session' . $data['user_id']))->with([
+                return redirect(url('student/select-session/' . $user_id))->with([
                     'flash' => 'Unable to confirm session. No slots available',
                     'key' => 'error',
                 ]);
@@ -370,7 +377,7 @@ class StudentOperation extends Controller
 
             $admission->confirmed = now();
             $admission->session = $session->id;
-            $admission->email_sent = now();
+            // $admission->email_sent = now();
             $admission->location = $courseDetails->location;
             $admission->save();
 

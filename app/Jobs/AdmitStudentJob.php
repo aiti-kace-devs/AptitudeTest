@@ -34,7 +34,6 @@ class AdmitStudentJob implements ShouldQueue
 
     public function __construct(UserAdmission $admission)
     {
-        dump($admission);
         $this->admission = $admission;
         $this->student = User::where('userId', $this->admission->user_id)->first();
         $this->course = Course::find($this->admission->course_id);
