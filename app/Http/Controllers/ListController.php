@@ -10,42 +10,53 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Database\Query\Builder; // Import the Query Builder
 use Illuminate\Support\Facades\Schema;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ListController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\View\View
+     * @return \Inertia\Response
      */
-    public function index(): View
+    public function index()
     {
         $views = DB::select('SHOW FULL TABLES WHERE Table_type = "VIEW"');
-        return view('lists.index', compact('views'));
+        return Inertia::render('List/Index')->with(compact('views'));
+        // return view('lists.index', compact('views'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\View\View
+     * @return \Inertia\Response
      */
-    public function create(): View
+    public function create()
     {
         $tables = DB::connection()->getDoctrineSchemaManager()->listTableNames();
-        return view('lists.create', compact('tables'));
+        return Inertia::render('List/Create', compact('tables'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request): RedirectResponse
     {
+        $viewExists = DB::table('information_schema.views') // Corrected table name.
+            ->where('TABLE_NAME', $request->input('view_name'))
+            ->exists();
+
+        if ($viewExists) {
+            redirect()->back()->withErrors(['view_name' => ['The view name is already taken.']])->withInput();
+            // return response()->json(['errors' => ], 422);
+        }
+
+        $tableNames = implode(',', DB::connection()->getDoctrineSchemaManager()->listTableNames());
         $validator = Validator::make($request->all(), [
-            'view_name' => 'required|string|unique:information_schema.views,TABLE_NAME', // Ensure unique view name
-            'table_name' => 'required|string|in:' . implode(',', DB::connection()->getDoctrineSchemaManager()->listTableNames()),
+            'view_name' => 'required|string', // Ensure unique view name
+            'table_name' => 'required|string|in:' . $tableNames,
             'columns' => 'nullable|array',
             'columns.*' => 'string',
             'where_conditions' => 'nullable|array',
@@ -56,7 +67,7 @@ class ListController extends Controller
             'order_by_direction' => 'nullable|string|in:asc,desc',
             'limit' => 'nullable|integer|min:1',
             'joins' => 'nullable|array',
-            'joins.*.table' => 'required|string',
+            'joins.*.table' => 'required|string|in:' . $tableNames,
             'joins.*.first_column' => 'required|string',
             'joins.*.operator' => 'required|string|in:=,>,<,>=,<=',
             'joins.*.second_column' => 'required|string',
@@ -107,10 +118,12 @@ class ListController extends Controller
         // Get the SQL query string
         $sql = $selectQuery->toSql();
 
+        dd($sql);
+
         // Create the view
         DB::statement("CREATE VIEW {$viewName} AS {$sql}");
 
-        return redirect()->route('lists.index')->with('success', 'List view created successfully!');
+        return redirect()->route('admin.lists.index')->with('success', 'List view created successfully!');
     }
 
     /**
@@ -174,5 +187,43 @@ class ListController extends Controller
         DB::statement("DROP VIEW IF EXISTS {$viewName}");
 
         return redirect()->route('lists.index')->with('success', 'List view deleted successfully!');
+    }
+
+
+    /**
+     * Fetches the columns for a given table.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTableColumns(Request $request)
+    {
+        // Validate the request to ensure the table_name is provided.
+        $request->validate([
+            'table_name' => 'required|string',
+        ]);
+
+        $tableName = $request->input('table_name');
+
+        try {
+            // Use the database connection to get the column names.
+            // This method uses the database schema to get the column information.
+            $columns = DB::connection()->getSchemaBuilder()->getColumnListing($tableName);
+
+            if (empty($columns)) {
+                // return response()->json(['error' => 'Table not found or has no columns.'], 404);
+                return Inertia::json(['error' => 'Table not found or has no columns.']); // Add this line
+            }
+
+            // Return the column names as a JSON response.
+            // return Inertia::json(['availableColumns' => $columns]); // Add this line
+
+            return response()->json(['availableColumns' => $columns]);
+        } catch (\Exception $e) {
+            // Handle any errors that occur during the process.
+            // Log the error message for debugging.
+            \Log::error('Error fetching columns for table ' . $tableName . ': ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch columns: ' . $e->getMessage()], 500);
+        }
     }
 }

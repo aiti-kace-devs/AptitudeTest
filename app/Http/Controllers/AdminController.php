@@ -995,58 +995,14 @@ class AdminController extends Controller
         $message = 'Student admitted successfully';
 
         $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
-        $url = url('student/select-session/' . $user_id);
-
-        try {
-            if ($oldAdmission && !$oldAdmission->email_sent) {
-                try {
-                    Mail::to($user->email)->queue(new StudentAdmitted($user));
-                    $oldAdmission->email_sent = now();
-                    $oldAdmission->save();
-                } catch (\Exception $e) {
-                    \Log::warning('Failed to send admission email (existing admission): ' . $e->getMessage());
-                }
-            }
-
-            if ($oldAdmission && $change) {
-                $message = 'Student admission changed successfully';
-            }
-
-            if (!$oldAdmission) {
-                $admission = new UserAdmission();
-                $admission->user_id = $user_id;
-                $admission->course_id = $course->id;
-                $admission->email_sent = now(); // Update immediately even if email fails
-                $admission->session = $session->id;
-                $admission->confirmed = now();
-                $admission->location = $course->location;
-                $admission->save();
-
-                try {
-                    Mail::to($user->email)
-                        ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
-                        ->queue(new StudentAdmitted($user));
-                } catch (\Exception $e) {
-                    \Log::warning('Failed to send admission email (new admission): ' . $e->getMessage());
-                }
-
-                AdmitStudentJob::dispatch($admission);
-            }
-
-            return redirect()->back()->with([
-                'flash' => $message,
-                'key' => 'success',
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Admit Student Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return redirect(url('student/select-session/' . $user_id))->with([
-                'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
-                'key' => 'error',
-            ]);
+        if ($oldAdmission && $change) {
+            $message = 'Student admission changed successfully';
         }
+
+        return redirect()->back()->with([
+            'flash' => $message,
+            'key' => 'success',
+        ]);
     }
 
 

@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.1",
         "barryvdh/laravel-debugbar": "^3.7",
+        "doctrine/dbal": "^3.9",
         "fruitcake/laravel-cors": "dev-develop",
         "geo-sot/laravel-env-editor": "^3.1",
         "guzzlehttp/guzzle": "^7.2",

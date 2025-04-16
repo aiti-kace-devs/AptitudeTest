@@ -178,7 +178,7 @@ return [
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
         GeoSot\EnvEditor\ServiceProvider::class,
         HansSchouten\LaravelPageBuilder\ServiceProvider::class,
-
+        App\Providers\AppConfigServiceProvider::class,
 
     ],
 

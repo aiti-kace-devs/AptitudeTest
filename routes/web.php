@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentOperation;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\RegisteredUserController;
+use App\Http\Controllers\AppConfigController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BranchController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormResponseController;
 use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\ListController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgrammeController;
@@ -233,11 +235,15 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         // end of manage sms_template routes
 
         Route::get('app-logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['admin.super']);
+        Route::get('/app-config', [AppConfigController::class, 'index'])->name('config.index')->middleware('admin.super');
+        Route::put('/app-config', [AppConfigController::class, 'update'])->name('config.update')->middleware('admin.super');
 
-        Route::get('/app-settings', [AdminController::class, 'getSettingsPage'])->name('admit_user_ui')->middleware('admin.super');
-        Route::post('/app-settings', [AdminController::class, 'getSettingsPage'])->name('app_settings.update')->middleware('admin.super');
+        // Route::get('/manage-lists', [ListController::class, 'index'])->name('lists.index')->middleware('admin.super');
+        Route::get('/lists/get-table-columns', [ListController::class, 'getTableColumns'])->middleware('admin.super')->name('lists.get-table-columns');
+        Route::resource('/lists', ListController::class)->middleware('admin.super');
     });
 });
+
 
 
 
