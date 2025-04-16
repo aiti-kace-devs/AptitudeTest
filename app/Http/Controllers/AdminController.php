@@ -508,17 +508,24 @@ class AdminController extends Controller
                     $passed = optional($std->result)->yes_ans >= $std->passmark;
                     return $passed ? '<span class="badge badge-success">PASS</span>' : '<span class="badge badge-danger">FAIL</span>';
                 })
+               
+
+
                 ->addColumn('actions', function ($std) {
-                    $buttons = ['<a href="' . url('admin/delete_students/' . $std->id) . '" class="btn btn-danger btn-sm">Delete</a>'];
-
-                    if ($std->exam_joined) {
-                        $buttons[] = '<a href="' . url('admin/admin_view_result/' . $std->user_id) . '" class="btn btn-success btn-sm">View Result</a>';
-                    }
-
-                    $buttons[] = '<a href="' . route('admin.reset-exam', [$std->exam_id, $std->user_id]) . '" class="btn btn-info btn-sm">Reset Result</a>';
-
-                    return implode(' ', $buttons);
+                    return '<div class="btn-group">
+                              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" >
+                                Action
+                              </button>
+                              <div class="dropdown-menu">
+                                ' . ($std->exam_joined ? '<a class="dropdown-item" href="' . url('admin/admin_view_result/' . $std->user_id) . '">View Result</a>' : '') . '
+                                <a class="dropdown-item" href="' . route('admin.reset-exam', [$std->exam_id, $std->user_id]) . '">Reset Result</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="' . url('admin/delete_students/' . $std->id) . '">Delete</a>
+                              </div>
+                            </div>';
                 })
+                ->rawColumns(['checkbox', 'result', 'status', 'actions'])
+
                 ->with(['all_filtered_ids' => $baseQuery->pluck('user_exams.id')->toArray()])
                 ->rawColumns(['checkbox', 'result', 'status', 'actions'])
                 ->toJson();
@@ -951,27 +958,27 @@ class AdminController extends Controller
             'user_id' => 'required|exists:users,userId',
             'change' => 'sometimes',
         ]);
-    
+
         $course = Course::find($validated['course_id']);
         $session = CourseSession::find($validated['session_id']);
         $user_id = $validated['user_id'];
         $change = $validated['change'] == 'true';
         $user = User::where('userId', $user_id)->first();
-    
+
         if ($session->course_id != $course->id) {
             return redirect()->back()->with([
                 'flash' => 'Session not valid for selected course',
                 'key' => 'error',
             ]);
         }
-    
+
         CreateStudentAdmissionJob::dispatch($user, $course, $session);
-    
+
         $message = 'Student admitted successfully';
-    
+
         $oldAdmission = UserAdmission::where('user_id', $user_id)->first();
         $url = url('student/select-session/' . $user_id);
-    
+
         try {
             if ($oldAdmission && !$oldAdmission->email_sent) {
                 try {
@@ -982,11 +989,11 @@ class AdminController extends Controller
                     \Log::warning('Failed to send admission email (existing admission): ' . $e->getMessage());
                 }
             }
-    
+
             if ($oldAdmission && $change) {
                 $message = 'Student admission changed successfully';
             }
-    
+
             if (!$oldAdmission) {
                 $admission = new UserAdmission();
                 $admission->user_id = $user_id;
@@ -996,7 +1003,7 @@ class AdminController extends Controller
                 $admission->confirmed = now();
                 $admission->location = $course->location;
                 $admission->save();
-    
+
                 try {
                     Mail::to($user->email)
                         ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@gi-kace.gov.gh'))
@@ -1004,10 +1011,10 @@ class AdminController extends Controller
                 } catch (\Exception $e) {
                     \Log::warning('Failed to send admission email (new admission): ' . $e->getMessage());
                 }
-    
+
                 AdmitStudentJob::dispatch($admission);
             }
-    
+
             return redirect()->back()->with([
                 'flash' => $message,
                 'key' => 'success',
@@ -1016,14 +1023,14 @@ class AdminController extends Controller
             \Log::error('Admit Student Error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
-    
+
             return redirect(url('student/select-session/' . $user_id))->with([
                 'flash' => 'Unable to confirm session. No slots available. Refresh page and try again later',
                 'key' => 'error',
             ]);
         }
     }
-    
+
 
     public function reset_verify($userId)
     {
@@ -1236,13 +1243,13 @@ class AdminController extends Controller
         if (empty($studentIds)) {
             return response()->json(['success' => false, 'message' => 'No students selected.'], 400);
         }
-    
+
         try {
             foreach ($studentIds as $studentId) {
                 $user = User::where('userId', $studentId)->first();
                 if (!$user) continue;
 
-        
+
             }
 
             return redirect()
