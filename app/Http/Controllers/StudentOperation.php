@@ -53,7 +53,6 @@ class StudentOperation extends Controller
         // Get the current authenticated user
         $user = Auth::user();
 
-
         // Get course details if available in user's record
         $course = null;
         if (!empty($user->exam)) {
@@ -67,17 +66,12 @@ class StudentOperation extends Controller
     // application status
     public function application_status()
     {
-
-        $user_exam = user_exam::where(
-            'user_id',
-            Session::get('id')
-        )->first();
+        $user_exam = user_exam::where('user_id', Session::get('id'))->first();
         $user_admission = UserAdmission::where('user_id', Auth::user()->userId)->first();
         // dd($exam_submitted, $data);
 
         return view('student.application-status', compact('user_exam', 'user_admission'));
     }
-
 
     //Exam page
     public function exam()
@@ -180,16 +174,10 @@ class StudentOperation extends Controller
     //On submit
     public function submit_questions(Request $request)
     {
-        $std_info = user_exam::where('user_id', Session::get('id'))
-            ->where('exam_id', $request->exam_id)
-            ->get()
-            ->first();
+        $std_info = user_exam::where('user_id', Session::get('id'))->where('exam_id', $request->exam_id)->get()->first();
 
         if ($std_info && $std_info->submitted) {
-            $res = Oex_result::where('exam_id', $request->exam_id)
-                ->where('user_id', Session::get('id'))
-                ->get()
-                ->first();
+            $res = Oex_result::where('exam_id', $request->exam_id)->where('user_id', Session::get('id'))->get()->first();
             $yes_ans = $res->yes_ans;
             $total = $res->yes_ans + $res->no_ans;
             $percentage = round(($yes_ans / $total) * 100);
@@ -252,7 +240,7 @@ class StudentOperation extends Controller
 
         return redirect(url('student/exam'))->with([
             // 'flash' => "Test submitted successfully. Result: {$percentage}%  {$yes_ans}/{$total}",
-            'flash' => "Test submitted successfully.",
+            'flash' => 'Test submitted successfully.',
             'key' => 'success',
         ]);
     }
@@ -347,7 +335,7 @@ class StudentOperation extends Controller
             'course' => $courseDetails,
             'confirmed' => false,
             'admission' => $admission,
-            'session' => CourseSession::where('id', $admission->session)->first()
+            'session' => CourseSession::where('id', $admission->session)->first(),
         ]);
     }
 
@@ -358,14 +346,11 @@ class StudentOperation extends Controller
                 'session_id' => 'required|exists:course_sessions,id',
             ]);
 
-
             $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
             $changingSession = $admission->confirmed && $admission->session;
 
             $courseDetails = Course::find($admission->course_id);
-            $session = CourseSession::where('course_id', $courseDetails->id)
-                ->where('id', $data['session_id'])
-                ->first();
+            $session = CourseSession::where('course_id', $courseDetails->id)->where('id', $data['session_id'])->first();
 
             if (!$session) {
                 return redirect(url('student/select-session' . $data['user_id']))->with([
@@ -412,13 +397,18 @@ class StudentOperation extends Controller
 
         $user = Auth::user();
 
-
+        if ($user->admission) {
+            return redirect()
+                ->back()
+                ->with([
+                    'flash' => 'Student already admitted. Unable to change course.',
+                    'key' => 'error',
+                ]);
+        }
 
         $currentCourseId = $user->registered_course;
 
-        $courses = Course::where('status', 1)
-            ->where('id', '!=', $currentCourseId)
-            ->get();
+        $courses = Course::where('status', 1)->where('id', '!=', $currentCourseId)->get();
 
         $currentCourse = null;
         if (!empty($currentCourseId)) {
@@ -427,7 +417,6 @@ class StudentOperation extends Controller
 
         return view('student.change-course', compact('user', 'courses', 'currentCourse'));
     }
-
 
     // Update course selection
 
@@ -449,7 +438,7 @@ class StudentOperation extends Controller
         }
 
         $request->validate([
-            'course_id' => 'required|exists:courses,id'
+            'course_id' => 'required|exists:courses,id',
         ]);
 
         // Get course information
@@ -463,7 +452,6 @@ class StudentOperation extends Controller
         // Update user record with course and session information
         $user->registered_course = $request->course_id; // Store course_id in exam field
         $user->save();
-
 
         return redirect()->route('student.profile')->with('success', 'Course changed successfully.');
     }
@@ -482,10 +470,14 @@ class StudentOperation extends Controller
         try {
             foreach ($studentIds as $studentId) {
                 $user = User::where('userId', $studentId)->first();
-                if (!$user) continue;
+                if (!$user) {
+                    continue;
+                }
 
                 $course = Course::find($user->registered_course);
-                if (!$course) continue;
+                if (!$course) {
+                    continue;
+                }
 
                 $existingAdmission = UserAdmission::where('user_id', $user->userId)->first();
                 if ($existingAdmission) {
@@ -525,20 +517,20 @@ class StudentOperation extends Controller
                 $count++;
             }
 
-
             return response()->json([
                 'success' => true,
-                'message' => "Admitted {$count} students successfully!"
+                'message' => "Admitted {$count} students successfully!",
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ], 500);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
-
-
 
     public function delete_admission($user_id, Request $request)
     {
@@ -559,9 +551,6 @@ class StudentOperation extends Controller
             return response()->json(['message' => 'User admission not found.'], 404);
         }
     }
-
-
-
 
     public function get_attendance_page()
     {
@@ -615,24 +604,35 @@ class StudentOperation extends Controller
 
         $validatedData = $request->validate($rules, [], ['ghcard' => 'Card number']);
 
-        if ($user->name && $user->ghcard && $user->gender && $user->contact) {
-            $user->network_type = $validatedData['network_type'];
-        } elseif ($user->name && $user->ghcard) {
-            $user->gender = $validatedData['gender'];
-            $user->contact = '0' . $validatedData['contact'];
-            $user->network_type = $validatedData['network_type'];
-        } else {
-            $user->name = $validatedData['name'];
-            $user->card_type = $validatedData['card_type'];
-            $user->ghcard =
-                $request->input('card_type') === 'ghcard'
-                ? 'GHA-' . $validatedData['ghcard']
-                : $validatedData['ghcard'];
-            $user->gender = $validatedData['gender'];
-            $user->contact = '0' . $validatedData['contact'];
+        if (isset($validatedData['network_type'])) {
             $user->network_type = $validatedData['network_type'];
         }
-        // dd($user);
+
+        if ($user->name && $user->ghcard && $user->gender && $user->contact) {
+        } elseif ($user->name && $user->ghcard) {
+            if (isset($validatedData['gender'])) {
+                $user->gender = $validatedData['gender'];
+            }
+            if (isset($validatedData['contact'])) {
+                $user->contact = '0' . $validatedData['contact'];
+            }
+        } else {
+            if (isset($validatedData['name'])) {
+                $user->name = $validatedData['name'];
+            }
+            if (isset($validatedData['card_type'])) {
+                $user->card_type = $validatedData['card_type'];
+            }
+            if (isset($validatedData['ghcard'])) {
+                $user->ghcard = $request->input('card_type') === 'ghcard' ? 'GHA-' . $validatedData['ghcard'] : $validatedData['ghcard'];
+            }
+            if (isset($validatedData['gender'])) {
+                $user->gender = $validatedData['gender'];
+            }
+            if (isset($validatedData['contact'])) {
+                $user->contact = '0' . $validatedData['contact'];
+            }
+        }
         $user->save();
 
         return redirect()
@@ -641,26 +641,5 @@ class StudentOperation extends Controller
                 'flash' => 'Your details have been updated successfully.',
                 'key' => 'success',
             ]);
-
-        // if ($user->created_at == $user->updated_at) {
-        //     $validatedData = $request->validate([
-        //         'name' => 'required|string|max:255',
-        //         'ghcard' => 'required|string|regex:/^[0-9]{9}-[0-9]{1}$/|max:16',
-        //     ], [], ['ghcard' => "Ghana Card number"]);
-
-        //     $user->name = $validatedData['name'];
-        //     $user->ghcard = "GHA-" . $validatedData['ghcard'];
-        //     $user->save();
-
-        //     return redirect()->back()->with([
-        //         'flash' => 'Your details have been updated successfully.',
-        //         'key' => 'success'
-        //     ]);
-        // } else {
-        //     return redirect()->back()->with([
-        //         'flash' => 'You have already updated your details once.',
-        //         'key' => 'error'
-        //     ]);
-        // }
     }
 }
