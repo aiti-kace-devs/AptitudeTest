@@ -10,6 +10,7 @@ class Programme extends Model
     use HasFactory;
 
     protected $fillable = [
+        'course_category_id',
         'title',
         'duration',
         'start_date',
@@ -20,6 +21,10 @@ class Programme extends Model
         'content',
         'slug'
     ];
+
+    public function course_category(){
+        return $this->belongsTo(CourseCategory::class);
+    }
 
     public function centre(){
         return $this->belongsToMany(Centre::class, 'courses');

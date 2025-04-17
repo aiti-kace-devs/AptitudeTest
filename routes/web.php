@@ -11,6 +11,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CentreController;
 use App\Http\Controllers\ClassScheduleController;
+use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormResponseController;
@@ -44,10 +45,8 @@ Route::get('/application', [LandingPageController::class, 'application'])->name(
 Route::get('/course/{slug}', [LandingPageController::class, 'show'])->where('course', 'cybersecurity-course|ai-course|data-protection-course|protection-expert-course|protection-sup-course|certified-dpf-course|cnst-course')
     ->name('course');
 
-
 Route::get('/forms/{formCode}', [FormController::class, 'submitForm'])->name('register');
 Route::post('form-responses/', [FormResponseController::class, 'store'])->name('admin.form_responses.store');
-
 
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
 
@@ -76,14 +75,6 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         Route::post('/{response}/destroy', [FormResponseController::class, 'destroy'])->name('destroy');
     });
 });
-
-
-
-
-
-
-
-
 
 
 Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(function () {
@@ -186,6 +177,18 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
             Route::get('/{id}/edit', [ProgrammeController::class, 'edit'])->name('programme.edit');
             Route::put('/{programme}/update', [ProgrammeController::class, 'update'])->name('programme.update');
             Route::get('/{programme}/delete', [ProgrammeController::class, 'destroy'])->name('programme.destroy');
+        });
+        // end of manage programme routes
+
+        // manage course category routes
+        Route::prefix('manage-course_category')->group(function () {
+            Route::get('/', [CourseCategoryController::class, 'index'])->name('course_category.index');
+            Route::get('/fetch', [CourseCategoryController::class, 'fetch'])->name('course_category.fetch');
+            Route::get('/create', [CourseCategoryController::class, 'create'])->name('course_category.create');
+            Route::post('/', [CourseCategoryController::class, 'store'])->name('course_category.store');
+            Route::get('/{id}/edit', [CourseCategoryController::class, 'edit'])->name('course_category.edit');
+            Route::put('/{category}/update', [CourseCategoryController::class, 'update'])->name('course_category.update');
+            Route::get('/{category}/delete', [CourseCategoryController::class, 'destroy'])->name('course_category.destroy');
         });
         // end of manage programme routes
 

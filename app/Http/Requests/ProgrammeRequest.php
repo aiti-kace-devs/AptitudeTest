@@ -22,6 +22,7 @@ class ProgrammeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'course_category_id' => 'required',
             'title' => 'required',
             'duration' => 'required',
             'start_date' => 'sometimes',
@@ -34,6 +35,13 @@ class ProgrammeRequest extends FormRequest
             ],
             'description' => 'sometimes',
             'content' => 'sometimes'
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'course_category_id' => 'category'
         ];
     }
 }

@@ -1,72 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Courses Page</title>
-    <link rel="stylesheet" href="{{ asset('assets/home/css/style.css') }}"/>
-   <style>
-    body {
-         
-/*            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
+    <link rel="stylesheet" href="{{ asset('assets/home/css/style.css') }}" />
+    <style>
+        body {
+
+            /*            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
 
             font-family: Arial, sans-serif;
 
-            
-        
-       
-    }
 
 
 
-    header {
-        text-align: center;
-        margin: 20px;
-    }
+        }
 
-    .navbar {
-        text-align: center;
-        background-color: #016234;
-        padding: 10px;
-    }
 
-    .navbar a {
-        text-decoration: none;
-        color: #fff;
-        padding: 10px 20px;
-        margin: 5px;
-        background-color: #C5071C;
-        border-radius: 5px;
-        display: inline-block;
-    }
 
-    .navbar a:hover {
-        background-color: #016234;
-    }
+        header {
+            text-align: center;
+            margin: 20px;
+        }
 
-    .courses {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-        margin-top: 20px;
-        padding: 0 20px;
-    }
+        .navbar {
+            text-align: center;
+            background-color: #016234;
+            padding: 10px;
+        }
 
-    .course-section {
-        display: none;
-    }
+        .navbar a {
+            text-decoration: none;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #C5071C;
+            border-radius: 5px;
+            display: inline-block;
+        }
 
-    .course-section.active {
-        display: block;
-    }
+        .navbar a:hover {
+            background-color: #016234;
+        }
 
-    .course-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-    }
+        .courses {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 20px;
+            padding: 0 20px;
+        }
 
-    /*.course-card {
+        .course-section {
+            display: none;
+        }
+
+        .course-section.active {
+            display: block;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        /*.course-card {
         background-color: white;
         padding: 20px;
         border-radius: 10px;
@@ -74,213 +75,147 @@
          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         text-align: left;
         display: flex; /* Use flexbox to control card height */
-        flex-direction: column; /* Stack content vertically */
-    }*/
-
-.course-card {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        text-align: left;
-        display: flex;
         flex-direction: column;
-        transition: box-shadow 0.3s ease; /* Smooth transition for the shadow */
-    }
+        /* Stack content vertically */
+        }
 
-    .course-image img {
-        width: 100%;
-        max-width: 50% auto;
-        border-radius: 8px;
-    }
+        */ .course-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s ease;
+            /* Smooth transition for the shadow */
+        }
 
-    .course-content {
-        flex-grow: 1; /* Allow content to grow and fill available space */
-    }
+        .course-image img {
+            width: 100%;
+            max-width: 50% auto;
+            border-radius: 8px;
+        }
 
-    .course-title {
-        color: #ee4606;
-        font-size: 18px;
-    }
+        .course-content {
+            flex-grow: 1;
+            /* Allow content to grow and fill available space */
+        }
 
-    .course-button {
-        background-color: #C5071C;
-        color: #fff;
-        padding: 10px 20px;
-        text-decoration: none;
-        border-radius: 50px 50px 50px 50px;
-        margin-top: 10px;
-    }
+        .course-title {
+            color: #ee4606;
+            font-size: 18px;
+        }
 
-    .course-button:hover {
-        background-color:#C5071C;
+        .course-button {
+            background-color: #C5071C;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 50px 50px 50px 50px;
+            margin-top: 10px;
+        }
+
+        .course-button:hover {
+            background-color: #C5071C;
 
 
-    }
+        }
+
+        .text-capitalize {
+            text-transform: capitalize !important;
+        }
 
 
 
-       /* ... (previous CSS) ... */
+        /* ... (previous CSS) ... */
 
-    .course-description {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 4; /* Limit to 4 lines */
-        -webkit-box-orient: vertical;
-    }
+        .course-description {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            /* Limit to 4 lines */
+            -webkit-box-orient: vertical;
+        }
 
-     @media (max-width: 768px) {
+        @media (max-width: 768px) {
             .course-grid {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjust card width for smaller screens */
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                /* Adjust card width for smaller screens */
             }
         }
 
         @media (max-width: 480px) {
             .navbar a {
-                display: block; /* Stack navbar links on small screens */
-                margin: 5px auto; /* Center links */
+                display: block;
+                /* Stack navbar links on small screens */
+                margin: 5px auto;
+                /* Center links */
             }
 
-    /* ... (rest of the CSS) ... */
-</style>
+            /* ... (rest of the CSS) ... */
+    </style>
 </head>
+
 <body>
     <header>
         <h1>One Million Coders Program (Pilot Courses)</h1>
     </header>
 
-    <div class="navbar">
-    <span class="menu-toggle" onclick="toggleMenu()"> </span>
-    <div class="navbar-links" id="navbarLinks">
-        <a href="javascript:void(0);" onclick="showCategory('all')">All Courses</a>
-        <a href="javascript:void(0);" onclick="showCategory('cybersecurity')">Cybersecurity</a>
-        <a href="javascript:void(0);" onclick="showCategory('data-protection')">Data Protection</a>
-        <a href="javascript:void(0);" onclick="showCategory('ai')">Artificial Intelligence</a>
-    </div>
-</div>
-
-    <div class="courses">
-        <section id="all" class="course-section active">
-            <div class="course-grid">
-                @foreach ($programmes as $programme)
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ asset('storage/programme/' . $programme->image) }}" alt="{{ $programme->title }} Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">{{ $programme->title }}</h2>
-                        <p class="course-description">
-                        {{ $programme->description }}
-                        </p>
-                        <a href="{{ route('course', $programme->slug) }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-                @endforeach                
+        <div class="navbar">
+            <span class="menu-toggle" onclick="toggleMenu()"> </span>
+            <div class="navbar-links  text-capitalize" id="navbarLinks">
+                <a href="javascript:void(0);" onclick="showCategory('all')">All Courses</a>
+                @foreach($categories as $category)
+                <a href="javascript:void(0);" onclick="showCategory('{{ $category->slug }}')">{{ $category->title }}</a>
+                @endforeach
             </div>
-        </section>
+        </div>
 
-        <section id="cybersecurity" class="course-section">
-            <div class="course-grid">
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
+        <div class="courses">
+            <section id="all" class="course-section active">
+                <div class="course-grid">
+                    @foreach ($programmes as $programme)
+                    <div class="course-card">
+                        <div class="course-image">
+                            <img src="{{ asset('storage/programme/' . $programme->image) }}" alt="{{ $programme->title }} Course Image" />
+                        </div>
+                        <div class="course-content">
+                            <h2 class="course-title">{{ $programme->title }}</h2>
+                            <p class="course-description">
+                                {{ $programme->description }}
+                            </p>
+                            <a href="{{ route('course', $programme->slug) }}" class="course-button">Read More</a>
+                        </div>
                     </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Cybersecurity Professional</h2>
-                        <p class="course-description">
-                            This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
-                        </p>
-                        <a href="{{ route('course', 'cybersecurity-course') }}" class="course-button">Read More</a>
-                    </div>
+                    @endforeach
                 </div>
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/cybersecurity.jpg') }}" alt="Cybersecurity Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Network Support Technician (CNST)</h2>
-                        <p class="course-description">
-                            Provide technical support with a focus on networking. Assist in network device management.
-                        </p>
-                        <a href="{{ route('course', 'cnst-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-            </div>
+            </section>
 
-        </section>
 
-        <section id="data-protection" class="course-section">
-            <div class="course-grid">
-               
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Manager</h2>
-                        <p class="course-description">
-                            This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
-                        </p>
-                        <a href="{{ route('course', 'protection-sup-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Expert</h2>
-                        <p class="course-description">
-                            Advanced Data Protection Strategy & Policy Development, International Data Transfers & Cross-Border Compliance, Privacy Program Management & Regulatory Engagement, Managing Large-Scale Data Protection Programs, Incident Response & Data Breach Management.
-                        </p>
-                        <a href="{{ route('course', 'protection-expert-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Data Protection Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Officer</h2>
-                        <p class="course-description">
-                            Monitor compliance with data protection laws and policies, detect and assess data protection risks and breaches, respond to data incidents and ensure regulatory compliance.
-                        </p>
-                        <a href="{{ route('course', 'certified-dpf-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-                 <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/data.jpg') }}" alt="Cybersecurity Course Image" />
-                    </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Certified Data Protection Professional</h2>
-                        <p class="course-description">
-                            This course emphasizes hands-on practice, allowing you to apply your new skills to build secure software, making it a perfect starting point for those looking to delve into both programming and cybersecurity.
-                        </p>
-                        <a href="{{ route('course', 'data-protection-course') }}" class="course-button">Read More</a>
-                    </div>
-                </div>
-            </div>
-        </section>
+            @foreach($categories as $category)
+            <section id="{{ $category->slug }}" class="course-section">
 
-        <section id="ai" class="course-section">
-            <div class="course-grid">
-                <div class="course-card">
-                    <div class="course-image">
-                        <img src="{{ url('assets/home/images/ai.jpeg') }}" alt="Artificial Intelligence Course Image" />
+                <div class="course-grid">
+                    @foreach ($category->programmes as $programme)
+                    <div class="course-card">
+                        <div class="course-image">
+                            <img src="{{ asset('storage/programme/' . $programme->image) }}" alt="{{ $programme->title }} Course Image" />
+                        </div>
+                        <div class="course-content">
+                            <h2 class="course-title">{{ $programme->title }}</h2>
+                            <p class="course-description">
+                                {{ $programme->description }}
+                            </p>
+                            <a href="{{ route('course', $programme->slug) }}" class="course-button">Read More</a>
+                        </div>
                     </div>
-                    <div class="course-content">
-                        <h2 class="course-title">Data Analyst Associate</h2>
-                        <p class="course-description">
-                            Analyze and preprocess data for models. Create visualizations using Microsoft Technologies
-                        </p>
-                        <a href="{{ route('course', 'ai-course') }}" class="course-button">Read More</a>
-                    </div>
+                    @endforeach
                 </div>
-            </div>
-        </section>
-    </div>
+            </section>
+            @endforeach
+        </div>
 
     <script>
         function showCategory(category) {
@@ -301,11 +236,11 @@
         showCategory('all');
 
 
-    function toggleMenu() {
-        var x = document.getElementById("navbarLinks");
-        x.classList.toggle("show");
-    }
-
+        function toggleMenu() {
+            var x = document.getElementById("navbarLinks");
+            x.classList.toggle("show");
+        }
     </script>
 </body>
+
 </html>

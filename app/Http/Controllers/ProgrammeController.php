@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProgrammeRequest;
+use App\Models\CourseCategory;
 use App\Models\Programme;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,10 +23,6 @@ class ProgrammeController extends Controller
      */
     public function index()
     {
-        // $programmes = Programme::get();
-
-        // return view('admin.manage_programme', compact('programmes'));
-
         return Inertia::render('Programme/List');
     }
 
@@ -34,6 +31,9 @@ class ProgrammeController extends Controller
         $data = Programme::get();;
         return DataTables::of($data)
             ->addIndexColumn()
+            ->editColumn('category', function ($row) {
+                return  $row->course_category?->title;
+            })
             ->editColumn('start_date', function ($row) {
                 return '<span class="hidden">' . strtotime($row->start_date) . '</span>' . Carbon::parse($row->start_date)->toFormattedDayDateString();
             })
@@ -79,7 +79,9 @@ class ProgrammeController extends Controller
     public function create()
     {
         $isCreateMethod = true;
-        return Inertia::render('Programme/Form', compact('isCreateMethod'));
+        $categories = CourseCategory::orderBy('title')->get();
+
+        return Inertia::render('Programme/Form', compact('isCreateMethod', 'categories'));
     }
 
     /**
@@ -142,15 +144,9 @@ class ProgrammeController extends Controller
     {
         $isCreateMethod = false;
         $programme = Programme::find($id);
-        $programme->status = (bool)$programme->status;
-        $programme->image = $programme->image ? asset('storage/programme/' . $programme->image) : null;
+        $categories = CourseCategory::orderBy('title')->get();
 
-        if (!empty($programme['content'])) {
-            $converter = new HtmlConverter();
-            $programme['content'] = $converter->convert($programme['content']);
-        }
-
-        return Inertia::render('Programme/Form', compact('programme', 'isCreateMethod'));
+        return Inertia::render('Programme/Form', compact('programme', 'categories', 'isCreateMethod'));
     }
 
     /**
@@ -212,7 +208,5 @@ class ProgrammeController extends Controller
         }
 
         $programme->delete();
-
-        return redirect()->route('admin.programme.index');
     }
 }

@@ -30,6 +30,7 @@ export default {
     isCreateMethod: Boolean,
     errors: Object,
     programme: Object,
+    categories: Object,
   },
   data() {
     const fileInput = ref(null);
@@ -42,6 +43,7 @@ export default {
     });
 
     const form = useForm({
+      course_category_id: this.programme?.course_category_id ?? null,
       title: this.programme?.title ?? null,
       duration: this.programme?.duration ?? null,
       start_date: this.programme?.start_date ?? null,
@@ -159,6 +161,29 @@ export default {
           <div class="p-6">
             <form @submit.prevent="submit">
               <div class="flex flex-col lg:w-1/2 gap-5">
+                <div>
+                  <InputLabel for="category" value="category" :required="true" />
+                  <SelectInput
+                    id="category"
+                    v-model="form.course_category_id"
+                    class="mt-1 w-full"
+                    :class="{
+                      'border-red-600': form.errors.course_category_id
+                    }"
+                  >
+                    <option value="" disabled selected>-- Select category --</option>
+                    <option
+                      v-for="category in this.categories"
+                      :key="category"
+                      :value="category.id"
+                    >
+                      {{ category.title }}
+                    </option>
+                  </SelectInput>
+
+                  <InputError :message="form.errors.course_category_id" />
+                </div>
+
                 <div>
                   <InputLabel for="title" value="title" :required="true" />
                   <TextInput

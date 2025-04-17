@@ -77,7 +77,7 @@ class DynamicFormRequest extends FormRequest
         return [
             'schema' => 'question',
             'schema.*.title' => 'question',
-            'schema.*.description' => 'description',
+        'schema.*.description' => 'description',
             'schema.*.options' => 'options',
         ];
     }
