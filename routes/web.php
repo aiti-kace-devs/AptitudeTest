@@ -140,6 +140,7 @@ Route::prefix('admin')->middleware('theme:dashboard')->name('admin.')->group(fun
         Route::post('/send-bulk-email', [AdminController::class, 'sendBulkEmail'])->name('send_bulk_email');
         Route::get('/fetch_sms_template', [AdminController::class, 'fetch_sms_template'])->name('fetch.sms.template');
         Route::post('/send_bulk_sms', [AdminController::class, 'sendBulkSMS'])->name('send_bulk_sms');
+        Route::delete('/delete-student-admission/{user_id}', [AdminController::class, 'delete_admission'])->name('delete-student-admission')->middleware('admin.super');
 
 
         Route::get('/manage_admins', [RegisteredUserController::class, 'index'])->name('manage_admins')->middleware('admin.super');
