@@ -252,8 +252,8 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12 d-flex justify-content-end pr-3 mb-2">
-                                            <a class="btn btn-info mr-2" href="javascript:;" data-toggle="modal"
-                                                data-target="#myModal">Add new student</a>
+                                            {{-- <a class="btn btn-info mr-2" href="javascript:;" data-toggle="modal"
+                                                data-target="#myModal">Add new student</a> --}}
                                             <button class="btn btn-warning mr-2" data-toggle="modal"
                                                 data-target="#bulk-email-modal">Send Emails
                                                 <i class="fas fa-envelope"></i>
@@ -267,7 +267,8 @@
 
 
                                             </button>
-                                            <button class="btn btn-primary mr-2" id="admit-selected">Admit Students</button>
+                                            <button class="btn btn-primary mr-2" id="shortlist-selected">Shortlist
+                                                Students</button>
                                         </div>
                                     </div>
                                 </span>
@@ -473,7 +474,7 @@
                             className: 'btn btn-success',
                             title: 'Students_Export_' + new Date().toISOString().slice(0, 10),
                             exportOptions: {
-                                columns: [1,2,3,4,5,6,7,9],
+                                columns: [1, 2, 3, 4, 5, 6, 7, 9],
                                 // format: {
                                 //     body: function(data, row, column, node) {
                                 //         return data.replace(/<[^>]*>/g, '');
@@ -671,7 +672,7 @@
                         }
                     });
 
-                    $('#admit-selected').click(function() {
+                    $('#shortlist-selected').click(function() {
                         var selectedIds = manuallySelectedIds.length > 0 ? manuallySelectedIds : allFilteredIds;
 
                         if (!selectedIds || selectedIds.length === 0) {
@@ -683,16 +684,16 @@
                         btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
 
                         Swal.fire({
-                            title: 'Admit Students?',
-                            text: `You are about to admit ${selectedIds.length} students. Continue?`,
+                            title: 'Shortlist Students?',
+                            text: `You are about to shortlist ${selectedIds.length} students. Continue?`,
                             icon: 'question',
                             showCancelButton: true,
-                            confirmButtonText: 'Yes, admit them',
+                            confirmButtonText: 'Yes, shortlist them',
                             cancelButtonText: 'Cancel'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "{{ route('admin.admit_student') }}",
+                                    url: "{{ route('admin.save_shortlisted_students') }}",
                                     type: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
@@ -703,21 +704,21 @@
                                     },
                                     success: function(response) {
                                         toastr.success(response.message ||
-                                            'Students admitted successfully!');
+                                            'Students shortlisted successfully!');
                                         table.ajax.reload();
                                         manuallySelectedIds = [];
                                     },
                                     error: function(xhr) {
                                         toastr.error(xhr.responseJSON?.message ||
-                                            'Failed to admit students.');
+                                            'Failed to shortlist students.');
                                         console.error(xhr.responseText);
                                     },
                                     complete: function() {
-                                        btn.prop('disabled', false).html('Admit Students');
+                                        btn.prop('disabled', false).html('Shortlist Students');
                                     }
                                 });
                             } else {
-                                btn.prop('disabled', false).html('Admit Students');
+                                btn.prop('disabled', false).html('Shortlist Students');
                             }
                         });
                     });

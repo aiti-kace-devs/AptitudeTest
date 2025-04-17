@@ -124,9 +124,9 @@ class StudentOperation extends Controller
 
         // 48 hours to finish exam
         $userCreatedAt = new Carbon(Auth::user()->created_at);
-        $userCreatedAtPlusTwoDays = $userCreatedAt->addDays(2);
+        $userCreatedAtPlusDeadlineDays = $userCreatedAt->addDays(config(EXAM_DEADLINE_AFTER_REGISTRATION, 2));
 
-        if ($userCreatedAtPlusTwoDays->isBefore($now)) {
+        if ($userCreatedAtPlusDeadlineDays->isBefore($now)) {
             return redirect(url('student/exam'))->with([
                 'flash' => 'Unable to take exam. Time to take exams has elapsed',
                 'key' => 'error',
@@ -339,7 +339,7 @@ class StudentOperation extends Controller
         ]);
     }
 
-    public function confirm_session($user_id, Request $request)
+    public function confirm_session(Request $request, $user_id)
     {
         try {
             $data = $request->validate([
@@ -349,11 +349,18 @@ class StudentOperation extends Controller
             $admission = UserAdmission::where('user_id', $user_id)->firstOrFail();
             $changingSession = $admission->confirmed && $admission->session;
 
+            if ($changingSession && !config(ALLOW_SESSION_CHANGE, false)) {
+                return redirect(url('student/select-session/' . $user_id))->with([
+                    'flash' => 'Unable to change session at this time. Contact administrator',
+                    'key' => 'error',
+                ]);
+            }
+
             $courseDetails = Course::find($admission->course_id);
             $session = CourseSession::where('course_id', $courseDetails->id)->where('id', $data['session_id'])->first();
 
             if (!$session) {
-                return redirect(url('student/select-session' . $data['user_id']))->with([
+                return redirect(url('student/select-session/' . $user_id))->with([
                     'flash' => 'Unable to confirm session. Try again later',
                     'key' => 'error',
                 ]);
@@ -362,7 +369,7 @@ class StudentOperation extends Controller
             $slotLeft = $session->slotLeft();
 
             if ($slotLeft < 1) {
-                return redirect(url('student/select-session' . $data['user_id']))->with([
+                return redirect(url('student/select-session/' . $user_id))->with([
                     'flash' => 'Unable to confirm session. No slots available',
                     'key' => 'error',
                 ]);
@@ -370,7 +377,7 @@ class StudentOperation extends Controller
 
             $admission->confirmed = now();
             $admission->session = $session->id;
-            $admission->email_sent = now();
+            // $admission->email_sent = now();
             $admission->location = $courseDetails->location;
             $admission->save();
 
@@ -394,13 +401,14 @@ class StudentOperation extends Controller
 
     public function change_course()
     {
+
         $user = Auth::user();
 
         if ($user->admission) {
             return redirect()
                 ->back()
                 ->with([
-                    'flash' => 'Unable to change course.',
+                    'flash' => 'Student already admitted. Unable to change course.',
                     'key' => 'error',
                 ]);
         }
@@ -421,18 +429,32 @@ class StudentOperation extends Controller
 
     public function update_course(Request $request)
     {
+        if (!config(ALLOW_COURSE_CHANGE, false)) {
+            return redirect()->back()->with([
+                'flash' => 'Students not allowed to change course at this time. Contact the administrators',
+                'key' => 'error',
+            ]);
+        }
+        $user = Auth::user();
+
+        if ($user->admission) {
+            return redirect()->back()->with([
+                'flash' => 'Unable to change course.',
+                'key' => 'error',
+            ]);
+        }
+
         $request->validate([
             'course_id' => 'required|exists:courses,id',
         ]);
 
-        $user = Auth::user();
-
         // Get course information
-        $course = Course::find($request->course_id);
+        // $course = Course::find($request->course_id);
 
-        if (!$course) {
-            return redirect()->back()->with('error', 'Selected course not found.');
-        }
+        // if (!$course) {
+        //     return redirect()->back()->with('error', 'Selected course not found.');
+        // }
+
 
         // Update user record with course and session information
         $user->registered_course = $request->course_id; // Store course_id in exam field
@@ -441,6 +463,8 @@ class StudentOperation extends Controller
         return redirect()->route('student.profile')->with('success', 'Course changed successfully.');
     }
 
+
+    // API function not used
     public function admit_student(Request $request)
     {
         $count = 0;
@@ -466,7 +490,11 @@ class StudentOperation extends Controller
                 if ($existingAdmission) {
                     if (!$existingAdmission->email_sent) {
                         try {
-                            Mail::to($user->email)->send(new StudentAdmitted($user->name, $course->course_name, $course->location, url('student/select-session/' . $user->userId)));
+                            Mail::to($user->email)->send(
+                                new StudentAdmitted(
+                                    $user
+                                )
+                            );
                             $existingAdmission->update(['email_sent' => now()]);
                             $count++;
                         } catch (\Throwable $mailError) {
@@ -483,7 +511,12 @@ class StudentOperation extends Controller
                 ]);
 
                 try {
-                    Mail::to($user->email)->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))->send(new StudentAdmitted(name: $user->name, course: $course->course_name, location: $course->location, url: url('student/select-session/' . $user->userId)));
+                    Mail::to($user->email)
+                        ->bcc(env('MAIL_FROM_ADDRESS', 'no-reply@example.com'))
+                        ->send(new StudentAdmitted(
+                            $user,
+
+                        ));
                 } catch (\Throwable $mailError) {
                     \Log::error("Failed to send email to {$user->email}: " . $mailError->getMessage());
                 }
