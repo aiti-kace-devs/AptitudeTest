@@ -650,6 +650,7 @@
                         $('#select-all').prop('checked', allChecked);
                     }
                 });
+                
 
                 var allFilteredIds = [];
                 var manuallySelectedIds = [];
