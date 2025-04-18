@@ -6,7 +6,7 @@ return [
      * A policy will determine which CSP headers will be set. A valid CSP policy is
      * any class that extends `Spatie\Csp\Policies\Policy`
      */
-    'policy' => Spatie\Csp\Policies\Basic::class,
+    'policy' => \App\Helpers\BasePolicy::class,
 
     /*
      * This policy which will be put in report only mode. This is great for testing out
@@ -30,13 +30,14 @@ return [
     /*
      * The class responsible for generating the nonces used in inline tags and headers.
      */
-    'nonce_generator' => Spatie\Csp\Nonce\RandomString::class,
+    'nonce_generator' => \App\Helpers\LaravelViteNonceGenerator::class,
 
     /*
      * Set to false to disable automatic nonce generation and handling.
      * This is useful when you want to use 'unsafe-inline' for scripts/styles
-     * and cannot add inline nonces. 
+     * and cannot add inline nonces.
      * Note that this will make your CSP policy less secure.
      */
     'nonce_enabled' => env('CSP_NONCE_ENABLED', true),
+
 ];
