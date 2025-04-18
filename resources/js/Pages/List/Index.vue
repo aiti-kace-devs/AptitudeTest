@@ -67,29 +67,29 @@ export default {
       }
     });
 
-    $(document).on("click", ".edit", (evt) => {
-      const data = $(evt.currentTarget).data("id");
+    // $(document).on("click", ".edit", (evt) => {
+    //   const data = $(evt.currentTarget).data("id");
 
-      router.get(route("admin.form.edit", data));
-    });
+    //   router.get(route("admin.form.edit", data));
+    // });
 
-    $(document).on("click", ".preview", (evt) => {
-      const data = $(evt.currentTarget).data("id");
+    // $(document).on("click", ".preview", (evt) => {
+    //   const data = $(evt.currentTarget).data("id");
 
-      router.get(route("admin.form.preview", data));
-    });
+    //   router.get(route("admin.form.preview", data));
+    // });
 
-    $(document).on("click", ".responses", (evt) => {
-      const data = $(evt.currentTarget).data("id");
+    // $(document).on("click", ".responses", (evt) => {
+    //   const data = $(evt.currentTarget).data("id");
 
-      router.get(route("admin.form.show", data));
-    });
+    //   router.get(route("admin.form.show", data));
+    // });
 
-    $(document).on("click", ".delete", (evt) => {
-      const data = $(evt.currentTarget).data("id");
+    // $(document).on("click", ".delete", (evt) => {
+    //   const data = $(evt.currentTarget).data("id");
 
-      this.showDestroyModal(data);
-    });
+    //   this.showDestroyModal(data);
+    // });
   },
   methods: {
     fetch() {
@@ -184,7 +184,7 @@ export default {
         <h1>Available Lists (Views)</h1>
         <ul>
             <li v-for="view in views" :key="view.Name">
-                <Link :href="route('admin.lists.show', { viewName: view.Name })">{{ view.Name }}</Link>
+                <p>{{ view.Name }}</p>
                 <form @submit.prevent="destroyView(view.Name)" style="display: inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
                         Delete

@@ -23,8 +23,20 @@ class ListController extends Controller
     public function index()
     {
         $views = DB::select('SHOW FULL TABLES WHERE Table_type = "VIEW"');
-        return Inertia::render('List/Index')->with(compact('views'));
-        // return view('lists.index', compact('views'));
+
+        // For PostgreSQL alternative:
+        // $views = DB::select("SELECT viewname as Name FROM pg_views WHERE schemaname NOT IN ('pg_catalog', 'information_schema')");
+
+        // Format the data properly
+        $formattedViews = array_map(function ($view) {
+            return [
+                'Name' => $view->{'Tables_in_' . env('DB_DATABASE')} ?? ($view->Name ?? $view->viewname),
+            ];
+        }, $views);
+
+        return Inertia::render('List/Index', [
+            'views' => $formattedViews,
+        ]);
     }
 
     /**
@@ -44,21 +56,22 @@ class ListController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $viewExists = DB::table('information_schema.views') // Corrected table name.
-            ->where('TABLE_NAME', $request->input('view_name'))
-            ->exists();
+        $viewExists = DB::table('information_schema.views')->where('TABLE_NAME', $request->input('view_name'))->exists();
 
         if ($viewExists) {
-            redirect()->back()->withErrors(['view_name' => ['The view name is already taken.']])->withInput();
-            // return response()->json(['errors' => ], 422);
+            return redirect()
+                ->back()
+                ->withErrors(['view_name' => ['The view name is already taken.']])
+                ->withInput();
         }
 
         $tableNames = implode(',', DB::connection()->getDoctrineSchemaManager()->listTableNames());
         $validator = Validator::make($request->all(), [
-            'view_name' => 'required|string', // Ensure unique view name
+            'view_name' => 'required|string',
             'table_name' => 'required|string|in:' . $tableNames,
             'columns' => 'nullable|array',
-            'columns.*' => 'string',
+            'columns.*.name' => 'required|string', // Changed to handle column objects
+            'columns.*.alias' => 'nullable|string', // New field for aliases
             'where_conditions' => 'nullable|array',
             'where_conditions.*.column' => 'required|string',
             'where_conditions.*.operator' => 'required|string|in:==,!=,<,>,<=,>=,LIKE,NOT LIKE,IN,NOT IN',
@@ -80,16 +93,19 @@ class ListController extends Controller
 
         $viewName = $request->input('view_name');
         $tableName = $request->input('table_name');
-        $columns = $request->input('columns', ['*']);
+        $columns = $request->input('columns', [['name' => '*']]);
         $whereConditions = $request->input('where_conditions', []);
         $orderByColumn = $request->input('order_by_column');
         $orderByDirection = $request->input('order_by_direction', 'asc');
         $limit = $request->input('limit');
         $joins = $request->input('joins', []);
 
-        // Build the SELECT query string
-        $selectQuery = DB::table($tableName)
-            ->select($columns);
+        // Build the SELECT query string with column aliases
+        $selectColumns = array_map(function ($column) {
+            return $column['alias'] ? "{$column['name']} as {$column['alias']}" : $column['name'];
+        }, $columns);
+
+        $selectQuery = DB::table($tableName)->selectRaw(implode(', ', $selectColumns));
 
         // Handle joins
         foreach ($joins as $join) {
@@ -97,13 +113,10 @@ class ListController extends Controller
             $operator = $join['operator'] ?? '=';
             $selectQuery->join($join['table'], $join['first_column'], $operator, $join['second_column'], $joinType);
         }
+
         // Handle where conditions
         foreach ($whereConditions as $condition) {
-            $selectQuery->where(
-                $condition['column'],
-                $condition['operator'],
-                $condition['value']
-            );
+            $selectQuery->where($condition['column'], $condition['operator'], $condition['value']);
         }
 
         // Handle order by
@@ -115,17 +128,12 @@ class ListController extends Controller
         if ($limit) {
             $selectQuery->limit($limit);
         }
-        // Get the SQL query string
-        $sql = $selectQuery->toSql();
-
-        dd($sql);
 
         // Create the view
-        DB::statement("CREATE VIEW {$viewName} AS {$sql}");
+        DB::statement("CREATE VIEW {$viewName} AS {$selectQuery->toSql()}");
 
         return redirect()->route('admin.lists.index')->with('success', 'List view created successfully!');
     }
-
     /**
      * Display the specified resource.
      *
@@ -179,16 +187,13 @@ class ListController extends Controller
      */
     public function destroy(string $viewName): RedirectResponse
     {
-        // Check if the view exists before attempting to drop it.
-        $viewExists = DB::select("SHOW TABLES LIKE '{$viewName}'");
-        if (!$viewExists) {
-            return redirect()->route('lists.index')->with('error', 'View does not exist.'); //Or throw an exception
+        try {
+            DB::statement("DROP VIEW IF EXISTS `{$viewName}`");
+            return redirect()->back()->with('success', 'View deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to delete view: ' . $e->getMessage());
         }
-        DB::statement("DROP VIEW IF EXISTS {$viewName}");
-
-        return redirect()->route('lists.index')->with('success', 'List view deleted successfully!');
     }
-
 
     /**
      * Fetches the columns for a given table.
