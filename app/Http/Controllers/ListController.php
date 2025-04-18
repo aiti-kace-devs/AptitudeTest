@@ -46,7 +46,10 @@ class ListController extends Controller
      */
     public function create()
     {
-        $tables = DB::connection()->getDoctrineSchemaManager()->listTableNames();
+        $dbtables = DB::connection()->getDoctrineSchemaManager()->listTableNames();
+        $dbviews = DB::select('SHOW FULL TABLES WHERE Table_type = "VIEW"');
+        // dump($dbtables, $dbviews);
+        $tables = array_merge($dbtables, $dbviews);
         return Inertia::render('List/Create', compact('tables'));
     }
 
